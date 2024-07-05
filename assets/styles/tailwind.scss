@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --primary: 24, 119, 242;
+        --secondary: 45, 63, 123;
+        --tertiary: 40, 53, 68;
+
+        --success: 101, 244, 13;
+        --info: 7, 166, 255;
+        --warning: 246, 223, 11;
+        --error: 215, 6, 6;
+
+        --surface: 245, 245, 245;
+    }
+
+    :root.dark {
+        --primary: 0, 0, 0;
+    }
+
+    // @media (prefers-color-scheme: dark) {
+    //     :root {
+    //         --primary: 0, 0, 0;
+    //     }
+    // }
+
+    // :root[data-theme="dark"] {
+    //     --primary: 0, 0, 0;
+    // }
+}

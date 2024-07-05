@@ -1,0 +1,180 @@
+// Using Fluid Typography from this article: https://www.aleksandrhovhannisyan.com/blog/fluid-type-scale-with-css-clamp/
+
+@use "sass:math";
+@use "sass:map";
+@use "sass:list";
+
+// Default Min and Max resolutions supported: Set as per "display thresholds" of Vuetify and UnoCSS configs.
+$default-min-bp: 640;
+$default-max-bp: 1920;
+
+// Base Font Size
+$type-base-min: 12; // 12px for resolution of 640px
+$type-base-max: 16; // 16px for resolution of 1920px
+
+// Type Scale Ratio
+$type-scale-min: 1.067; // Minor second
+$type-scale-max: 1.125; // Major second
+
+$type-steps: "xs", "sm", "md", "base", "lg", "xl", "xxl", "3xl", "4xl", "5xl";
+$type-base-index: list.index($type-steps, "md");
+
+@function to-rems($px) {
+    $rems: math.div($px, 16) * 1rem;
+    @return $rems;
+}
+
+@function rnd($number, $places: 0) {
+    $n: 1;
+    @if $places > 0 {
+        @for $i from 1 through $places {
+            $n: $n * 10;
+        }
+    }
+    @return math.div(math.round($number * $n), $n);
+}
+
+@function clamped($min-px, $max-px, $min-bp: $default-min-bp, $max-bp: $default-max-bp) {
+    $slope: math.div($max-px - $min-px, $max-bp - $min-bp);
+    $slope-vw: rnd($slope * 100, 2);
+    $intercept-rems: rnd(to-rems($min-px - $slope * $min-bp), 2);
+    $min-rems: rnd(to-rems($min-px), 2);
+    $max-rems: rnd(to-rems($max-px), 2);
+    @return clamp(#{$min-rems}, #{$slope-vw}vw + #{$intercept-rems}, #{$max-rems});
+}
+
+:root {
+    @for $i from 1 through length($type-steps) {
+        $step: list.nth($type-steps, $i);
+        $power: $i - $type-base-index;
+        $min: $type-base-min * math.pow($type-scale-min, $power);
+        $max: $type-base-max * math.pow($type-scale-max, $power);
+        --font-#{$step}: #{clamped($min, $max)};
+    }
+
+    --font-label: "Noto Sans", Georgia, Garamond, serif;
+    --font-body: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-mono: "Noto Sans", monospace;
+}
+
+/*Headlines are best-suited for short, high-emphasis text on smaller screens. These styles can be good for marking primary passages of text or important regions of content.*/
+
+.headline-large {
+    font-family: var(--font-body);
+    line-height: 2.5rem;
+    font-size: var(--font-5xl, 2rem);
+    font-weight: 700;
+    letter-spacing: normal;
+    max-width: 60ch;
+}
+
+.headline-medium {
+    font-family: var(--font-body);
+    line-height: 2rem;
+    font-size: var(--font-3xl, 1.8rem);
+    font-weight: 600;
+    letter-spacing: normal;
+    max-width: 60ch;
+}
+
+.headline-small {
+    font-family: var(--font-body);
+    line-height: 2rem;
+    font-size: var(--font-xxl, 1.5rem);
+    font-weight: 400;
+    letter-spacing: normal;
+    max-width: 60ch;
+}
+
+/*Titles are smaller than headline styles, and should be used for medium-emphasis text that remains relatively short. For example, consider using title styles to divide secondary passages of text or secondary regions of content.*/
+
+.title-large {
+    font-family: var(--font-body);
+    line-height: 2;
+    font-size: var(--font-xl, 1.25rem);
+    font-weight: 400;
+    letter-spacing: normal;
+    max-width: 60ch;
+}
+
+.title-medium {
+    font-family: var(--font-body);
+    line-height: 1.8;
+    font-size: var(--font-lg, 1.125rem);
+    font-weight: 500;
+    letter-spacing: 0.015rem;
+    max-width: 60ch;
+}
+
+.title-small {
+    font-family: var(--font-body);
+    line-height: 1.6;
+    font-size: var(--font-base, 1rem);
+    font-weight: 500;
+    letter-spacing: 0.01rem;
+    max-width: 60ch;
+}
+
+/*Label styles are smaller, utilitarian styles, used for things like the text inside components or for very small text in the content body, such as captions.*/
+
+.label-large {
+    font-family: var(--font-label);
+    line-height: 1.6;
+    font-size: var(--font-base, 1rem);
+    font-weight: 500;
+    letter-spacing: 0.01rem;
+    max-width: 60ch;
+}
+
+.label-medium {
+    font-family: var(--font-label);
+    line-height: 1.6;
+    font-size: var(--font-md, 0.9rem);
+    font-weight: 500;
+    letter-spacing: 0.05rem;
+    max-width: 80ch;
+}
+
+.label-small {
+    font-family: var(--font-label);
+    line-height: 1.5;
+    font-size: var(--font-sm, 0.8rem);
+    font-weight: 500;
+    letter-spacing: 0.05rem;
+    max-width: 100ch;
+}
+
+/*Body styles are used for longer passages of text in your app.*/
+
+.body-large {
+    font-family: var(--font-body);
+    line-height: 1.6;
+    font-size: var(--font-md, 0.9rem);
+    font-weight: 400;
+    letter-spacing: 0.025rem;
+    max-width: 60ch;
+}
+
+.body-medium {
+    font-family: var(--font-body);
+    line-height: 1.5;
+    font-size: var(--font-sm, 0.8rem);
+    font-weight: 400;
+    letter-spacing: 0.04rem;
+    max-width: 80ch;
+}
+
+.body-small {
+    font-family: var(--font-body);
+    line-height: 1.4;
+    font-size: var(--font-xs, 0.7rem);
+    font-weight: 400;
+    letter-spacing: 0.05rem;
+    max-width: 120ch;
+}
+
+/*numbers are all of the same size*/
+.number {
+    font-family: var(--font-body);
+    font-variant-numeric: tabular-nums;
+}

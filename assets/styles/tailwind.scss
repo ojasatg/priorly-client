@@ -4,6 +4,7 @@
 
 @layer base {
     :root {
+        // colors
         --primary: 24, 119, 242;
         --secondary: 45, 63, 123;
         --tertiary: 40, 53, 68;
@@ -14,6 +15,9 @@
         --error: 215, 6, 6;
 
         --surface: 245, 245, 245;
+
+        // transitions
+        --main-ease: cubic-bezier(0.65, 0.05, 0.36, 1);
     }
 
     :root.dark {

@@ -52,18 +52,26 @@ $type-base-index: list.index($type-steps, "md");
         --font-#{$step}: #{clamped($min, $max)};
     }
 
-    --font-label: "Noto Sans", Georgia, Garamond, serif;
     --font-body: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    --font-mono: "Noto Sans", monospace;
+
+    --font-headline-size: 1.5rem;
+    --font-title-size: 1.25rem;
+    --font-label-size: 0.75rem;
+    --font-body-size: 1rem;
+
+    --headline-weight: 600;
+    --title-weight: 500;
+    --body-weight: 400;
+    --label-weight: 400;
 }
 
 /*Headlines are best-suited for short, high-emphasis text on smaller screens. These styles can be good for marking primary passages of text or important regions of content.*/
 
 .headline-large {
     font-family: var(--font-body);
-    line-height: 2.5rem;
-    font-size: var(--font-5xl, 2rem);
-    font-weight: 700;
+    line-height: 2rem;
+    font-size: calc(var(--font-headline-size) * 2);
+    font-weight: var(--headline-weight);
     letter-spacing: normal;
     max-width: 60ch;
 }
@@ -71,8 +79,8 @@ $type-base-index: list.index($type-steps, "md");
 .headline-medium {
     font-family: var(--font-body);
     line-height: 2rem;
-    font-size: var(--font-3xl, 1.8rem);
-    font-weight: 600;
+    font-size: var(--font-headline-size);
+    font-weight: var(--headline-weight);
     letter-spacing: normal;
     max-width: 60ch;
 }
@@ -80,8 +88,8 @@ $type-base-index: list.index($type-steps, "md");
 .headline-small {
     font-family: var(--font-body);
     line-height: 2rem;
-    font-size: var(--font-xxl, 1.5rem);
-    font-weight: 400;
+    font-size: calc(var(--font-headline-size) * 5 / 6);
+    font-weight: var(--headline-weight);
     letter-spacing: normal;
     max-width: 60ch;
 }
@@ -91,8 +99,8 @@ $type-base-index: list.index($type-steps, "md");
 .title-large {
     font-family: var(--font-body);
     line-height: 2;
-    font-size: var(--font-xl, 1.25rem);
-    font-weight: 400;
+    font-size: calc(var(--font-title-size) * 6 / 5);
+    font-weight: var(--title-weight);
     letter-spacing: normal;
     max-width: 60ch;
 }
@@ -100,8 +108,8 @@ $type-base-index: list.index($type-steps, "md");
 .title-medium {
     font-family: var(--font-body);
     line-height: 1.8;
-    font-size: var(--font-lg, 1.125rem);
-    font-weight: 500;
+    font-size: var(--font-title-size);
+    font-weight: var(--title-weight);
     letter-spacing: 0.015rem;
     max-width: 60ch;
 }
@@ -109,8 +117,8 @@ $type-base-index: list.index($type-steps, "md");
 .title-small {
     font-family: var(--font-body);
     line-height: 1.6;
-    font-size: var(--font-base, 1rem);
-    font-weight: 500;
+    font-size: calc(var(--font-title-size) * 4 / 5);
+    font-weight: var(--title-weight);
     letter-spacing: 0.01rem;
     max-width: 60ch;
 }
@@ -118,28 +126,28 @@ $type-base-index: list.index($type-steps, "md");
 /*Label styles are smaller, utilitarian styles, used for things like the text inside components or for very small text in the content body, such as captions.*/
 
 .label-large {
-    font-family: var(--font-label);
+    font-family: var(--font-body);
     line-height: 1.6;
-    font-size: var(--font-base, 1rem);
-    font-weight: 500;
+    font-size: calc(var(--font-label-size) * 4 / 3);
+    font-weight: var(--label-weight);
     letter-spacing: 0.01rem;
     max-width: 60ch;
 }
 
 .label-medium {
-    font-family: var(--font-label);
+    font-family: var(--font-body);
     line-height: 1.6;
-    font-size: var(--font-md, 0.9rem);
-    font-weight: 500;
+    font-size: var(--font-label-size);
+    font-weight: var(--label-weight);
     letter-spacing: 0.05rem;
     max-width: 80ch;
 }
 
 .label-small {
-    font-family: var(--font-label);
+    font-family: var(--font-body);
     line-height: 1.5;
-    font-size: var(--font-sm, 0.8rem);
-    font-weight: 500;
+    font-size: calc(var(--font-label-size) * 2 / 3);
+    font-weight: var(--label-weight);
     letter-spacing: 0.05rem;
     max-width: 100ch;
 }
@@ -149,8 +157,8 @@ $type-base-index: list.index($type-steps, "md");
 .body-large {
     font-family: var(--font-body);
     line-height: 1.6;
-    font-size: var(--font-md, 0.9rem);
-    font-weight: 400;
+    font-size: calc(var(--font-body-size) * 5 / 4);
+    font-weight: var(--body-weight);
     letter-spacing: 0.025rem;
     max-width: 60ch;
 }
@@ -158,8 +166,8 @@ $type-base-index: list.index($type-steps, "md");
 .body-medium {
     font-family: var(--font-body);
     line-height: 1.5;
-    font-size: var(--font-sm, 0.8rem);
-    font-weight: 400;
+    font-size: var(--font-body-size);
+    font-weight: var(--body-weight);
     letter-spacing: 0.04rem;
     max-width: 80ch;
 }
@@ -167,8 +175,8 @@ $type-base-index: list.index($type-steps, "md");
 .body-small {
     font-family: var(--font-body);
     line-height: 1.4;
-    font-size: var(--font-xs, 0.7rem);
-    font-weight: 400;
+    font-size: calc(var(--font-body-size) * 3 / 4);
+    font-weight: var(--body-weight);
     letter-spacing: 0.05rem;
     max-width: 120ch;
 }

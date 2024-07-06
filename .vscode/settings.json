@@ -5,5 +5,5 @@
     "editor.detectIndentation": false,
 
     "eslint.validate": ["javascript", "typescript", "svelte"],
-    "cSpell.words": ["iconify", "priorly", "skeletonlabs", "tailwindcss"]
+    "cSpell.words": ["felte", "iconify", "priorly", "skeletonlabs", "tailwindcss"]
 }

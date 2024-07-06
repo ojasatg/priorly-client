@@ -1,5 +1,7 @@
 import { join } from "path";
 import { skeleton } from "@skeletonlabs/tw-plugin";
+import tailwindForms from "@tailwindcss/forms";
+
 import { priorlyTheme } from "./assets/theme/priorlyTheme";
 
 export default {
@@ -20,7 +22,7 @@ export default {
                 warning: "rgba(var(--warning))",
                 error: "rgba(var(--error))",
 
-                surface: "rgba(var(--surface1))",
+                surface: "rgba(var(--surface))",
             },
         },
     },
@@ -30,5 +32,6 @@ export default {
                 custom: [priorlyTheme],
             },
         }),
+        tailwindForms,
     ],
 };

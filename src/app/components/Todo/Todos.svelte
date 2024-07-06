@@ -1,10 +1,12 @@
 <script lang="ts">
-    import { Button, Modal, Portal } from "stwui";
+    import { Button } from "stwui";
     import tooltip from "stwui/actions/tooltip";
 
     import { type TTodoResponseSchema } from "$schemas/response.schemas";
     import TodoForm from "./TodoForm.svelte";
     import TodoItem from "./TodoItem.svelte";
+
+    import PRDialog from "$lib/components/PRDialog.svelte";
 
     export let todos: TTodoResponseSchema[];
 
@@ -38,13 +40,17 @@
         </Button>
     </span>
 
-    <Portal>
+    <PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo item">
+        <TodoForm todo={selectedTodo} slot="content" />
+    </PRDialog>
+
+    <!-- <Portal>
         {#if showAddTodoForm}
             <Modal handleClose={() => (showAddTodoForm = false)}>
                 <Modal.Content slot="content">
-                    <TodoForm todo={selectedTodo} />
+                    
                 </Modal.Content>
             </Modal>
         {/if}
-    </Portal>
+    </Portal> -->
 </section>

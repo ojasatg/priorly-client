@@ -48,7 +48,7 @@
     }
 </script>
 
-<section class="flex flex-col gap-4 bg-white p-4">
+<section class="flex flex-col gap-4 bg-surface">
     <section class="flex flex-col gap-2">
         <Input
             name="title"

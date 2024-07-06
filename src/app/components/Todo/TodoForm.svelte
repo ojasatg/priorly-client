@@ -1,33 +1,52 @@
 <script lang="ts">
+    // node imports
     import { Button, CheckboxGroup, DatePicker, Input, TextArea, Toggle } from "stwui";
-    import Icon from "@iconify/svelte";
+    import type { SafeParseReturnType } from "zod";
+    import { getIcon } from "@iconify/svelte";
 
-    import type { TSchemaViewTodoItem } from "$schemas/views.schemas";
-    import { SchemaFormTodoItem, type TSchemaFormTodoItem } from "$schemas/forms.schemas";
+    // local imports
+    import type { TTodoResponseSchema } from "$schemas/response.schemas";
+    import { AddTodoReuestSchema, type TAddTodoReuestSchema } from "$schemas/request.schemas";
 
-    export let todo: TSchemaViewTodoItem;
+    // props
+    export let todo: TTodoResponseSchema;
 
-    let newTodo: TSchemaFormTodoItem = {};
+    // local consts
+    const iconAdd = getIcon("mdi:plus")?.body;
 
-    let title = "";
-    let description = "";
+    // local variables
+    let title = todo.title ?? "";
+    let description = todo.description ?? "";
 
-    let deadline: Date;
+    let deadline: Date | undefined = todo?.deadline ? new Date(todo.deadline * 1000) : undefined;
     let setDeadline = false;
 
-    let reminder: Date;
+    let reminder: Date | undefined = todo?.reminder ? new Date(todo.reminder * 1000) : undefined;
     let setReminder = false;
 
     let done = false;
 
-    function logData() {
-        console.log({
+    let addTodoValidationResult: SafeParseReturnType<TAddTodoReuestSchema, TAddTodoReuestSchema>;
+
+    // local functions
+    function resetValues() {
+        title = "";
+        description = "";
+        done = false;
+        deadline = undefined;
+        reminder = undefined;
+    }
+
+    function onAdd() {
+        const newTodo = {
             title,
             description,
-            deadline,
-            reminder,
             done,
-        });
+            reminder: reminder ? reminder?.getTime() / 1000 : undefined,
+            deadline: deadline ? deadline?.getTime() / 1000 : undefined,
+        };
+        addTodoValidationResult = AddTodoReuestSchema.safeParse(newTodo);
+        resetValues();
     }
 </script>
 
@@ -38,7 +57,7 @@
             placeholder="Enter a Title"
             bind:value={title}
             type="text"
-            error=""
+            error={addTodoValidationResult?.error?.formErrors?.fieldErrors?.title?.[0]}
             allowClear
         />
         <TextArea
@@ -46,7 +65,7 @@
             placeholder="Add a Description"
             bind:value={description}
             type="text"
-            error=""
+            error={addTodoValidationResult?.error?.formErrors?.fieldErrors?.description?.[0]}
             allowClear
         />
     </section>
@@ -72,7 +91,7 @@
                     label="Date"
                     placeholder="Pick a Deadline"
                     bind:value={deadline}
-                    error=""
+                    error={addTodoValidationResult?.error?.formErrors?.fieldErrors?.deadline?.[0]}
                 ></DatePicker>
             {/if}
 
@@ -88,14 +107,14 @@
                     label="Date"
                     placeholder="Add a Reminder"
                     bind:value={reminder}
-                    error=""
+                    error={addTodoValidationResult?.error?.formErrors?.fieldErrors?.reminder?.[0]}
                 ></DatePicker>
             {/if}
         {/if}
     </section>
     <section class="mt-4">
-        <Button type="primary" on:click={logData}>
-            <Icon icon="carbon:add" width="1.25rem" />
+        <Button type="primary" on:click={onAdd}>
+            <Button.Leading data={iconAdd} slot="leading" />
             Add
         </Button>
     </section>

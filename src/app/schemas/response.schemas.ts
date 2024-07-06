@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const SchemaViewTodoItem = z.object({
+export const TodoResponseSchema = z.object({
     id: z.string(),
     title: z.string(),
     description: z.string(),
@@ -8,6 +8,7 @@ export const SchemaViewTodoItem = z.object({
     created: z.number(),
     updated: z.number(),
     deadline: z.number(),
+    reminder: z.number(),
 });
 
-export type TSchemaViewTodoItem = z.infer<typeof SchemaViewTodoItem>;
+export type TTodoResponseSchema = z.infer<typeof TodoResponseSchema>;

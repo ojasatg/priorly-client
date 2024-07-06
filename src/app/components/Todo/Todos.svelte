@@ -1,16 +1,18 @@
 <script lang="ts">
-    import { type TSchemaViewTodoItem } from "$schemas/views.schemas";
+    import { type TTodoResponseSchema } from "$schemas/response.schemas";
     import TodoForm from "./TodoForm.svelte";
     import TodoItem from "./TodoItem.svelte";
 
-    export let todos: TSchemaViewTodoItem[];
+    export let todos: TTodoResponseSchema[];
 
-    const selectedTodo = {} as TSchemaViewTodoItem;
+    const selectedTodo = {} as TTodoResponseSchema;
 </script>
 
 <section>
-    {#each todos as todo}
-        <TodoItem {todo} />
-    {/each}
+    <section class="grid grid-cols-3 gap-2">
+        {#each todos as todo}
+            <TodoItem {todo} />
+        {/each}
+    </section>
     <TodoForm todo={selectedTodo} />
 </section>

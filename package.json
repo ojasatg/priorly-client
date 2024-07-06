@@ -48,9 +48,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@felte/reporter-svelte": "^1.1.11",
-    "@felte/validator-zod": "^1.0.17",
-    "felte": "^1.2.14",
     "zod": "^3.23.8"
   }
 }

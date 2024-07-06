@@ -41,7 +41,6 @@
         reminder = undefined;
     }
 
-    // todo: find a way to validate on every input change
     function onAdd() {
         const newTodo = {
             title,

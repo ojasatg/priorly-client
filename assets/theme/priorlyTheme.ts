@@ -1,4 +1,3 @@
-// todo: delete this file if not used
 export const priorlyTheme = {
     name: "priorly-theme",
     properties: {

@@ -1,5 +1,6 @@
 import tailwindForms from "@tailwindcss/forms";
 import stwui from "stwui/plugin";
+import { iconsPlugin, getIconCollections } from "@egoist/tailwindcss-icons";
 
 export default {
     darkMode: "selector",
@@ -20,7 +21,13 @@ export default {
             },
         },
     },
-    plugins: [tailwindForms, stwui],
+    plugins: [
+        tailwindForms,
+        stwui,
+        iconsPlugin({
+            collections: getIconCollections(["mdi"]),
+        }),
+    ],
     stwui: {
         themes: ["light", "dark"],
     },

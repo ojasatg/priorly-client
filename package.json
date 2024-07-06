@@ -15,6 +15,7 @@
     "clean": "rm -rf build && rm -rf .svelte-kit && rm -rf node_modules"
   },
   "devDependencies": {
+    "@egoist/tailwindcss-icons": "^1.8.1",
     "@fontsource/fira-mono": "^4.5.10",
     "@iconify/svelte": "^4.0.2",
     "@neoconfetti/svelte": "^1.0.0",
@@ -48,6 +49,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@iconify-json/mdi": "^1.1.67",
     "zod": "^3.23.8"
   }
 }

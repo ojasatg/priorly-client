@@ -12,7 +12,7 @@
             done: false,
             created: getCurrentTimeStamp(),
             updated: getCurrentTimeStamp(),
-            deadline: getCurrentTimeStamp(),
+            deadline: getCurrentTimeStamp() + 10000000,
             reminder: getCurrentTimeStamp(),
         },
         {
@@ -22,8 +22,8 @@
             done: false,
             created: getCurrentTimeStamp(),
             updated: getCurrentTimeStamp(),
-            deadline: getCurrentTimeStamp(),
-            reminder: getCurrentTimeStamp(),
+            deadline: getCurrentTimeStamp() + 20000000,
+            reminder: getCurrentTimeStamp() + 10000000,
         },
         {
             id: "xyz",

@@ -6,10 +6,10 @@ export function getCurrentTimeStamp() {
     return new Date().getTime() / 1000;
 }
 
-export function getFormattedTimestamp(timestamp: number) {
+export function getFormattedTimestamp(timestamp: number, options?: Intl.DateTimeFormatOptions) {
     const date = new Date(timestamp * 1000);
 
-    const options: Intl.DateTimeFormatOptions = {
+    const defaultOptions: Intl.DateTimeFormatOptions = options || {
         weekday: "long",
         day: "numeric",
         month: "long",
@@ -19,7 +19,21 @@ export function getFormattedTimestamp(timestamp: number) {
         hour12: true, // Use 12-hour format with AM/PM
     };
 
-    const formatter = new Intl.DateTimeFormat("en-US", options);
+    const formatter = new Intl.DateTimeFormat("en-US", options || defaultOptions);
     const formattedDateTime = formatter.format(date);
     return formattedDateTime;
+}
+
+export function getDaysDifferenceFromTimestamp(d1: number, d2?: number) {
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    const date1 = new Date(d1 * 1000);
+    const date2 = d2 ? new Date(d2 * 1000) : new Date();
+
+    // Discard the time and time-zone information.
+    const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
+    const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+
+    const diff = Math.abs(Math.floor((utc2 - utc1) / MS_PER_DAY));
+    return diff;
 }

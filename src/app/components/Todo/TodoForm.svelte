@@ -2,7 +2,6 @@
     // node imports
     import { Button, CheckboxGroup, DatePicker, Input, TextArea, Toggle } from "stwui";
     import type { SafeParseReturnType } from "zod";
-    import { getIcon } from "@iconify/svelte";
 
     // local imports
     import type { TTodoResponseSchema } from "$schemas/response.schemas";
@@ -12,7 +11,6 @@
     export let todo: TTodoResponseSchema;
 
     // local consts
-    const iconAdd = getIcon("mdi:plus")?.body;
 
     // local variables
     let title = todo.title ?? "";
@@ -50,8 +48,8 @@
     }
 </script>
 
-<section>
-    <section>
+<section class="flex flex-col gap-4 bg-white p-4">
+    <section class="flex flex-col gap-2">
         <Input
             name="title"
             placeholder="Enter a Title"
@@ -69,7 +67,7 @@
             allowClear
         />
     </section>
-    <section class="mt-4 flex flex-col gap-4">
+    <section class="flex flex-col gap-4">
         <CheckboxGroup>
             <CheckboxGroup.Checkbox name="done" value="done" bind:checked={done}>
                 <CheckboxGroup.Checkbox.Label slot="label" class="label-medium"
@@ -112,10 +110,14 @@
             {/if}
         {/if}
     </section>
-    <section class="mt-4">
-        <Button type="primary" on:click={onAdd}>
-            <Button.Leading data={iconAdd} slot="leading" />
-            Add
+    <section class="ml-auto w-fit">
+        <Button on:click={onAdd} size="sm" class="text-gray-600">
+            <span slot="leading" class="i-mdi-cancel h-6 w-6"></span>
+            <span class="body-medium">Cancel</span>
+        </Button>
+        <Button type="primary" on:click={onAdd} size="sm">
+            <span slot="leading" class="i-mdi-plus h-6 w-6"></span>
+            <span class="body-medium">Add</span>
         </Button>
     </section>
 </section>

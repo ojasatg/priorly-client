@@ -2,9 +2,7 @@
     import { type TSchemaViewTodoItem } from "$schemas/views.schemas";
     import Todos from "$components/Todo/Todos.svelte";
 
-    function getTimestamp() {
-        return new Date().getTime() / 1000;
-    }
+    import { getCurrentTimeStamp } from "$lib/utils/datetime.utils";
 
     const todos: TSchemaViewTodoItem[] = [
         {
@@ -12,27 +10,27 @@
             title: "Complete assignment",
             description: "Finish the project by the end of the week",
             done: false,
-            created: getTimestamp(),
-            updated: getTimestamp(),
-            deadline: getTimestamp(),
+            created: getCurrentTimeStamp(),
+            updated: getCurrentTimeStamp(),
+            deadline: getCurrentTimeStamp(),
         },
         {
             id: "pqr",
             title: "Buy groceries",
             description: "Pick up vegetables and fruits from the market",
             done: false,
-            created: getTimestamp(),
-            updated: getTimestamp(),
-            deadline: getTimestamp(),
+            created: getCurrentTimeStamp(),
+            updated: getCurrentTimeStamp(),
+            deadline: getCurrentTimeStamp(),
         },
         {
             id: "xyz",
             title: "Call client",
             description: "Discuss the new project requirements",
             done: true,
-            created: getTimestamp(),
-            updated: getTimestamp(),
-            deadline: getTimestamp(),
+            created: getCurrentTimeStamp(),
+            updated: getCurrentTimeStamp(),
+            deadline: getCurrentTimeStamp(),
         },
     ];
 </script>

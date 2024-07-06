@@ -1,6 +1,6 @@
 <script lang="ts">
     import { type TSchemaViewTodoItem } from "../../schemas/views.schemas";
-    import { getFormattedTimestamp } from "$lib/utils/formatters.utils";
+    import { getFormattedTimestamp } from "$lib/utils/datetime.utils";
 
     export let todo: TSchemaViewTodoItem;
 </script>

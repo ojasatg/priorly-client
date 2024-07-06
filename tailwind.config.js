@@ -1,11 +1,9 @@
-import { join } from "path";
 import tailwindForms from "@tailwindcss/forms";
-
-import { priorlyTheme } from "./assets/theme/priorlyTheme";
+import stwui from "stwui/plugin";
 
 export default {
     darkMode: "selector",
-    content: ["./src/**/*.{html,js,svelte,ts}"],
+    content: ["./src/**/*.{html,js,svelte,ts}", "./node_modules/stwui/**/*.{svelte,js,ts,html}"],
     theme: {
         extend: {
             colors: {
@@ -22,5 +20,8 @@ export default {
             },
         },
     },
-    plugins: [tailwindForms],
+    plugins: [tailwindForms, stwui],
+    stwui: {
+        themes: ["light", "dark"],
+    },
 };

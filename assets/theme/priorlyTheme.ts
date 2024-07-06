@@ -1,6 +1,4 @@
-import type { CustomThemeConfig } from "@skeletonlabs/tw-plugin";
-
-export const priorlyTheme: CustomThemeConfig = {
+export const priorlyTheme = {
     name: "priorly-theme",
     properties: {
         // =~= Theme Properties =~=

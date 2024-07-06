@@ -4,6 +4,5 @@
     "editor.formatOnSave": true,
     "editor.detectIndentation": false,
 
-    "eslint.validate": ["javascript", "typescript", "svelte"],
-    "cSpell.words": ["felte", "iconify", "priorly", "skeletonlabs", "tailwindcss"]
+    "eslint.validate": ["javascript", "typescript", "svelte"]
 }

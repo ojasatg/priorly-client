@@ -1,6 +1,5 @@
 <script lang="ts">
     import { spring } from "svelte/motion";
-    import { FileButton, LightSwitch } from "@skeletonlabs/skeleton";
     import Icon from "@iconify/svelte";
 
     let count = 0;

@@ -10,33 +10,22 @@
 
     let title = "";
     let description = "";
+    let setDeadline = false;
     let deadline = 0;
     let done = false;
-
-    function logTitle() {
-        console.log("title updated: ", title);
-    }
-
-    function logDescription() {
-        console.log("description updated: ", description);
-    }
 </script>
 
 <section>
-    <PRInput
-        name={"title"}
-        bind:modelValue={title}
-        label={"Title"}
-        error={"This is an error"}
-        on:updateModelValue={logTitle}
-    />
+    <section>
+        <PRInput name={"title"} bind:modelValue={title} label={"Title"} error={"title error"} />
 
-    <PrTextArea
-        name={"title"}
-        bind:modelValue={description}
-        label={"Description"}
-        error={"This is an error"}
-        rows={8}
-        on:updateModelValue={logDescription}
-    />
+        <PrTextArea
+            name={"title"}
+            bind:modelValue={description}
+            label={"Description"}
+            error={"description error"}
+            rows={8}
+        />
+    </section>
+    <section></section>
 </section>

@@ -18,8 +18,10 @@
     export let beforeSubmit: TBeforeFunction;
     export let beforeCancel: TBeforeFunction;
 
-    const dispatchSubmit = createEventDispatcher<{ submit: { success: boolean } }>();
-    const dispatchCancel = createEventDispatcher<{ cancel: { success: boolean } }>();
+    const dispatcEvent = createEventDispatcher<{
+        submit: { success: boolean };
+        cancel: { success: boolean };
+    }>();
 
     $: text_color_class = `text-${type}`;
     $: title_icon = PROMPT_ICON_MAP[type];
@@ -28,11 +30,11 @@
         if (beforeSubmit && typeof beforeSubmit === "function") {
             const abort = beforeSubmit();
             if (abort) {
-                dispatchSubmit("submit", { success: false });
+                dispatcEvent("submit", { success: false });
                 return;
             }
         }
-        dispatchSubmit("submit", { success: true });
+        dispatcEvent("submit", { success: true });
         modelValue = false;
     }
 
@@ -40,11 +42,11 @@
         if (beforeCancel && typeof beforeCancel === "function") {
             const abort = beforeCancel();
             if (abort) {
-                dispatchCancel("cancel", { success: false });
+                dispatcEvent("cancel", { success: false });
                 return;
             }
         }
-        dispatchCancel("cancel", { success: true });
+        dispatcEvent("cancel", { success: true });
         modelValue = false;
     }
 </script>

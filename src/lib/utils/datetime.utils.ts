@@ -34,6 +34,6 @@ export function getDaysDifferenceFromTimestamp(d1: number, d2?: number) {
     const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
     const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
 
-    const diff = Math.abs(Math.floor((utc2 - utc1) / MS_PER_DAY));
+    const diff = Math.floor((utc1 - utc2) / MS_PER_DAY);
     return diff;
 }

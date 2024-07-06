@@ -1,6 +1,6 @@
 <script lang="ts">
     // node imports
-    import { Button, Divider } from "stwui";
+    import { Button } from "stwui";
     import tooltip from "stwui/actions/tooltip";
 
     // local imports
@@ -10,17 +10,23 @@
         getDaysDifferenceFromTimestamp,
     } from "$lib/utils/datetime.utils";
 
+    const CUSTOM_DATE_OPTIONS = {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    };
+
     export let todo: TTodoResponseSchema;
 
     const daysRemainingFromDeadline = getDaysDifferenceFromTimestamp(todo.deadline);
 
-    $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "text-gray-400";
+    $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
 </script>
 
 <section>
-    <section class="card w-[20rem] rounded-md bg-white px-4 pb-4 pt-2 shadow-md shadow-gray-400">
+    <section class="card w-80 rounded-md bg-white px-4 pb-4 pt-2 shadow-md shadow-gray-400">
         <header class="flex items-center justify-between">
-            <p class="title-medium card-header p-0">{todo.title}</p>
+            <p class="title-medium card-header p-0" class:line-through={todo.done}>{todo.title}</p>
             <span
                 use:tooltip={{
                     placement: "top",
@@ -36,17 +42,22 @@
         </header>
         <p class="body-medium my-4 text-wrap">{todo.description}</p>
         <section class="card-footer mt-2 p-0">
-            <section class="mb-2">
-                <p class="label-medium inline text-gray-400">Created at</p>
-                <p class="label-medium inline">{getFormattedTimestamp(todo.created)}</p>
+            <section>
+                <p class="label-medium inline text-gray-400">Created on</p>
+                <p class="label-medium inline">
+                    {getFormattedTimestamp(todo.created, CUSTOM_DATE_OPTIONS)}
+                </p>
+            </section>
+            <section>
+                <p class="label-medium inline text-gray-400">Last updated on</p>
+                <p class="label-medium inline">
+                    {getFormattedTimestamp(todo.updated, CUSTOM_DATE_OPTIONS)}
+                </p>
             </section>
 
-            {#if todo.reminder || todo.deadline}
-                <Divider />
-            {/if}
-
-            {#if todo.reminder || todo.deadline}
-                <section class="mt-4 flex flex-col gap-1">
+            {#if todo.reminder || todo.deadline || todo.completed}
+                <hr class="my-2" />
+                <section class="flex flex-col gap-1">
                     {#if todo.reminder}
                         <section
                             use:tooltip={{
@@ -55,7 +66,7 @@
                                 arrow: false,
                                 animation: "scale",
                             }}
-                            class="card-footer flex items-center gap-1 p-0 text-gray-400"
+                            class="card-footer flex items-center gap-1 p-0"
                         >
                             <span class="i-mdi-alarm"></span>
                             <p class="label-medium inline">
@@ -63,7 +74,7 @@
                             </p>
                         </section>
                     {/if}
-                    {#if todo.reminder}
+                    {#if todo.deadline}
                         <section
                             use:tooltip={{
                                 placement: "bottom-start",
@@ -75,11 +86,24 @@
                         >
                             <span class="i-mdi-clock-alert-outline"></span>
                             <p class="label-medium inline">
-                                {getFormattedTimestamp(todo.deadline, {
-                                    day: "numeric",
-                                    month: "long",
-                                    year: "numeric",
-                                })}
+                                {getFormattedTimestamp(todo.deadline, CUSTOM_DATE_OPTIONS)}
+                            </p>
+                        </section>
+                    {/if}
+
+                    {#if todo.completed}
+                        <section
+                            use:tooltip={{
+                                placement: "bottom-start",
+                                content: "Completed",
+                                arrow: false,
+                                animation: "scale",
+                            }}
+                            class="card-footer flex items-center gap-1 p-0 text-success"
+                        >
+                            <span class="i-mdi-checkbox-marked-circle-outline"></span>
+                            <p class="label-medium inline">
+                                {getFormattedTimestamp(todo.completed)}
                             </p>
                         </section>
                     {/if}

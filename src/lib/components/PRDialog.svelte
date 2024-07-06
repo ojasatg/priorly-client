@@ -8,24 +8,24 @@
     export let title;
     export let subtitle;
 
-    export let beforeClose: TBeforeFunction;
+    export let beforeClose: TBeforeFunction = undefined;
 
-    const dispatchClose = createEventDispatcher<{ close: { success: boolean } }>();
+    const dispatchEvent = createEventDispatcher<{ close: { success: boolean } }>();
 
     function onClose() {
         if (beforeClose && typeof beforeClose === "function") {
             const abort = beforeClose();
             if (abort) {
-                dispatchClose("close", { success: false });
+                dispatchEvent("close", { success: false });
                 return;
             }
         }
-        dispatchClose("close", { success: true });
+        dispatchEvent("close", { success: true });
         modelValue = false;
     }
 </script>
 
-<Portal class="bg-surface ">
+<Portal>
     {#if modelValue}<Modal handleClose={onClose}>
             <Modal.Content slot="content">
                 <Modal.Content.Header slot="header">

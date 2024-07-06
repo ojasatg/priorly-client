@@ -9,7 +9,7 @@
         --secondary: 45, 63, 123;
         --tertiary: 40, 53, 68;
 
-        --success: 101, 244, 13;
+        --success: 0, 165, 81;
         --info: 7, 166, 255;
         --warning: 246, 223, 11;
         --error: 215, 6, 6;
@@ -21,7 +21,8 @@
     }
 
     :root.dark {
-        --primary: 0, 0, 0;
+        // --primary: 0, 0, 0;
+        --surface: 0, 0, 0;
     }
 
     // @media (prefers-color-scheme: dark) {

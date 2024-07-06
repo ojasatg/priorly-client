@@ -29,6 +29,6 @@ export default {
         }),
     ],
     stwui: {
-        themes: ["light", "dark"],
+        themes: ["light"],
     },
 };

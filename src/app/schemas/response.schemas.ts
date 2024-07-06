@@ -7,8 +7,9 @@ export const TodoResponseSchema = z.object({
     done: z.boolean(),
     created: z.number(),
     updated: z.number(),
-    deadline: z.number(),
-    reminder: z.number(),
+    deadline: z.number().nullish(),
+    reminder: z.number().nullish(),
+    completed: z.number().nullish(),
 });
 
 export type TTodoResponseSchema = z.infer<typeof TodoResponseSchema>;

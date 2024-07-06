@@ -1,5 +1,6 @@
 <script lang="ts">
     // node imports
+    import { createEventDispatcher } from "svelte";
     import { Button, CheckboxGroup, DatePicker, Input, TextArea, Toggle } from "stwui";
     import type { SafeParseReturnType } from "zod";
 
@@ -9,8 +10,6 @@
 
     // props
     export let todo: TTodoResponseSchema;
-
-    // local consts
 
     // local variables
     let title = todo.title ?? "";
@@ -26,6 +25,13 @@
 
     let addTodoValidationResult: SafeParseReturnType<TAddTodoReuestSchema, TAddTodoReuestSchema>;
 
+    // events
+    const dispatchEvent = createEventDispatcher<{
+        add: TAddTodoReuestSchema;
+        cancel: null;
+        close: null;
+    }>();
+
     // local functions
     function resetValues() {
         title = "";
@@ -35,6 +41,7 @@
         reminder = undefined;
     }
 
+    // todo: find a way to validate on every input change
     function onAdd() {
         const newTodo = {
             title,
@@ -44,7 +51,16 @@
             deadline: deadline ? deadline?.getTime() / 1000 : undefined,
         };
         addTodoValidationResult = AddTodoReuestSchema.safeParse(newTodo);
+
+        if (addTodoValidationResult.success) {
+            dispatchEvent("add", newTodo);
+        }
         resetValues();
+        dispatchEvent("close");
+    }
+
+    function onCancel() {
+        dispatchEvent("cancel");
     }
 </script>
 
@@ -111,7 +127,7 @@
         {/if}
     </section>
     <section class="ml-auto w-fit">
-        <Button on:click={onAdd} size="sm" class="text-gray-600">
+        <Button on:click={onCancel} size="sm" class="text-gray-600">
             <span slot="leading" class="i-mdi-cancel h-6 w-6"></span>
             <span class="body-medium">Cancel</span>
         </Button>

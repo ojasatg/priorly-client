@@ -13,6 +13,14 @@
     const selectedTodo = {} as TTodoResponseSchema;
 
     let showAddTodoForm = false;
+
+    function onAdd(event) {
+        console.log(event.detail);
+    }
+
+    function onCancel() {
+        showAddTodoForm = false;
+    }
 </script>
 
 <section>
@@ -41,16 +49,12 @@
     </span>
 
     <PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo item">
-        <TodoForm todo={selectedTodo} slot="content" />
+        <TodoForm
+            todo={selectedTodo}
+            on:add={onAdd}
+            on:cancel={onCancel}
+            on:close={onCancel}
+            slot="content"
+        />
     </PRDialog>
-
-    <!-- <Portal>
-        {#if showAddTodoForm}
-            <Modal handleClose={() => (showAddTodoForm = false)}>
-                <Modal.Content slot="content">
-                    
-                </Modal.Content>
-            </Modal>
-        {/if}
-    </Portal> -->
 </section>

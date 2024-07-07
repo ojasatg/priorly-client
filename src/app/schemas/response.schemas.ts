@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const TodoResponseSchema = z.object({
+export const TodoAddResponseSchema = z.object({
     id: z.string(),
     title: z.string(),
     description: z.string(),
@@ -12,4 +12,4 @@ export const TodoResponseSchema = z.object({
     completed: z.number().nullish(),
 });
 
-export type TTodoResponseSchema = z.infer<typeof TodoResponseSchema>;
+export type TTodoAddResponseSchema = z.infer<typeof TodoAddResponseSchema>;

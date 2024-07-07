@@ -13,9 +13,14 @@ const config = {
         // See https://kit.svelte.dev/docs/adapters for more information about adapters.
         adapter: adapter(),
 
+        env: {
+            dir: "./",
+        },
+
         alias: {
             $components: "./src/app/components",
             $schemas: "./src/app/schemas",
+            $handlers: "./src/app/handlers",
         },
     },
 };

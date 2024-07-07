@@ -4,7 +4,7 @@
     import tooltip from "stwui/actions/tooltip";
 
     // local imports
-    import { type TTodoResponseSchema } from "$schemas/response.schemas";
+    import { type TTodoAddResponseSchema } from "$schemas/response.schemas";
     import {
         getFormattedTimestamp,
         getDaysDifferenceFromTimestamp,
@@ -16,7 +16,7 @@
         year: "numeric",
     };
 
-    export let todo: TTodoResponseSchema;
+    export let todo: TTodoAddResponseSchema;
 
     const daysRemainingFromDeadline = getDaysDifferenceFromTimestamp(todo.deadline ?? 0);
 

@@ -1,7 +1,7 @@
 import { getCurrentTimeStamp } from "$lib/utils/datetime.utils";
 import z from "zod";
 
-export const AddTodoRequestSchema = z.object({
+export const TodoAddRequestSchema = z.object({
     title: z
         .string()
         .min(1, "Title cannot be empty")
@@ -12,4 +12,4 @@ export const AddTodoRequestSchema = z.object({
     reminder: z.number().min(getCurrentTimeStamp(), "Date cannot be less than today").optional(),
 });
 
-export type TAddTodoRequestSchema = z.infer<typeof AddTodoRequestSchema>;
+export type TTodoAddRequestSchema = z.infer<typeof TodoAddRequestSchema>;

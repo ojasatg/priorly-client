@@ -2,20 +2,23 @@
     import { Button } from "stwui";
     import tooltip from "stwui/actions/tooltip";
 
-    import { type TTodoResponseSchema } from "$schemas/response.schemas";
+    import { type TTodoAddResponseSchema } from "$schemas/response.schemas";
     import TodoForm from "./TodoForm.svelte";
     import TodoItem from "./TodoItem.svelte";
 
     import PRDialog from "$lib/components/PRDialog.svelte";
+    import type { TTodoAddRequestSchema } from "$schemas/request.schemas";
+    import { useTodoCreate } from "../../services/todo.service";
 
-    export let todos: TTodoResponseSchema[];
+    export let todos: TTodoAddResponseSchema[];
 
-    const selectedTodo = {} as TTodoResponseSchema;
+    const selectedTodo = {} as TTodoAddResponseSchema;
 
     let showAddTodoForm = false;
 
-    function onAdd(event) {
-        console.log(event.detail);
+    async function onAdd(event: CustomEvent<TTodoAddRequestSchema>) {
+        const newTodo = event.detail;
+        useTodoCreate({ requestData: newTodo });
     }
 
     function onCancel() {

@@ -37,9 +37,7 @@
         </button>
     </div>
     <div class="headline-large text-primary">This is a demo text</div>
-    <FileButton name="files" button="btn variant-soft-primary">Upload</FileButton>
     <Icon icon="carbon:home" height="2rem" width="2rem" />
-    <LightSwitch />
 </div>
 
 <style lang="scss">

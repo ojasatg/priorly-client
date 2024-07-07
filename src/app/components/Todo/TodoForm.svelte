@@ -7,31 +7,30 @@
     import { validator } from "@felte/validator-zod";
 
     // local imports
-    import type { TTodoResponseSchema } from "$schemas/response.schemas";
-    import { AddTodoRequestSchema, type TAddTodoRequestSchema } from "$schemas/request.schemas";
+    import type { TTodoAddResponseSchema } from "$schemas/response.schemas";
+    import { TodoAddRequestSchema, type TTodoAddRequestSchema } from "$schemas/request.schemas";
 
     // props
-    export let todo: TTodoResponseSchema;
+    export let todo: TTodoAddResponseSchema;
 
     // events
     const dispatchEvent = createEventDispatcher<{
-        add: TAddTodoRequestSchema;
+        add: TTodoAddRequestSchema;
         cancel: null;
         close: null;
     }>();
 
     // local consts
     const { form: addTodoForm, errors: addTodoFormErrors } = createForm({
-        extend: validator({ schema: AddTodoRequestSchema }),
+        extend: validator({ schema: TodoAddRequestSchema }),
         validate: (values) => {
-            const result = AddTodoRequestSchema.safeParse(values);
+            const result = TodoAddRequestSchema.safeParse(values);
 
             if (!result.success) {
                 return result.error.formErrors.fieldErrors;
             }
         },
         onSubmit: (values) => {
-            console.log(values);
             dispatchEvent("add", values);
 
             // todo: move this onSuccess method of the createForm

@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { type TTodoResponseSchema } from "$schemas/response.schemas";
+    import { type TTodoAddResponseSchema } from "$schemas/response.schemas";
     import Todos from "$components/Todo/Todos.svelte";
 
     import { getCurrentTimeStamp } from "$lib/utils/datetime.utils";
 
-    const todos: TTodoResponseSchema[] = [
+    const todos: TTodoAddResponseSchema[] = [
         {
             id: "abc",
             title: "Complete assignment",

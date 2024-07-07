@@ -2,14 +2,43 @@
     // node imports
     import { createEventDispatcher } from "svelte";
     import { Button, CheckboxGroup, DatePicker, Input, TextArea, Toggle } from "stwui";
-    import type { SafeParseReturnType } from "zod";
+    import tooltip from "stwui/actions/tooltip";
+    import { createForm } from "felte";
+    import { validator } from "@felte/validator-zod";
 
     // local imports
     import type { TTodoResponseSchema } from "$schemas/response.schemas";
-    import { AddTodoReuestSchema, type TAddTodoReuestSchema } from "$schemas/request.schemas";
+    import { AddTodoRequestSchema, type TAddTodoRequestSchema } from "$schemas/request.schemas";
 
     // props
     export let todo: TTodoResponseSchema;
+
+    // events
+    const dispatchEvent = createEventDispatcher<{
+        add: TAddTodoRequestSchema;
+        cancel: null;
+        close: null;
+    }>();
+
+    // local consts
+    const { form: addTodoForm, errors: addTodoFormErrors } = createForm({
+        extend: validator({ schema: AddTodoRequestSchema }),
+        validate: (values) => {
+            const result = AddTodoRequestSchema.safeParse(values);
+
+            if (!result.success) {
+                return result.error.formErrors.fieldErrors;
+            }
+        },
+        onSubmit: (values) => {
+            console.log(values);
+            dispatchEvent("add", values);
+
+            // todo: move this onSuccess method of the createForm
+            resetValues();
+            dispatchEvent("close");
+        },
+    });
 
     // local variables
     let title = todo.title ?? "";
@@ -21,16 +50,7 @@
     let reminder: Date | undefined = todo?.reminder ? new Date(todo.reminder * 1000) : undefined;
     let setReminder = false;
 
-    let done = false;
-
-    let addTodoValidationResult: SafeParseReturnType<TAddTodoReuestSchema, TAddTodoReuestSchema>;
-
-    // events
-    const dispatchEvent = createEventDispatcher<{
-        add: TAddTodoReuestSchema;
-        cancel: null;
-        close: null;
-    }>();
+    let done = todo.done ?? false;
 
     // local functions
     function resetValues() {
@@ -41,98 +61,95 @@
         reminder = undefined;
     }
 
-    function onAdd() {
-        const newTodo = {
-            title,
-            description,
-            done,
-            reminder: reminder ? reminder?.getTime() / 1000 : undefined,
-            deadline: deadline ? deadline?.getTime() / 1000 : undefined,
-        };
-        addTodoValidationResult = AddTodoReuestSchema.safeParse(newTodo);
-
-        if (addTodoValidationResult.success) {
-            dispatchEvent("add", newTodo);
-        }
-        resetValues();
-        dispatchEvent("close");
-    }
-
     function onCancel() {
         dispatchEvent("cancel");
     }
 </script>
 
 <section class="flex flex-col gap-4 bg-surface">
-    <section class="flex flex-col gap-2">
-        <Input
-            name="title"
-            placeholder="Enter a Title"
-            bind:value={title}
-            type="text"
-            error={addTodoValidationResult?.error?.formErrors?.fieldErrors?.title?.[0]}
-            allowClear
-        />
-        <TextArea
-            name="description"
-            placeholder="Add a Description"
-            bind:value={description}
-            type="text"
-            error={addTodoValidationResult?.error?.formErrors?.fieldErrors?.description?.[0]}
-            allowClear
-        />
-    </section>
-    <section class="flex flex-col gap-4">
-        <CheckboxGroup>
-            <CheckboxGroup.Checkbox name="done" value="done" bind:checked={done}>
-                <CheckboxGroup.Checkbox.Label slot="label" class="label-medium"
-                    >Mark as done</CheckboxGroup.Checkbox.Label
-                >
-            </CheckboxGroup.Checkbox>
-        </CheckboxGroup>
-
-        {#if !done}
-            <Toggle bind:on={setDeadline}>
-                <Toggle.ContentLeft slot="content-left">
-                    <Toggle.ContentLeft.Label slot="label" class="label-medium ml-1"
-                        >Deadline</Toggle.ContentLeft.Label
+    <form use:addTodoForm>
+        <section class="flex flex-col gap-2">
+            <Input
+                name="title"
+                placeholder="Enter a Title"
+                bind:value={title}
+                type="text"
+                error={$addTodoFormErrors.title?.[0]}
+                allowClear
+            />
+            <TextArea
+                name="description"
+                placeholder="Add a Description"
+                bind:value={description}
+                type="text"
+                error={$addTodoFormErrors.description?.[0]}
+                allowClear
+            />
+        </section>
+        <section class="flex flex-col gap-4">
+            <CheckboxGroup>
+                <CheckboxGroup.Checkbox name="done" value="done" bind:checked={done}>
+                    <CheckboxGroup.Checkbox.Label slot="label" class="label-medium"
+                        >Mark as done</CheckboxGroup.Checkbox.Label
                     >
-                </Toggle.ContentLeft>
-            </Toggle>
-            {#if setDeadline}<DatePicker
-                    name="date"
-                    label="Date"
-                    placeholder="Pick a Deadline"
-                    bind:value={deadline}
-                    error={addTodoValidationResult?.error?.formErrors?.fieldErrors?.deadline?.[0]}
-                ></DatePicker>
-            {/if}
+                </CheckboxGroup.Checkbox>
+            </CheckboxGroup>
 
-            <Toggle bind:on={setReminder}>
-                <Toggle.ContentLeft slot="content-left">
-                    <Toggle.ContentLeft.Label slot="label" class="label-medium ml-1"
-                        >Reminder</Toggle.ContentLeft.Label
+            {#if !done}
+                <Toggle bind:on={setDeadline}>
+                    <Toggle.ContentLeft slot="content-left">
+                        <Toggle.ContentLeft.Label slot="label" class="label-medium ml-1"
+                            >Deadline</Toggle.ContentLeft.Label
+                        >
+                    </Toggle.ContentLeft>
+                </Toggle>
+                {#if setDeadline}<DatePicker
+                        name="date"
+                        label="Date"
+                        placeholder="Pick a Deadline"
+                        bind:value={deadline}
+                        error={$addTodoFormErrors.deadline?.[0]}
+                    ></DatePicker>
+                {/if}
+
+                <section class="flex items-center gap-2">
+                    <Toggle bind:on={setReminder}>
+                        <Toggle.ContentLeft slot="content-left">
+                            <Toggle.ContentLeft.Label slot="label" class="label-medium ml-1"
+                                >Reminder</Toggle.ContentLeft.Label
+                            >
+                        </Toggle.ContentLeft>
+                    </Toggle>
+                    <span
+                        class="i-mdi-information-outline h-5 w-5 text-primary"
+                        use:tooltip={{
+                            placement: "right",
+                            content: "Set a Reminder in your Google Calendar",
+                            arrow: false,
+                            animation: "scale",
+                        }}
                     >
-                </Toggle.ContentLeft>
-            </Toggle>
-            {#if setReminder}<DatePicker
-                    name="date"
-                    label="Date"
-                    placeholder="Add a Reminder"
-                    bind:value={reminder}
-                    error={addTodoValidationResult?.error?.formErrors?.fieldErrors?.reminder?.[0]}
-                ></DatePicker>
+                    </span>
+                </section>
+                {#if setReminder}<DatePicker
+                        name="date"
+                        label="Date"
+                        placeholder="Add a Reminder"
+                        bind:value={reminder}
+                        error={$addTodoFormErrors.reminder?.[0]}
+                    ></DatePicker>
+                {/if}
             {/if}
-        {/if}
-    </section>
-    <section class="ml-auto w-fit">
-        <Button on:click={onCancel} size="sm" class="text-gray-600">
-            <span slot="leading" class="i-mdi-cancel h-6 w-6"></span>
-            <span class="body-medium">Cancel</span>
-        </Button>
-        <Button type="primary" on:click={onAdd} size="sm">
-            <span slot="leading" class="i-mdi-plus h-6 w-6"></span>
-            <span class="body-medium">Add</span>
-        </Button>
-    </section>
+        </section>
+        <section class="ml-auto w-fit">
+            <Button on:click={onCancel} size="sm" class="text-gray-600">
+                <span slot="leading" class="i-mdi-cancel h-6 w-6"></span>
+                <span class="body-medium">Cancel</span>
+            </Button>
+            <Button type="primary" htmlType="submit" size="sm">
+                <span slot="leading" class="i-mdi-plus h-6 w-6"></span>
+                <span class="body-medium">Add</span>
+            </Button>
+        </section>
+    </form>
 </section>

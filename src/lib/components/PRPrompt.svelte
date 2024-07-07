@@ -2,10 +2,34 @@
     import { Portal, Modal, Button } from "stwui";
     import { createEventDispatcher } from "svelte";
 
-    type TBeforeFunction = (...args: unknown[]) => Promise<boolean | undefined> | undefined;
+    type TBeforeFunction = (...args: unknown[]) => Promise<boolean> | undefined;
     type TPromptType = "success" | "info" | "warning" | "error";
 
-    const PROMPT_ICON_MAP: Record<TPromptType, string> = {};
+    const PROMPT_DETAILS_MAP: Record<
+        TPromptType,
+        { icon: string; classColor: string; buttonType: "primary" | "danger" }
+    > = {
+        success: {
+            icon: "i-mdi-check-circle",
+            classColor: "text-success",
+            buttonType: "primary",
+        },
+        info: {
+            icon: "i-mdi-information",
+            classColor: "text-primary",
+            buttonType: "primary",
+        },
+        warning: {
+            icon: "i-mdi-alert-circle",
+            classColor: "text-warning",
+            buttonType: "danger",
+        },
+        error: {
+            icon: "i-mdi-alert-decagram",
+            classColor: "text-error",
+            buttonType: "danger",
+        },
+    };
 
     export let modelValue = false;
     export let title;
@@ -15,16 +39,17 @@
     export let submitText = "";
     export let cancelText = "";
 
-    export let beforeSubmit: TBeforeFunction;
-    export let beforeCancel: TBeforeFunction;
+    export let beforeSubmit: TBeforeFunction | undefined = undefined;
+    export let beforeCancel: TBeforeFunction | undefined = undefined;
 
     const dispatcEvent = createEventDispatcher<{
         submit: { success: boolean };
         cancel: { success: boolean };
     }>();
 
-    $: text_color_class = `text-${type}`;
-    $: title_icon = PROMPT_ICON_MAP[type];
+    $: text_color_class = PROMPT_DETAILS_MAP[type].classColor;
+    $: title_icon = PROMPT_DETAILS_MAP[type].icon;
+    $: primary_button_type = PROMPT_DETAILS_MAP[type].buttonType;
 
     function onSubmit() {
         if (beforeSubmit && typeof beforeSubmit === "function") {
@@ -75,7 +100,7 @@
                         <Button on:click={onCancel} size="sm" class="text-gray-600">
                             <span class="body-medium">{cancelText ?? "Cancel"}</span>
                         </Button>
-                        <Button {type} on:click={onSubmit} size="sm">
+                        <Button type={primary_button_type} on:click={onSubmit} size="sm">
                             <span class="body-medium">{submitText ?? "OK"}</span>
                         </Button>
                     </section>

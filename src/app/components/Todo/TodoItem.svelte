@@ -10,7 +10,7 @@
         getDaysDifferenceFromTimestamp,
     } from "$lib/utils/datetime.utils";
 
-    const CUSTOM_DATE_OPTIONS = {
+    const CUSTOM_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -18,7 +18,7 @@
 
     export let todo: TTodoResponseSchema;
 
-    const daysRemainingFromDeadline = getDaysDifferenceFromTimestamp(todo.deadline);
+    const daysRemainingFromDeadline = getDaysDifferenceFromTimestamp(todo.deadline ?? 0);
 
     $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
 </script>

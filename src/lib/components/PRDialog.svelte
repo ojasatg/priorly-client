@@ -2,13 +2,13 @@
     import { Portal, Modal, Button } from "stwui";
     import { createEventDispatcher } from "svelte";
 
-    type TBeforeFunction = (...args: unknown[]) => Promise<boolean | undefined> | undefined;
+    type TBeforeFunction = (...args: unknown[]) => Promise<boolean> | undefined;
 
-    export let modelValue;
+    export let modelValue: boolean;
     export let title;
     export let subtitle;
 
-    export let beforeClose: TBeforeFunction = undefined;
+    export let beforeClose: TBeforeFunction | undefined = undefined;
 
     const dispatchEvent = createEventDispatcher<{ close: { success: boolean } }>();
 
@@ -32,8 +32,8 @@
                     <section class="flex flex-col justify-between">
                         <section class="flex items-center justify-between">
                             <p class="title-medium">{title}</p>
-                            <Button shape="circle" on:click={onClose}>
-                                <span slot="icon" class="i-mdi-close title-medium"> </span>
+                            <Button shape="circle" size="lg" on:click={onClose}>
+                                <span slot="icon" class="title-medium i-mdi-close h-8 w-8"> </span>
                             </Button>
                         </section>
                         <p class="body-small">{subtitle}</p>

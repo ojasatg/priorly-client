@@ -36,6 +36,7 @@ export default [
             ],
             curly: ["error", "all"],
             "no-console": ["error", { allow: ["warn", "error", "info"] }],
+            "@typescript-eslint/no-unsafe-function-type": ["warn"],
         },
     },
     {

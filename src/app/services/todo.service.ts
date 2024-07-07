@@ -2,22 +2,18 @@ import { PUBLIC_API_URI } from "$env/static/public";
 import { ofetch, type FetchOptions } from "ofetch";
 import defu from "defu";
 
-import { EAPIRequestMethod, type IPostAPIParams, type TAPISuccess } from "$lib/types/api.types";
+import { EAPIRequestMethod, type IPostAPIParams, type TAPISuccess } from "$types/api.types";
+import { APIs } from "$constants/api.consts";
 // import { handleAuthenticationError } from "$handlers/auth.handler";
 
 import type { TTodoAddRequestSchema } from "$schemas/request.schemas";
 import type { TTodoAddResponseSchema } from "$schemas/response.schemas";
 
-import { APIs } from "$lib/constants/api.consts";
-
 async function todoAPIFetch<TData>(
     url: string,
     options = {},
 ): Promise<TAPISuccess<TData> | undefined> {
-    // const baseURL = import.meta.env.API_URI;
-    // const baseURL = "http://localhost:3120";
     const baseURL = PUBLIC_API_URI;
-
     const defaults: FetchOptions = {
         baseURL,
 
@@ -53,6 +49,7 @@ async function todoAPIFetch<TData>(
     // }
 }
 
+// Todos
 export async function useTodoCreate({ requestData }: IPostAPIParams<TTodoAddRequestSchema>) {
     return todoAPIFetch<TTodoAddResponseSchema>(APIs.TODO.CREATE, {
         method: EAPIRequestMethod.POST,

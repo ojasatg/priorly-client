@@ -2,40 +2,16 @@
     import { Portal, Modal, Button } from "stwui";
     import { createEventDispatcher } from "svelte";
 
-    type TBeforeFunction = (...args: unknown[]) => Promise<boolean> | undefined;
-    type TPromptType = "success" | "info" | "warning" | "error";
+    import type { TComponentType } from "$lib/types/ui.types";
+    import { COMPONENT_DETAILS_MAP } from "$lib/constants/ui.consts";
 
-    const PROMPT_DETAILS_MAP: Record<
-        TPromptType,
-        { icon: string; classColor: string; buttonType: "primary" | "danger" }
-    > = {
-        success: {
-            icon: "i-mdi-check-circle",
-            classColor: "text-success",
-            buttonType: "primary",
-        },
-        info: {
-            icon: "i-mdi-information",
-            classColor: "text-primary",
-            buttonType: "primary",
-        },
-        warning: {
-            icon: "i-mdi-alert-circle",
-            classColor: "text-warning",
-            buttonType: "danger",
-        },
-        error: {
-            icon: "i-mdi-alert-decagram",
-            classColor: "text-error",
-            buttonType: "danger",
-        },
-    };
+    type TBeforeFunction = (...args: unknown[]) => Promise<boolean> | undefined;
 
     export let modelValue = false;
     export let title;
     export let message;
     export let note = "";
-    export let type: TPromptType;
+    export let type: TComponentType;
     export let submitText = "";
     export let cancelText = "";
 
@@ -47,9 +23,9 @@
         cancel: { success: boolean };
     }>();
 
-    $: text_color_class = PROMPT_DETAILS_MAP[type].classColor;
-    $: title_icon = PROMPT_DETAILS_MAP[type].icon;
-    $: primary_button_type = PROMPT_DETAILS_MAP[type].buttonType;
+    $: text_color_class = COMPONENT_DETAILS_MAP[type].classColor;
+    $: title_icon = COMPONENT_DETAILS_MAP[type].icon;
+    $: primary_button_type = COMPONENT_DETAILS_MAP[type].buttonType;
 
     function onSubmit() {
         if (beforeSubmit && typeof beforeSubmit === "function") {
@@ -82,7 +58,7 @@
             <Modal.Content slot="content">
                 <Modal.Content.Header slot="header">
                     <section class="title-medium flex items-center gap-2 {title_icon}">
-                        <span class="i-mdi-info-outline"></span>
+                        <span class={title_icon}></span>
                         <p>{title}</p>
                     </section>
                 </Modal.Content.Header>
@@ -91,7 +67,7 @@
                         {message}
                     </section>
                     <section class="body-small flex items-center gap-2 {text_color_class}">
-                        <span class="i-mdi-info-outline"></span>
+                        <span class="i-mdi-information-outline {text_color_class}"></span>
                         <p>{note}</p>
                     </section>
                 </Modal.Content.Body>

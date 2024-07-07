@@ -1,14 +1,24 @@
 <script>
-    import Header from "./Header.svelte";
     import "./styles.css";
     import "../app.scss";
+
+    import PRAlert from "$lib/components/PRAlert.svelte";
+    import { useAlertStore } from "$lib/stores/alertStore";
+
+    const alert = useAlertStore();
 </script>
 
-<div class="app">
-    <Header />
+<section class="app">
+    {#if $alert}
+        <PRAlert />
+    {/if}
+    <!-- <Header /> -->
 
     <main>
         <slot />
+        <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={() => alert.showAlert()}>
+            Show Alert
+        </button>
     </main>
 
     <footer>
@@ -16,7 +26,7 @@
             visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit
         </p>
     </footer>
-</div>
+</section>
 
 <style>
     .app {

@@ -6,6 +6,9 @@
     import { createForm } from "felte";
     import { validator } from "@felte/validator-zod";
 
+    // lib imports
+    import { useAlertStore } from "$lib/stores/alertStore";
+
     // local imports
     import type { TTodoAddResponseSchema } from "$schemas/response.schemas";
     import { TodoAddRequestSchema, type TTodoAddRequestSchema } from "$schemas/request.schemas";
@@ -20,6 +23,9 @@
         close: null;
     }>();
 
+    // stores
+    const alert = useAlertStore();
+
     // local consts
     const { form: addTodoForm, errors: addTodoFormErrors } = createForm({
         extend: validator({ schema: TodoAddRequestSchema }),
@@ -32,10 +38,16 @@
         },
         onSubmit: (values) => {
             dispatchEvent("add", values);
+        },
+        onSuccess: (response) => {
+            console.log(response);
 
-            // todo: move this onSuccess method of the createForm
+            alert.showAlert();
+
+            console.log($alert);
+
             resetValues();
-            dispatchEvent("close");
+            // dispatchEvent("close");
         },
     });
 

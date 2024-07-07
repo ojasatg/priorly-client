@@ -21,6 +21,8 @@ const config = {
             $components: "./src/app/components",
             $schemas: "./src/app/schemas",
             $handlers: "./src/app/handlers",
+            $constants: "./src/app/constants",
+            $types: "./src/app/types",
         },
     },
 };

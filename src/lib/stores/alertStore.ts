@@ -22,7 +22,7 @@ const useAlertStore = () => {
             message: params.message,
             buttonText: params.buttonText,
             buttonAction: params.buttonAction,
-            duration: params.duration,
+            duration: params.duration ?? 5000,
         };
 
         _alerts.update((prev) => [...prev, newAlert]);
@@ -48,12 +48,13 @@ const useAlertStore = () => {
         subscribe,
         showAlert,
 
-        success: (message: string, duration: number) =>
+        success: (message: string, duration?: number) =>
             showAlert({ type: "success", message, duration }),
-        info: (message: string, duration: number) => showAlert({ type: "info", message, duration }),
-        warning: (message: string, duration: number) =>
+        info: (message: string, duration?: number) =>
+            showAlert({ type: "info", message, duration }),
+        warning: (message: string, duration?: number) =>
             showAlert({ type: "warn", message, duration }),
-        error: (message: string, duration: number) =>
+        error: (message: string, duration?: number) =>
             showAlert({ type: "error", message, duration }),
     };
 };

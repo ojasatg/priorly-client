@@ -23,6 +23,7 @@ const config = {
             $handlers: "./src/app/handlers",
             $constants: "./src/app/constants",
             $types: "./src/app/types",
+            $services: "./src/app/services",
         },
     },
 };

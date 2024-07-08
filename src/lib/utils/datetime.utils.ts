@@ -37,3 +37,7 @@ export function getDaysDifferenceFromTimestamp(d1: number, d2?: number) {
     const diff = Math.floor((utc1 - utc2) / MS_PER_DAY);
     return diff;
 }
+
+export function useSleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}

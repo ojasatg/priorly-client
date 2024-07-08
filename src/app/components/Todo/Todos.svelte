@@ -7,19 +7,12 @@
     import TodoItem from "./TodoItem.svelte";
 
     import PRDialog from "$lib/components/PRDialog.svelte";
-    import type { TTodoAddRequestSchema } from "$schemas/request.schemas";
-    import { useTodoCreate } from "../../services/todo.service";
 
     export let todos: TTodoAddResponseSchema[];
 
     const selectedTodo = {} as TTodoAddResponseSchema;
 
     let showAddTodoForm = false;
-
-    async function onAdd(event: CustomEvent<TTodoAddRequestSchema>) {
-        const newTodo = event.detail;
-        useTodoCreate({ requestData: newTodo });
-    }
 
     function onCancel() {
         showAddTodoForm = false;
@@ -52,12 +45,6 @@
     </span>
 
     <PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo item">
-        <TodoForm
-            todo={selectedTodo}
-            on:add={onAdd}
-            on:cancel={onCancel}
-            on:close={onCancel}
-            slot="content"
-        />
+        <TodoForm todo={selectedTodo} on:cancel={onCancel} on:close={onCancel} slot="content" />
     </PRDialog>
 </section>

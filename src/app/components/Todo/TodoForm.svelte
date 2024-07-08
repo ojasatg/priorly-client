@@ -13,7 +13,7 @@
     import type { TTodoAddResponseSchema } from "$schemas/response.schemas";
     import { TodoCreateFormSchema, type TTodoCreateFormSchema } from "$schemas/form.schemas";
     import todoService from "$services/todo.service";
-    import type { TAPISuccess } from "$types/api.types";
+    import type { TAPISuccess } from "$lib/types/api.types";
     import { addDaysToDate, getTimestampFromDate } from "$lib/utils/datetime.utils";
 
     // props

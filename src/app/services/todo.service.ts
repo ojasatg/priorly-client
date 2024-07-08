@@ -1,22 +1,25 @@
 import { PUBLIC_API_URI } from "$env/static/public";
-
-import type { ZodSchema } from "zod";
 import { ofetch, type FetchOptions } from "ofetch";
 import defu from "defu";
 
-import { EAPIRequestMethod, type IPostAPIParams, type TAPISuccess } from "$types/api.types";
+import {
+    EAPIRequestMethod,
+    type IPostAPIParams,
+    type IServiceBaseParams,
+    type TAPISuccess,
+} from "$lib/types/api.types";
 import { APIs } from "$constants/api.consts";
 // import { handleAuthenticationError } from "$handlers/auth.handler";
 
 import { TodoAddRequestSchema, type TTodoAddRequestSchema } from "$schemas/request.schemas";
-import type { TTodoAddResponseSchema } from "$schemas/response.schemas";
+import { TodoAddResponseSchema, type TTodoAddResponseSchema } from "$schemas/response.schemas";
 import { alerts } from "$lib/stores/alertStore";
 
-async function todoAPIFetch<TData>(
-    url: string,
-    options?: FetchOptions,
-    schema?: ZodSchema,
-): Promise<TAPISuccess<TData> | undefined> {
+async function todoServiceBase<TData>({
+    url,
+    options,
+    requestSchema,
+}: IServiceBaseParams): Promise<TAPISuccess<TData> | undefined> {
     const baseURL = PUBLIC_API_URI;
     const defaults: FetchOptions = {
         baseURL,
@@ -35,9 +38,9 @@ async function todoAPIFetch<TData>(
     };
 
     const requestBody = options?.body;
-    if (schema && requestBody) {
+    if (requestSchema && requestBody) {
         try {
-            schema.parse(requestBody);
+            requestSchema.parse(requestBody);
         } catch (error) {
             console.error(error);
             alerts.error("Something is not right! Please check the input(s) again.");
@@ -58,14 +61,15 @@ async function todoAPIFetch<TData>(
 
 // Todos
 async function createTodo({ requestData }: IPostAPIParams<TTodoAddRequestSchema>) {
-    return todoAPIFetch<TTodoAddResponseSchema>(
-        APIs.TODO.CREATE,
-        {
+    return todoServiceBase<TTodoAddResponseSchema>({
+        url: APIs.TODO.CREATE,
+        options: {
             method: EAPIRequestMethod.POST,
             body: requestData,
         },
-        TodoAddRequestSchema,
-    );
+        requestSchema: TodoAddRequestSchema,
+        responseSchema: TodoAddResponseSchema,
+    });
 }
 
 const todoService = {

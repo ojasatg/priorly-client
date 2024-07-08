@@ -57,7 +57,7 @@ async function todoAPIFetch<TData>(
 }
 
 // Todos
-export async function useTodoCreate({ requestData }: IPostAPIParams<TTodoAddRequestSchema>) {
+async function createTodo({ requestData }: IPostAPIParams<TTodoAddRequestSchema>) {
     return todoAPIFetch<TTodoAddResponseSchema>(
         APIs.TODO.CREATE,
         {
@@ -67,3 +67,9 @@ export async function useTodoCreate({ requestData }: IPostAPIParams<TTodoAddRequ
         TodoAddRequestSchema,
     );
 }
+
+const todoService = {
+    createTodo,
+};
+
+export default todoService;

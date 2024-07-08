@@ -38,6 +38,12 @@ export function getDaysDifferenceFromTimestamp(d1: number, d2?: number) {
     return diff;
 }
 
+export function addDaysToDate(date: Date, days: number) {
+    const newDate = new Date(date);
+    newDate.setDate(date.getDate() + days);
+    return newDate;
+}
+
 export function useSleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }

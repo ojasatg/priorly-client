@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const TodoAddFormSchema = z.object({
+export const TodoCreateFormSchema = z.object({
     title: z
         .string()
         .min(1, "Title cannot be empty")
@@ -11,4 +11,4 @@ export const TodoAddFormSchema = z.object({
     reminder: z.string().optional(),
 });
 
-export type TTodoAddFormSchema = z.infer<typeof TodoAddFormSchema>;
+export type TTodoCreateFormSchema = z.infer<typeof TodoCreateFormSchema>;

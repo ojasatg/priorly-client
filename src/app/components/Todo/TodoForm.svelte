@@ -11,10 +11,10 @@
 
     // local imports
     import type { TTodoAddResponseSchema } from "$schemas/response.schemas";
-    import { TodoAddFormSchema, type TTodoAddFormSchema } from "$schemas/form.schemas";
-    import { useTodoCreate } from "$services/todo.service";
+    import { TodoCreateFormSchema, type TTodoCreateFormSchema } from "$schemas/form.schemas";
+    import todoService from "$services/todo.service";
     import type { TAPISuccess } from "$types/api.types";
-    import { getTimestampFromDate } from "$lib/utils/datetime.utils";
+    import { addDaysToDate, getTimestampFromDate } from "$lib/utils/datetime.utils";
 
     // props
     export let todo: TTodoAddResponseSchema;
@@ -24,51 +24,6 @@
         cancel: null;
         close: null;
     }>();
-
-    // reactive statements
-    // as soon as deadline or reminder changes, if deadline is there check that reminder is not greater than the deadline
-
-    // local consts
-    const {
-        form: addTodoForm,
-        errors: addTodoFormErrors,
-        setErrors: setAddTodoFormErrors,
-    } = createForm({
-        extend: validator({ schema: TodoAddFormSchema }),
-        validate: (values) => {
-            const result = TodoAddFormSchema.safeParse(values);
-
-            if (!result.success) {
-                return result.error.formErrors.fieldErrors;
-            }
-        },
-        onSubmit: async (values: TTodoAddFormSchema) => {
-            submitting = true;
-
-            const deadlineTimestamp = deadline ? getTimestampFromDate(deadline) : undefined;
-            const reminderTimestamp = reminder ? getTimestampFromDate(reminder) : undefined;
-
-            const newTodo = {
-                ...values,
-                deadline: deadlineTimestamp,
-                reminder: reminderTimestamp,
-            };
-
-            const response = await useTodoCreate({ requestData: newTodo });
-            return response;
-        },
-        onSuccess: (response) => {
-            const typedResponse = response as TAPISuccess<TTodoAddResponseSchema>;
-            alerts.success(typedResponse.message);
-            submitting = false;
-            resetValues();
-            dispatchEvent("close");
-        },
-        onError(error) {
-            submitting = false;
-            alerts.success(error as string);
-        },
-    });
 
     // local variables
     let title = todo.title ?? "";
@@ -81,6 +36,62 @@
     let done = todo.done ?? false;
     let submitting = false;
 
+    function validateDeadlineReminder(deadline?: Date, reminder?: Date) {
+        const deadlineTimestamp = deadline ? getTimestampFromDate(deadline) : undefined;
+        const reminderTimestamp = reminder ? getTimestampFromDate(reminder) : undefined;
+
+        if (reminderTimestamp && deadlineTimestamp) {
+            if (reminderTimestamp > deadlineTimestamp) {
+                const error = "Reminder cannot be after the Deadline";
+                setAddTodoFormErrors("reminder", [error]);
+                return error;
+            } else {
+                setAddTodoFormErrors("reminder", []);
+            }
+        }
+    }
+
+    // reactive statements
+    $: validateDeadlineReminder(deadline, reminder);
+
+    // local consts
+    const {
+        form: addTodoForm,
+        errors: addTodoFormErrors,
+        setErrors: setAddTodoFormErrors,
+    } = createForm({
+        extend: validator({ schema: TodoCreateFormSchema }),
+        validate: (values) => {
+            const result = TodoCreateFormSchema.safeParse(values);
+
+            const errors = result.error?.formErrors.fieldErrors || {};
+            const validateReminderWithDeadlineError = validateDeadlineReminder(deadline, reminder);
+
+            if (validateReminderWithDeadlineError) {
+                errors["reminder"] = [validateReminderWithDeadlineError];
+            }
+
+            return errors;
+        },
+        onSubmit: async (values: TTodoCreateFormSchema) => {
+            submitting = true;
+            const response = await createTodo(values);
+            return response;
+        },
+        onSuccess: (response) => {
+            const typedResponse = response as TAPISuccess<TTodoAddResponseSchema>;
+            alerts.success(typedResponse.message);
+
+            submitting = false;
+            resetValues();
+            dispatchEvent("close");
+        },
+        onError(error) {
+            submitting = false;
+            alerts.error(error as string);
+        },
+    });
+
     // local functions
     function resetValues() {
         title = "";
@@ -92,6 +103,21 @@
 
     function onCancel() {
         dispatchEvent("cancel");
+    }
+
+    async function createTodo(todo: TTodoCreateFormSchema) {
+        const deadlineTimestamp = deadline ? getTimestampFromDate(deadline) : undefined;
+        const reminderTimestamp = reminder ? getTimestampFromDate(reminder) : undefined;
+
+        const newTodo = {
+            ...todo,
+            deadline: deadlineTimestamp,
+            reminder: reminderTimestamp,
+        };
+
+        const response = await todoService.createTodo({ requestData: newTodo });
+
+        return response;
     }
 </script>
 
@@ -158,7 +184,7 @@
                     placeholder="Add a Reminder"
                     bind:value={reminder}
                     min={new Date()}
-                    max={deadline}
+                    max={deadline ? addDaysToDate(deadline, 1) : undefined}
                     error={$addTodoFormErrors.reminder?.[0]}
                     allowClear
                     class="flex-auto"

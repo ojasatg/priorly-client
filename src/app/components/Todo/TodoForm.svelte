@@ -7,7 +7,7 @@
     import { validator } from "@felte/validator-zod";
 
     // lib imports
-    import { useAlertStore } from "$lib/stores/alertStore";
+    import { alerts } from "$lib/stores/alertStore";
 
     // local imports
     import type { TTodoAddResponseSchema } from "$schemas/response.schemas";
@@ -24,7 +24,6 @@
     }>();
 
     // stores
-    const alert = useAlertStore();
 
     // local consts
     const { form: addTodoForm, errors: addTodoFormErrors } = createForm({
@@ -42,9 +41,8 @@
         onSuccess: (response) => {
             console.log(response);
 
-            alert.showAlert();
-
-            console.log($alert);
+            dispatchEvent("close");
+            alerts.success("Todo Added", 5000);
 
             resetValues();
             // dispatchEvent("close");

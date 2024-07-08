@@ -2,31 +2,41 @@
     import { Alert, Button } from "stwui";
 
     import { COMPONENT_DETAILS_MAP } from "$lib/constants/ui.consts";
+    import type { TAlert } from "$lib/types/ui.types";
+    import { alerts } from "$lib/stores/alertStore";
 
-    // const { type, message, hasButton, buttonText } = alertStore;
+    // $: text_color_class = COMPONENT_DETAILS_MAP.success.classColor;
+    // $: alert_icon = COMPONENT_DETAILS_MAP.success.icon;
+    // $: border_color_class = COMPONENT_DETAILS_MAP.success.borderColor;
 
-    let alert_disappear = "";
-    setTimeout(() => {
-        alert_disappear = "alert-disappear";
-    }, 4000);
-
-    $: text_color_class = COMPONENT_DETAILS_MAP.success.classColor;
-    $: alert_icon = COMPONENT_DETAILS_MAP.success.icon;
-    $: border_color_class = COMPONENT_DETAILS_MAP.success.borderColor;
+    $: allAlerts = $alerts as TAlert[];
 </script>
 
-<section class="alert {alert_disappear} ">
-    <Alert class="w-[32rem] border-[1px] bg-surface p-4 {border_color_class} shadow-2xl">
-        <span class="{alert_icon} {text_color_class} h-6 w-6" slot="leading"></span>
-        <Alert.Title class="body-medium" slot="title">Good Job</Alert.Title>
-        <!-- {#if hasButton}
-            <Alert.Extra slot="extra">
-                <Button on:click={alertStore.buttonAction?.()}>
-                    <span class={text_color_class}>{buttonText}</span>
-                </Button>
-            </Alert.Extra>
-        {/if} -->
-    </Alert>
+<section class="fixed right-4 top-8 z-[9999] flex flex-col gap-2">
+    {#each allAlerts as alert (alert.id)}
+        <section class="alert-appear">
+            <Alert
+                class="w-[28rem] border-[1px] bg-surface p-4 {COMPONENT_DETAILS_MAP[alert.type]
+                    .borderColor} shadow-2xl"
+            >
+                <span
+                    class="{COMPONENT_DETAILS_MAP[alert.type].icon} {COMPONENT_DETAILS_MAP[
+                        alert.type
+                    ].classColor} h-6 w-6"
+                    slot="leading"
+                ></span>
+                <Alert.Title class="body-medium" slot="title">{alert.message}</Alert.Title>
+                <Alert.Extra slot="extra">
+                    {#if alert.buttonText}
+                        <Button on:click={alert.buttonAction?.()}>
+                            <span class={COMPONENT_DETAILS_MAP[alert.type].classColor}
+                                >{alert.buttonText}</span
+                            >
+                        </Button>
+                    {/if}
+                </Alert.Extra>
+            </Alert>
+        </section>{/each}
 </section>
 
 <style lang="scss">
@@ -52,11 +62,8 @@
         }
     }
 
-    .alert {
-        position: fixed;
+    .alert-appear {
         animation: smooth-appear 0.3s ease forwards;
-        top: 2%;
-        z-index: 9999;
     }
 
     .alert-disappear {

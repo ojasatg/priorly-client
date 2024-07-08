@@ -3,21 +3,43 @@
     import "../app.scss";
 
     import PRAlert from "$lib/components/PRAlert.svelte";
-    import { useAlertStore } from "$lib/stores/alertStore";
+    import { alerts } from "$lib/stores/alertStore";
+    import _ from "lodash";
 
-    const alert = useAlertStore();
+    function showAlerts() {
+        alerts.success("success!", 3000);
+        alerts.info("info!", 3000);
+        alerts.warning("warning!", 3000);
+        alerts.error("error!", 3000);
+    }
+
+    function showActionAlert() {
+        alerts.showAlert({
+            type: "success",
+            message: "Action alert",
+            duration: 5000,
+            buttonText: "Click Me!",
+
+            buttonAction: () => {
+                alert("Button Action clicked");
+            },
+        });
+    }
 </script>
 
 <section class="app">
-    {#if $alert}
+    {#if !_.isEmpty($alerts)}
         <PRAlert />
     {/if}
     <!-- <Header /> -->
 
     <main>
         <slot />
-        <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={() => alert.showAlert()}>
+        <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={showAlerts}>
             Show Alert
+        </button>
+        <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={showActionAlert}>
+            Show Action Alert
         </button>
     </main>
 

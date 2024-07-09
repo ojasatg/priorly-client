@@ -18,6 +18,7 @@
 
     import { getCurrentTimeStamp } from "$lib/utils/datetime.utils";
     import Todos from "$components/Todo/Todos.svelte";
+    import { mockAPIResponse } from "$lib/utils/api.utils";
 
     // Get todos schema
     const TODOS = [
@@ -53,9 +54,7 @@
         },
     ];
 
-    const todos = new Promise<TTodoItemViewSchema[]>((resolve) => {
-        setTimeout(() => resolve(TODOS), 5000);
-    });
+    const todos = mockAPIResponse<TTodoItemViewSchema[]>(TODOS, 4000);
 </script>
 
 <section>

@@ -38,8 +38,9 @@
                 arrow: false,
                 animation: "scale",
             }}
+            class="mt-1"
         >
-            <Button shape="circle">
+            <Button size="lg" shape="circle">
                 <span slot="icon" class="i-mdi-application-edit-outline"> </span>
             </Button>
         </span>

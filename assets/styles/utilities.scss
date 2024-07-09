@@ -1,0 +1,21 @@
+:root {
+    .skeleton {
+        background: rgb(198, 198, 198);
+        background: linear-gradient(
+            90deg,
+            rgba(198, 198, 198, 1) 0%,
+            rgba(244, 244, 244, 1) 51%,
+            rgba(198, 198, 198, 1) 100%
+        );
+        background-size: 1000px 1000px;
+        animation: skeleton-shimmer 2.5s linear infinite forwards;
+    }
+    @keyframes skeleton-shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+}

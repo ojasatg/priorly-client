@@ -24,7 +24,8 @@
         {
             id: "abc",
             title: "Complete assignment",
-            description: "Finish the project by the end of the week",
+            description:
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eleifend sed turpis a fringilla. Etiam nec felis in dolor lobortis accumsan. Mauris convallis bibendum purus vel interdum. Cras finibus ligula et volutpat consectetur. Sed eros nunc, lacinia rutrum ornare vel, efficitur at sem. Integer id.",
             done: false,
             created: getCurrentTimeStamp() - 9999999,
             updated: getCurrentTimeStamp(),
@@ -51,10 +52,14 @@
             reminder: getCurrentTimeStamp(),
         },
     ];
+
+    const todos = new Promise<TTodoItemViewSchema[]>((resolve) => {
+        setTimeout(() => resolve(TODOS), 5000);
+    });
 </script>
 
 <section>
-    <Todos todos={TODOS} />
+    <Todos {todos} />
 
     <span
         use:tooltip={{

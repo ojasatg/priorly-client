@@ -4,5 +4,6 @@
     "editor.formatOnSave": true,
     "editor.detectIndentation": false,
 
-    "eslint.validate": ["javascript", "typescript", "svelte"]
+    "eslint.validate": ["javascript", "typescript", "svelte"],
+    "editor.wordWrap": "on"
 }

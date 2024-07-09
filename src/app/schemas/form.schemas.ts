@@ -12,6 +12,10 @@ export const CreateTodoFormSchema = z.object({
         .nullish(),
     deadline: z.string().nullish(),
     reminder: z.string().nullish(),
+    color: z
+        .string()
+        .regex(/^#[0-9A-F]{6}[0-9a-f]{0,2}$/i, "Please add a valid color")
+        .nullish(),
 });
 
 export type TCreateTodoFormSchema = z.infer<typeof CreateTodoFormSchema>;

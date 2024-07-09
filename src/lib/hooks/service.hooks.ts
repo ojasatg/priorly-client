@@ -1,14 +1,13 @@
 import { PUBLIC_API_URI } from "$env/static/public";
-import { EServiceMessageCodes } from "$lib/constants/api.consts";
-import { SuccessResponseSchema, ErrorResponseSchema } from "$lib/schemas/api.schemas";
-import { alerts } from "$lib/stores/alertStore";
 import {
-    type IServiceBaseParams,
-    type TAPISuccess,
+    EServiceMessageCodes,
     EAPIRequestMethod,
     EServerResponseCodes,
     EServerResponseRescodes,
-} from "$lib/types/api.types";
+} from "$lib/constants/api.consts";
+import { SuccessResponseSchema, ErrorResponseSchema } from "$lib/schemas/api.schemas";
+import { alerts } from "$lib/stores/alertStore";
+import type { IServiceBaseParams, TAPISuccess } from "$lib/types/api.types";
 import { generateServiceMessages } from "$lib/utils/api.utils";
 import defu from "defu";
 import _ from "lodash";
@@ -120,10 +119,10 @@ async function createService<TData>({
         if (errorParse.success) {
             // if error parsed successfully then we show error received by the server and throw error for the caller
             if (showAlerts) {
-                alerts.error(errorParse.data.message);
+                alerts.error(errorParse.data.message as string);
             }
             console.error(errorParse.data.error);
-            throw new Error(errorParse.data.error);
+            throw new Error(errorParse.data.error as string);
         } else {
             // else we show a predifined message and throw error for the caller.
             if (showAlerts) {

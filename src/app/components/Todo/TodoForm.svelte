@@ -6,7 +6,7 @@
     import { createForm } from "felte";
 
     // lib imports
-    import { addDaysToDate, getTimestampFromDate, useSleep } from "$lib/utils/datetime.utils";
+    import { addDaysToDate, getTimestampFromDate } from "$lib/utils/datetime.utils";
 
     // local imports
     import type { TTodoItemViewSchema } from "$schemas/view.schemas";
@@ -103,8 +103,6 @@
     async function createTodo(todo: TCreateTodoFormSchema) {
         const deadlineTimestamp = deadline ? getTimestampFromDate(deadline) : undefined;
         const reminderTimestamp = reminder ? getTimestampFromDate(reminder) : undefined;
-
-        await useSleep(5000);
 
         const newTodo = {
             ...todo,
@@ -209,7 +207,7 @@
             {/if}
         </section>
         <section class="ml-auto w-fit">
-            <Button on:click={onCancel} size="sm" class="text-gray-600">
+            <Button on:click={onCancel} size="sm" class="bg-gray-200">
                 <span slot="leading" class="i-mdi-cancel h-6 w-6"></span>
                 <span class="body-medium">Cancel</span>
             </Button>

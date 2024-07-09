@@ -1,4 +1,5 @@
-import { EAPIRequestMethod, type IPostAPIParams } from "$lib/types/api.types";
+import type { IPostAPIParams } from "$lib/types/api.types";
+import { EAPIRequestMethod } from "$lib/constants/api.consts";
 import { APIs } from "$constants/api.consts";
 
 import { CreateTodoRequestSchema, type TCreateTodoRequestSchema } from "$schemas/request.schemas";

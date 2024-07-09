@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EServerResponseRescodes } from "$lib/types/api.types";
+import { EServerResponseRescodes } from "$lib/constants/api.consts";
 
 export const SuccessResponseSchema = z.object({
     rescode: z.nativeEnum(EServerResponseRescodes),

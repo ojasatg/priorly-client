@@ -2,7 +2,6 @@
     import { Button } from "stwui";
     import tooltip from "stwui/actions/tooltip";
 
-    import type { TTodoAddResponseSchema } from "$schemas/response.schemas";
     import type { TTodoItemViewSchema } from "$schemas/view.schemas";
 
     import TodoForm from "$components/Todo/TodoForm.svelte";
@@ -20,7 +19,8 @@
     import { getCurrentTimeStamp } from "$lib/utils/datetime.utils";
     import Todos from "$components/Todo/Todos.svelte";
 
-    const TODOS: TTodoAddResponseSchema[] = [
+    // Get todos schema
+    const TODOS = [
         {
             id: "abc",
             title: "Complete assignment",
@@ -75,7 +75,7 @@
         </Button>
     </span>
 
-    <PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo">
+    <PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo" scrim>
         <TodoForm todo={selectedTodo} on:cancel={onCancel} on:close={onCancel} slot="content" />
     </PRDialog>
 </section>

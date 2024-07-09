@@ -25,7 +25,7 @@
                     ].classColor} h-6 w-6"
                     slot="leading"
                 ></span>
-                <Alert.Title class="body-medium" slot="title">{alert.message}</Alert.Title>
+                <Alert.Title class="body-small" slot="title">{alert.message}</Alert.Title>
                 <Alert.Extra slot="extra">
                     {#if alert.buttonText}
                         <Button on:click={alert.buttonAction?.()}>

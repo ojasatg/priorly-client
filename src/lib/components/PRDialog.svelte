@@ -6,7 +6,8 @@
 
     export let modelValue: boolean;
     export let title;
-    export let subtitle;
+    export let subtitle = "";
+    export let scrim = false;
 
     export let beforeClose: TBeforeFunction | undefined = undefined;
 
@@ -43,6 +44,8 @@
                     <slot name="content" />
                 </Modal.Content.Body>
             </Modal.Content>
+            <Modal.Backdrop handleClose={!scrim ? onClose : () => {}} slot="backdrop"
+            ></Modal.Backdrop>
         </Modal>
     {/if}
 </Portal>

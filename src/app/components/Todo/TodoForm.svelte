@@ -4,20 +4,18 @@
     import { Button, CheckboxGroup, DatePicker, Input, TextArea } from "stwui";
     import tooltip from "stwui/actions/tooltip";
     import { createForm } from "felte";
-    import { validator } from "@felte/validator-zod";
 
     // lib imports
-    import { alerts } from "$lib/stores/alertStore";
+    import { addDaysToDate, getTimestampFromDate, useSleep } from "$lib/utils/datetime.utils";
 
     // local imports
-    import type { TTodoAddResponseSchema } from "$schemas/response.schemas";
-    import { TodoCreateFormSchema, type TTodoCreateFormSchema } from "$schemas/form.schemas";
+    import type { TTodoItemViewSchema } from "$schemas/view.schemas";
+    import { CreateTodoFormSchema, type TCreateTodoFormSchema } from "$schemas/form.schemas";
     import todoService from "$services/todo.service";
-    import type { TAPISuccess } from "$lib/types/api.types";
-    import { addDaysToDate, getTimestampFromDate } from "$lib/utils/datetime.utils";
+    import type { TCreateTodoResponseSchema } from "$schemas/response.schemas";
 
     // props
-    export let todo: TTodoAddResponseSchema;
+    export let todo: TTodoItemViewSchema;
 
     // events
     const dispatchEvent = createEventDispatcher<{
@@ -60,9 +58,10 @@
         errors: addTodoFormErrors,
         setErrors: setAddTodoFormErrors,
     } = createForm({
-        extend: validator({ schema: TodoCreateFormSchema }),
+        // extend: validator({ schema: CreateTodoFormSchema }), - automatic validation
         validate: (values) => {
-            const result = TodoCreateFormSchema.safeParse(values);
+            // custom validation
+            const result = CreateTodoFormSchema.safeParse(values);
 
             const errors = result.error?.formErrors.fieldErrors || {};
             const validateReminderWithDeadlineError = validateDeadlineReminder(deadline, reminder);
@@ -73,22 +72,18 @@
 
             return errors;
         },
-        onSubmit: async (values: TTodoCreateFormSchema) => {
+        onSubmit: async (values: TCreateTodoFormSchema) => {
             submitting = true;
-            const response = await createTodo(values);
-            return response;
+            const responseData = await createTodo(values);
+            return responseData;
         },
-        onSuccess: (response) => {
-            const typedResponse = response as TAPISuccess<TTodoAddResponseSchema>;
-            alerts.success(typedResponse.message);
-
+        onSuccess: () => {
             submitting = false;
             resetValues();
             dispatchEvent("close");
         },
-        onError(error) {
+        onError() {
             submitting = false;
-            alerts.error(error as string);
         },
     });
 
@@ -105,9 +100,11 @@
         dispatchEvent("cancel");
     }
 
-    async function createTodo(todo: TTodoCreateFormSchema) {
+    async function createTodo(todo: TCreateTodoFormSchema) {
         const deadlineTimestamp = deadline ? getTimestampFromDate(deadline) : undefined;
         const reminderTimestamp = reminder ? getTimestampFromDate(reminder) : undefined;
+
+        await useSleep(5000);
 
         const newTodo = {
             ...todo,
@@ -115,9 +112,13 @@
             reminder: reminderTimestamp,
         };
 
-        const response = await todoService.createTodo({ requestData: newTodo });
+        // if the execution is success then we are guaranteed to have this data otherwise the errors are handled by the service itself
+        const responseData = (await todoService.createTodo({
+            requestData: newTodo,
+            showAlerts: true,
+        })) as TCreateTodoResponseSchema;
 
-        return response;
+        return responseData;
     }
 </script>
 

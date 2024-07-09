@@ -14,6 +14,7 @@
     export let type: TComponentType;
     export let submitText = "";
     export let cancelText = "";
+    export let scrim = false;
 
     export let beforeSubmit: TBeforeFunction | undefined = undefined;
     export let beforeCancel: TBeforeFunction | undefined = undefined;
@@ -82,6 +83,7 @@
                     </section>
                 </Modal.Content.Footer>
             </Modal.Content>
+            <Modal.Backdrop handleClose={!scrim ? onCancel : () => {}} slot="backdrop" />
         </Modal>
     {/if}
 </Portal>

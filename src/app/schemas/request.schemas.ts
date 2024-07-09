@@ -18,4 +18,7 @@ export const CreateTodoRequestSchema = z.object({
         .nullish(),
 });
 
+export const AllTodosRequestSchema = z.object({});
+
 export type TCreateTodoRequestSchema = z.infer<typeof CreateTodoRequestSchema>;
+export type TAllTodosRequestSchema = z.infer<typeof AllTodosRequestSchema>;

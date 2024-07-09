@@ -1,12 +1,17 @@
-import type { IPostAPIParams } from "$lib/types/api.types";
+import type { IGetAPIParams, IPostAPIParams } from "$lib/types/api.types";
 import { EAPIRequestMethod } from "$lib/constants/api.consts";
 import { APIs } from "$constants/api.consts";
 
-import { CreateTodoRequestSchema, type TCreateTodoRequestSchema } from "$schemas/request.schemas";
 import {
+    CreateTodoRequestSchema,
+    type TCreateTodoRequestSchema,
     CreateTodoResponseSchema,
     type TCreateTodoResponseSchema,
-} from "$schemas/response.schemas";
+    type TAllTododsResponseSchema,
+    AllTodosRequestSchema,
+    AllTodosResponseSchema,
+    AllTodosQuerySchema,
+} from "$schemas";
 import { useCreateService } from "$lib/hooks/service.hooks";
 import { z } from "zod";
 
@@ -27,8 +32,23 @@ async function createTodo({ requestData, showAlerts }: IPostAPIParams<TCreateTod
     });
 }
 
+async function allTodos({ showAlerts, query }: IGetAPIParams) {
+    return useTodoService<TAllTododsResponseSchema>({
+        url: APIs.TODO.ALL,
+        options: {
+            method: EAPIRequestMethod.GET,
+            query,
+        },
+        querySchema: AllTodosQuerySchema,
+        requestSchema: AllTodosRequestSchema,
+        responseSchema: AllTodosResponseSchema,
+        showAlerts,
+    });
+}
+
 const todoService = {
     createTodo,
+    allTodos,
 };
 
 export default todoService;

@@ -4,11 +4,8 @@
     import tooltip from "stwui/actions/tooltip";
 
     // local imports
-    import { type TTodoItemViewSchema } from "$schemas/view.schemas";
-    import {
-        getFormattedTimestamp,
-        getDaysDifferenceFromTimestamp,
-    } from "$lib/utils/datetime.utils";
+    import { type TTodoItemSchema } from "$schemas";
+    import { getFormattedTimestamp, getDaysDifferenceFromTimestamp } from "$lib/utils";
 
     const CUSTOM_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
         day: "numeric",
@@ -16,7 +13,7 @@
         year: "numeric",
     };
 
-    export let todo: TTodoItemViewSchema;
+    export let todo: TTodoItemSchema;
 
     const daysRemainingFromDeadline = getDaysDifferenceFromTimestamp(todo.deadline ?? 0);
 

@@ -2,63 +2,34 @@
     import { Button } from "stwui";
     import tooltip from "stwui/actions/tooltip";
 
-    import type { TTodoItemViewSchema } from "$schemas/view.schemas";
-
-    import TodoForm from "$components/Todo/TodoForm.svelte";
-
     import PRDialog from "$lib/components/PRDialog.svelte";
+    import type { TTodoItemSchema } from "$schemas";
 
-    const selectedTodo = {} as TTodoItemViewSchema;
+    import AllTodos from "$components/Todo/AllTodos.svelte";
+    import TodoForm from "$components/Todo/TodoForm.svelte";
+    import todoService from "$services/todo.service";
+    import { onMount } from "svelte";
 
+    const selectedTodo = {} as TTodoItemSchema;
     let showAddTodoForm = false;
+
+    let awaitingTodosData: Promise<{ todos: TTodoItemSchema[] } | undefined>;
+
+    async function getAllTodos() {
+        awaitingTodosData = todoService.allTodos({});
+    }
 
     function onCancel() {
         showAddTodoForm = false;
     }
 
-    import { getCurrentTimeStamp } from "$lib/utils/datetime.utils";
-    import Todos from "$components/Todo/Todos.svelte";
-    import { mockAPIResponse } from "$lib/utils/api.utils";
-
-    // Get todos schema
-    const TODOS = [
-        {
-            id: "abc",
-            title: "Complete assignment",
-            description:
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eleifend sed turpis a fringilla. Etiam nec felis in dolor lobortis accumsan. Mauris convallis bibendum purus vel interdum. Cras finibus ligula et volutpat consectetur. Sed eros nunc, lacinia rutrum ornare vel, efficitur at sem. Integer id.",
-            done: false,
-            created: getCurrentTimeStamp() - 9999999,
-            updated: getCurrentTimeStamp(),
-            deadline: getCurrentTimeStamp() + 10000000,
-            reminder: getCurrentTimeStamp(),
-        },
-        {
-            id: "pqr",
-            title: "Buy groceries",
-            description: "Pick up vegetables and fruits from the market",
-            done: true,
-            created: getCurrentTimeStamp(),
-            updated: getCurrentTimeStamp(),
-            completed: getCurrentTimeStamp() + 20000000,
-        },
-        {
-            id: "xyz",
-            title: "Call client",
-            description: "Discuss the new project requirements",
-            done: false,
-            created: getCurrentTimeStamp(),
-            updated: getCurrentTimeStamp(),
-            deadline: getCurrentTimeStamp(),
-            reminder: getCurrentTimeStamp(),
-        },
-    ];
-
-    const todos = mockAPIResponse<TTodoItemViewSchema[]>(TODOS, 4000);
+    onMount(() => {
+        getAllTodos();
+    });
 </script>
 
 <section>
-    <Todos {todos} />
+    <AllTodos {awaitingTodosData} />
 
     <span
         use:tooltip={{

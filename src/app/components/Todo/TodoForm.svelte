@@ -6,16 +6,19 @@
     import { createForm } from "felte";
 
     // lib imports
-    import { addDaysToDate, getTimestampFromDate } from "$lib/utils/datetime.utils";
+    import { addDaysToDate, getTimestampFromDate } from "$lib/utils";
 
     // local imports
-    import type { TTodoItemViewSchema } from "$schemas/view.schemas";
-    import { CreateTodoFormSchema, type TCreateTodoFormSchema } from "$schemas/form.schemas";
+    import {
+        CreateTodoFormSchema,
+        type TCreateTodoFormSchema,
+        type TTodoItemSchema,
+        type TCreateTodoResponseSchema,
+    } from "$schemas";
     import todoService from "$services/todo.service";
-    import type { TCreateTodoResponseSchema } from "$schemas/response.schemas";
 
     // props
-    export let todo: TTodoItemViewSchema;
+    export let todo: TTodoItemSchema;
 
     // events
     const dispatchEvent = createEventDispatcher<{

@@ -1,6 +1,6 @@
 import type { TAlert, TComponentType } from "$lib/types/ui.types";
 import type { TButtonReturnFunction } from "$lib/types/event.types";
-import { generateRandomDOMId } from "$lib/utils/ui.utils";
+import { generateRandomDOMId } from "$lib/utils";
 import { derived, writable } from "svelte/store";
 
 interface IShowAlertParams {

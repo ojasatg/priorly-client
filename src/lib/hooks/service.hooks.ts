@@ -8,7 +8,7 @@ import {
 import { SuccessResponseSchema, ErrorResponseSchema } from "$lib/schemas/api.schemas";
 import { alerts } from "$lib/stores/alertStore";
 import type { IServiceBaseParams, TAPISuccess } from "$lib/types/api.types";
-import { generateServiceMessages } from "$lib/utils/api.utils";
+import { generateServiceMessages } from "$lib/utils";
 import defu from "defu";
 import _ from "lodash";
 import { type FetchOptions, ofetch } from "ofetch";

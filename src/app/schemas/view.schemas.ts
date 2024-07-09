@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const TodoItemViewSchema = z.object({
+export const TodoItemSchema = z.object({
     id: z.string(),
     title: z.string(),
     description: z.string(),
@@ -12,4 +12,4 @@ export const TodoItemViewSchema = z.object({
     completed: z.number().nullish(),
 });
 
-export type TTodoItemViewSchema = z.infer<typeof TodoItemViewSchema>;
+export type TTodoItemSchema = z.infer<typeof TodoItemSchema>;

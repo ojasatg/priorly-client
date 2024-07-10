@@ -1,6 +1,7 @@
 export enum EServiceMessageCodes {
     REQUEST_VALIDATION_FAILED = "REQUEST_VALIDATION_FAILED",
     QUERY_VALIDATION_FAILED = "QUERY_VALIDATION_FAILED",
+    QUERY_WITHOUT_SCHEMA = "QUERY_WITHOUT_SCHEMA",
     RESPONSE_VALIDATION_FAILED = "RESPONSE_VALIDATION_FAILED",
     ERROR_VALIDATION_FAILED = "ERROR_VALIDATION_FAILED",
     EMPTY_RESPONSE = "EMPTY_RESPONSE",
@@ -10,6 +11,7 @@ export enum EServiceMessageCodes {
 export const SERVICE_MESSAGES: { [key in EServiceMessageCodes]?: string } = {
     REQUEST_VALIDATION_FAILED: "Something is not right! Please check the input(s) again.",
     QUERY_VALIDATION_FAILED: "Something is not right! Please check the input(s) again.",
+    QUERY_WITHOUT_SCHEMA: "Query found but query schema not provided.",
     RESPONSE_VALIDATION_FAILED: "Oops! Something went wrong. Please report this issue.",
     ERROR_VALIDATION_FAILED: "Oops! Something went wrong. Please report this issue.",
 };
@@ -22,7 +24,6 @@ export enum EAPIRequestMethod {
 export enum EServerResponseCodes {
     OK = 200,
     CREATED = 201,
-    UPDATED = 204, // OR DELETED
     ACCEPTED = 202,
 
     BAD_REQUEST = 400,

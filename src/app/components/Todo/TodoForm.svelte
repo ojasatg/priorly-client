@@ -12,8 +12,8 @@
     import {
         CreateTodoFormSchema,
         type TCreateTodoFormSchema,
-        type TTodoItemSchema,
         type TCreateTodoResponseSchema,
+        type TTodoItemSchema,
     } from "$schemas";
     import todoService from "$services/todo.service";
 
@@ -22,6 +22,7 @@
 
     // events
     const dispatchEvent = createEventDispatcher<{
+        create: TCreateTodoResponseSchema;
         cancel: null;
         close: null;
     }>();
@@ -80,9 +81,10 @@
             const responseData = await createTodo(values);
             return responseData;
         },
-        onSuccess: () => {
+        onSuccess: (response) => {
             submitting = false;
             resetValues();
+            dispatchEvent("create", response as TCreateTodoResponseSchema);
             dispatchEvent("close");
         },
         onError() {
@@ -109,6 +111,9 @@
 
         const newTodo = {
             ...todo,
+            title: todo.title.trim(),
+            description: todo.description?.trim(),
+            done: todo.done ?? false,
             deadline: deadlineTimestamp,
             reminder: reminderTimestamp,
         };

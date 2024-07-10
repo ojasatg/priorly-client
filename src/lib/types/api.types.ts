@@ -1,6 +1,4 @@
 import { EServerResponseRescodes } from "$lib/constants/api.consts";
-import type { FetchOptions } from "ofetch";
-import type { ZodSchema } from "zod";
 
 export type TAPIError = {
     rescode: EServerResponseRescodes.ERROR;
@@ -22,14 +20,5 @@ export interface IPostAPIParams<TRequest, TQuery = undefined> {
 
 export interface IGetAPIParams<TQuery = undefined> {
     query?: TQuery;
-    showAlerts?: boolean;
-}
-
-export interface IServiceBaseParams {
-    url: string;
-    options: FetchOptions;
-    querySchema: ZodSchema;
-    requestSchema: ZodSchema;
-    responseSchema: ZodSchema;
     showAlerts?: boolean;
 }

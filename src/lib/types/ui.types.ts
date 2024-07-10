@@ -6,7 +6,7 @@ export type TAlert = {
     id: string;
     visible: boolean;
     type: TComponentType;
-    message: string;
+    message?: string;
     buttonText?: string;
     buttonAction?: () => TButtonReturnFunction;
     duration?: number;

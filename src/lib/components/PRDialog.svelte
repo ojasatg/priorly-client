@@ -2,27 +2,20 @@
     import { Portal, Modal, Button } from "stwui";
     import { createEventDispatcher } from "svelte";
 
-    type TBeforeFunction = (...args: unknown[]) => Promise<boolean> | undefined;
-
     export let modelValue: boolean;
     export let title;
     export let subtitle = "";
     export let scrim = false;
 
-    export let beforeClose: TBeforeFunction | undefined = undefined;
-
-    const dispatchEvent = createEventDispatcher<{ close: { success: boolean } }>();
+    const dispatchEvent = createEventDispatcher<{ close: null }>();
 
     function onClose() {
-        if (beforeClose && typeof beforeClose === "function") {
-            const abort = beforeClose();
-            if (abort) {
-                dispatchEvent("close", { success: false });
-                return;
-            }
+        const contiune = dispatchEvent("close", null, { cancelable: true });
+        // After dispatch, run beforeClose function. Call event.preventDefault() to abort the further execution.
+        if (contiune) {
+            // only executes when event.preventDefault() is not called
+            modelValue = false;
         }
-        dispatchEvent("close", { success: true });
-        modelValue = false;
     }
 </script>
 

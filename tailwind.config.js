@@ -25,7 +25,7 @@ export default {
         tailwindForms,
         stwui,
         iconsPlugin({
-            collections: getIconCollections(["mdi"]),
+            collections: getIconCollections(["mdi", "carbon"]),
         }),
     ],
     stwui: {

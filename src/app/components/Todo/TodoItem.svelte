@@ -1,10 +1,13 @@
 <script lang="ts">
     // node imports
+    import { createEventDispatcher } from "svelte";
     import { Button } from "stwui";
     import tooltip from "stwui/actions/tooltip";
 
+    import PRDivider from "$lib/components/PRDivider.svelte";
+
     // local imports
-    import { type TTodoItemSchema } from "$schemas";
+    import { type TTodoItemViewSchema } from "$schemas";
     import { getFormattedTimestamp, getDaysDifferenceFromTimestamp } from "$lib/utils";
 
     const CUSTOM_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
@@ -13,9 +16,27 @@
         year: "numeric",
     };
 
-    export let todo: TTodoItemSchema;
+    export let todo: TTodoItemViewSchema;
+    let deleting = false;
 
     const daysRemainingFromDeadline = getDaysDifferenceFromTimestamp(todo.deadline ?? 0);
+
+    const dispatchEvent = createEventDispatcher<{
+        delete: {
+            id: string;
+            afterDeletion: () => void;
+        };
+    }>();
+
+    function onDelete() {
+        deleting = true;
+        dispatchEvent("delete", {
+            id: todo.id,
+            afterDeletion: () => {
+                deleting = false;
+            },
+        });
+    }
 
     $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
 </script>
@@ -37,28 +58,41 @@
             }}
             class="mt-1"
         >
-            <Button size="lg" shape="circle">
+            <Button size="lg" shape="circle" loading={deleting}>
                 <span slot="icon" class="i-mdi-application-edit-outline"> </span>
             </Button>
         </span>
     </header>
     <p class="body-medium my-4 text-wrap">{todo.description}</p>
     <section class="card-footer mt-2 p-0">
-        <section>
-            <p class="label-medium inline text-gray-400">Created on</p>
-            <p class="label-medium inline">
-                {getFormattedTimestamp(todo.created, CUSTOM_DATE_OPTIONS)}
-            </p>
-        </section>
-        <section>
-            <p class="label-medium inline text-gray-400">Last updated on</p>
-            <p class="label-medium inline">
-                {getFormattedTimestamp(todo.updated, CUSTOM_DATE_OPTIONS)}
-            </p>
+        <section class="flex items-end justify-between">
+            <section>
+                <p class="label-medium inline text-gray-600">Created on</p>
+                <p class="label-medium inline text-gray-900">
+                    {getFormattedTimestamp(todo.created, CUSTOM_DATE_OPTIONS)}
+                </p>
+                <section />
+                <p class="label-medium inline text-gray-600">Last updated on</p>
+                <p class="label-medium inline text-gray-900">
+                    {getFormattedTimestamp(todo.updated, CUSTOM_DATE_OPTIONS)}
+                </p>
+            </section>
+            <span
+                use:tooltip={{
+                    placement: "top",
+                    content: "Delete",
+                    arrow: false,
+                    animation: "scale",
+                }}
+            >
+                <Button size="lg" shape="circle" loading={deleting} on:click={onDelete}>
+                    <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error"> </span>
+                </Button>
+            </span>
         </section>
 
         {#if todo.reminder || todo.deadline || todo.completed}
-            <hr class="my-2" />
+            <PRDivider />
             <section class="flex flex-col gap-1">
                 {#if todo.reminder}
                     <section

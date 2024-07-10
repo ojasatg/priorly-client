@@ -11,9 +11,13 @@ import {
     AllTodosRequestSchema,
     AllTodosResponseSchema,
     AllTodosQuerySchema,
+    type TAllTodosQuerySchema,
+    type TDeleteTodoRequestSchema,
+    type TDeleteTodoResponseSchema,
+    DeleteTodoRequestSchema,
+    DeleteTodoResponseSchema,
 } from "$schemas";
 import { useCreateService } from "$lib/hooks/service.hooks";
-import { z } from "zod";
 
 const useTodoService = useCreateService();
 
@@ -25,14 +29,13 @@ async function createTodo({ requestData, showAlerts }: IPostAPIParams<TCreateTod
             method: EAPIRequestMethod.POST,
             body: requestData,
         },
-        querySchema: z.object({}), // empty for this service
         requestSchema: CreateTodoRequestSchema,
         responseSchema: CreateTodoResponseSchema,
         showAlerts,
     });
 }
 
-async function allTodos({ showAlerts, query }: IGetAPIParams) {
+async function allTodos({ showAlerts, query }: IGetAPIParams<TAllTodosQuerySchema>) {
     return useTodoService<TAllTododsResponseSchema>({
         url: APIs.TODO.ALL,
         options: {
@@ -46,9 +49,23 @@ async function allTodos({ showAlerts, query }: IGetAPIParams) {
     });
 }
 
+async function deleteTodo({ requestData, showAlerts }: IPostAPIParams<TDeleteTodoRequestSchema>) {
+    return useTodoService<TDeleteTodoResponseSchema>({
+        url: APIs.TODO.DELETE,
+        options: {
+            method: EAPIRequestMethod.POST,
+            body: requestData,
+        },
+        requestSchema: DeleteTodoRequestSchema,
+        responseSchema: DeleteTodoResponseSchema,
+        showAlerts,
+    });
+}
+
 const todoService = {
     createTodo,
     allTodos,
+    deleteTodo,
 };
 
 export default todoService;

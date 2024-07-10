@@ -5,7 +5,7 @@ import { derived, writable } from "svelte/store";
 
 interface IShowAlertParams {
     type: TComponentType;
-    message: string;
+    message?: string;
     buttonText?: string;
     buttonAction?: () => TButtonReturnFunction;
     duration?: number;
@@ -15,17 +15,19 @@ const useAlertStore = () => {
     const _alerts = writable<TAlert[]>([]);
 
     function showAlert(params: IShowAlertParams) {
-        const newAlert: TAlert = {
-            id: generateRandomDOMId(),
-            visible: true,
-            type: params.type,
-            message: params.message,
-            buttonText: params.buttonText,
-            buttonAction: params.buttonAction,
-            duration: params.duration ?? 5000,
-        };
+        if (params.message) {
+            const newAlert: TAlert = {
+                id: generateRandomDOMId(),
+                visible: true,
+                type: params.type,
+                message: params.message,
+                buttonText: params.buttonText,
+                buttonAction: params.buttonAction,
+                duration: params.duration ?? 5000,
+            };
 
-        _alerts.update((prev) => [...prev, newAlert]);
+            _alerts.update((prev) => [...prev, newAlert]);
+        }
     }
 
     const alerts = derived(_alerts, ($_alerts, set) => {
@@ -48,13 +50,13 @@ const useAlertStore = () => {
         subscribe,
         showAlert,
 
-        success: (message: string, duration?: number) =>
+        success: (message?: string, duration?: number) =>
             showAlert({ type: "success", message, duration }),
-        info: (message: string, duration?: number) =>
+        info: (message?: string, duration?: number) =>
             showAlert({ type: "info", message, duration }),
-        warning: (message: string, duration?: number) =>
+        warning: (message?: string, duration?: number) =>
             showAlert({ type: "warn", message, duration }),
-        error: (message: string, duration?: number) =>
+        error: (message?: string, duration?: number) =>
             showAlert({ type: "error", message, duration }),
     };
 };

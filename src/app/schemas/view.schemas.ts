@@ -1,15 +1,8 @@
 import z from "zod";
+import { TodoItemSchema } from "./response.schemas";
 
-export const TodoItemSchema = z.object({
-    id: z.string(),
-    title: z.string(),
-    description: z.string(),
-    done: z.boolean(),
-    created: z.number(),
-    updated: z.number(),
-    deadline: z.number().nullish(),
-    reminder: z.number().nullish(),
-    completed: z.number().nullish(),
-});
+export const TodoItemViewSchema = TodoItemSchema.merge(
+    z.object({ loading: z.boolean().optional() }),
+);
 
-export type TTodoItemSchema = z.infer<typeof TodoItemSchema>;
+export type TTodoItemViewSchema = z.infer<typeof TodoItemViewSchema>;

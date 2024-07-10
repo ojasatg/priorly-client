@@ -1,20 +1,31 @@
 import { PUBLIC_API_URI } from "$env/static/public";
+
+import defu from "defu";
+import _ from "lodash";
+import { type FetchOptions, ofetch } from "ofetch";
+import { z, ZodSchema } from "zod";
+
 import {
     EServiceMessageCodes,
     EAPIRequestMethod,
     EServerResponseCodes,
     EServerResponseRescodes,
+    SERVICE_MESSAGES,
 } from "$lib/constants/api.consts";
 import { SuccessResponseSchema, ErrorResponseSchema } from "$lib/schemas/api.schemas";
 import { alerts } from "$lib/stores/alertStore";
-import type { IServiceBaseParams, TAPISuccess } from "$lib/types/api.types";
-import { generateServiceMessages } from "$lib/utils";
-import defu from "defu";
-import _ from "lodash";
-import { type FetchOptions, ofetch } from "ofetch";
-import { z } from "zod";
+import type { TAPISuccess } from "$lib/types/api.types";
 
 // import { handleAuthenticationError } from "$handlers/auth.handler";
+
+interface ICreateServiceParams {
+    url: string;
+    options: FetchOptions;
+    querySchema?: ZodSchema;
+    requestSchema: ZodSchema;
+    responseSchema: ZodSchema;
+    showAlerts?: boolean;
+}
 
 async function createService<TData>({
     url,
@@ -23,7 +34,7 @@ async function createService<TData>({
     requestSchema,
     responseSchema,
     showAlerts,
-}: IServiceBaseParams): Promise<TData | undefined> {
+}: ICreateServiceParams): Promise<TData | undefined> {
     const baseURL = PUBLIC_API_URI;
     const defaults: FetchOptions = {
         baseURL,
@@ -52,25 +63,27 @@ async function createService<TData>({
         } catch (error) {
             console.error(error);
             if (showAlerts) {
-                alerts.error(
-                    generateServiceMessages(EServiceMessageCodes.REQUEST_VALIDATION_FAILED),
-                );
+                alerts.error(SERVICE_MESSAGES[EServiceMessageCodes.REQUEST_VALIDATION_FAILED]);
             }
             throw new Error(EServiceMessageCodes.REQUEST_VALIDATION_FAILED);
         }
     }
 
     if (!_.isEmpty(queryParams)) {
-        try {
-            const queryParse = querySchema.parse(queryParams);
-            queryParams = queryParse; // strips unwanted keys
-            options.query = queryParse;
-        } catch (error) {
-            console.error(error);
-            if (showAlerts) {
-                alerts.error(generateServiceMessages(EServiceMessageCodes.QUERY_VALIDATION_FAILED));
+        if (!querySchema) {
+            throw new Error(EServiceMessageCodes.QUERY_WITHOUT_SCHEMA);
+        } else {
+            try {
+                const queryParse = querySchema.parse(queryParams);
+                queryParams = queryParse; // strips unwanted keys
+                options.query = queryParse;
+            } catch (error) {
+                console.error(error);
+                if (showAlerts) {
+                    alerts.error(SERVICE_MESSAGES[EServiceMessageCodes.QUERY_VALIDATION_FAILED]);
+                }
+                throw new Error(EServiceMessageCodes.QUERY_VALIDATION_FAILED);
             }
-            throw new Error(EServiceMessageCodes.QUERY_VALIDATION_FAILED);
         }
     }
 
@@ -106,9 +119,7 @@ async function createService<TData>({
             // throw error when validation fails
             console.error(error);
             if (showAlerts) {
-                alerts.error(
-                    generateServiceMessages(EServiceMessageCodes.RESPONSE_VALIDATION_FAILED),
-                );
+                alerts.error(SERVICE_MESSAGES[EServiceMessageCodes.RESPONSE_VALIDATION_FAILED]);
             }
             throw new Error(EServiceMessageCodes.RESPONSE_VALIDATION_FAILED);
         }
@@ -126,7 +137,7 @@ async function createService<TData>({
         } else {
             // else we show a predifined message and throw error for the caller.
             if (showAlerts) {
-                alerts.error(generateServiceMessages(EServiceMessageCodes.ERROR_VALIDATION_FAILED));
+                alerts.error(SERVICE_MESSAGES[EServiceMessageCodes.ERROR_VALIDATION_FAILED]);
             }
             console.error(EServiceMessageCodes.ERROR_VALIDATION_FAILED);
             throw new Error(EServiceMessageCodes.ERROR_VALIDATION_FAILED);

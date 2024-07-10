@@ -1,19 +1,28 @@
 <script lang="ts">
+    // svelte imports
+    import { onMount } from "svelte";
+    // component imports
     import { Button } from "stwui";
     import tooltip from "stwui/actions/tooltip";
+    // other modules
     import _ from "lodash";
 
+    // lib imports in order
+    import { alerts } from "$lib/stores/alertStore";
     import PRDialog from "$lib/components/PRDialog.svelte";
 
+    // schemas and types (in order)
     import type { TTodoItemSchema, TTodoItemViewSchema, TCreateTodoResponseSchema } from "$schemas";
 
+    // services
+    import todoService from "$services/todo.service";
+
+    // local components
+    import TodosWrapperLoader from "$components/loaders/TodosWrapperLoader.svelte";
     import TodosWrapper from "$components/Todo/TodosWrapper.svelte";
     import TodoForm from "$components/Todo/TodoForm.svelte";
-    import todoService from "$services/todo.service";
-    import { onMount } from "svelte";
-    import { alerts } from "$lib/stores/alertStore";
-    import TodosWrapperLoader from "$components/loaders/TodosWrapperLoader.svelte";
 
+    // local variables
     const selectedTodo = {} as TTodoItemViewSchema;
     let showAddTodoForm = false;
 
@@ -23,6 +32,7 @@
     let pendingTodos: TTodoItemViewSchema[];
     let doneTodos: TTodoItemViewSchema[];
 
+    // event catchers
     function onCancel() {
         showAddTodoForm = false;
     }
@@ -45,10 +55,12 @@
         allTodos = allTodos; //  reassign to update the UI
     }
 
+    // local utilities
     function _filterTodos(todos: TTodoItemViewSchema[], filter: Partial<TTodoItemSchema>) {
-        return _.filter(allTodos, filter) as TTodoItemViewSchema[];
+        return _.filter(todos, filter) as TTodoItemViewSchema[];
     }
 
+    // functions
     async function getAllTodos() {
         try {
             fetchingTodos = true;
@@ -62,9 +74,11 @@
         }
     }
 
+    // reactive statements
     $: pendingTodos = _filterTodos(allTodos, { done: false });
     $: doneTodos = _filterTodos(allTodos, { done: true });
 
+    // lifecycle methods
     onMount(() => {
         getAllTodos();
     });

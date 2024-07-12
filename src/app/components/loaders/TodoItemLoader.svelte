@@ -4,7 +4,7 @@
 
 <section
     id={`todo-item-${id}`}
-    class="card h-fit w-80 rounded-md bg-white px-4 pb-4 pt-2 shadow-md shadow-gray-400"
+    class="card h-fit w-80 rounded-md border border-gray-200 bg-white px-4 pb-4 pt-2"
 >
     <header class="mt-2 flex items-center justify-between gap-2">
         <div class="skeleton h-8 flex-grow p-0"></div>

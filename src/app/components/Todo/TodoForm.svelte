@@ -13,12 +13,12 @@
         CreateTodoFormSchema,
         type TCreateTodoFormSchema,
         type TCreateTodoResponseSchema,
-        type TTodoItemSchema,
+        type TTodoItemResponseSchema,
     } from "$schemas";
     import todoService from "$services/todo.service";
 
     // props
-    export let todo: TTodoItemSchema;
+    export let todo: TTodoItemResponseSchema;
 
     // events
     const dispatchEvent = createEventDispatcher<{
@@ -35,7 +35,7 @@
     let deadline: Date | undefined = todo?.deadline ? new Date(todo.deadline * 1000) : undefined;
     let reminder: Date | undefined = todo?.reminder ? new Date(todo.reminder * 1000) : undefined;
 
-    let done = todo.done ?? false;
+    let isDone = todo.isDone ?? false;
     let submitting = false;
 
     function validateDeadlineReminder(deadline?: Date, reminder?: Date) {
@@ -96,7 +96,7 @@
     function resetValues() {
         title = "";
         description = "";
-        done = false;
+        isDone = false;
         deadline = undefined;
         reminder = undefined;
     }
@@ -112,8 +112,8 @@
         const newTodo = {
             ...todo,
             title: todo.title.trim(),
-            description: todo.description?.trim(),
-            done: todo.done ?? false,
+            description: todo.description?.trim() ?? "",
+            isDone: todo.isDone ?? false,
             deadline: deadlineTimestamp,
             reminder: reminderTimestamp,
         };
@@ -150,14 +150,14 @@
         </section>
         <section class="mb-2 grid gap-4">
             <CheckboxGroup>
-                <CheckboxGroup.Checkbox name="done" value="done" bind:checked={done}>
+                <CheckboxGroup.Checkbox name="isDone" value="isDone" bind:checked={isDone}>
                     <CheckboxGroup.Checkbox.Label slot="label" class="label-medium"
                         >Mark as done</CheckboxGroup.Checkbox.Label
                     >
                 </CheckboxGroup.Checkbox>
             </CheckboxGroup>
 
-            {#if !done}
+            {#if !isDone}
                 <DatePicker
                     name="deadline"
                     label="Deadline"
@@ -174,7 +174,7 @@
                                 class="i-mdi-information-outline h-4 w-4 text-primary"
                                 use:tooltip={{
                                     placement: "right",
-                                    content: "Set a Deadline in your Google Calendar",
+                                    content: "Set a deadline in your Google Calendar",
                                     arrow: false,
                                     animation: "scale",
                                 }}
@@ -188,11 +188,12 @@
                 <DatePicker
                     name="reminder"
                     label="Reminder"
-                    placeholder="Add a Reminder"
+                    placeholder="Add a reminder"
                     bind:value={reminder}
                     min={new Date()}
                     max={deadline ? addDaysToDate(deadline, 1) : undefined}
                     error={$addTodoFormErrors.reminder?.[0]}
+                    showTime
                     allowClear
                     class="flex-auto"
                 >

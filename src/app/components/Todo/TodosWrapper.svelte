@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { TTodoItemSchema } from "$schemas";
+    import type { TTodoItemViewSchema } from "$schemas";
     import TodoItem from "./TodoItem.svelte";
 
-    export let todos: TTodoItemSchema[];
+    export let todos: TTodoItemViewSchema[];
 </script>
 
 <section>

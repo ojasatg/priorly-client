@@ -1,8 +1,5 @@
 import z from "zod";
-import { TodoItemSchema } from "./response.schemas";
+import { TodoItemResponseSchema } from "./response.schemas";
 
-export const TodoItemViewSchema = TodoItemSchema.merge(
-    z.object({ loading: z.boolean().optional() }),
-);
-
+export const TodoItemViewSchema = TodoItemResponseSchema;
 export type TTodoItemViewSchema = z.infer<typeof TodoItemViewSchema>;

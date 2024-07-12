@@ -1,9 +1,8 @@
-<script>
-    import "./styles.css";
+<script lang="ts">
     import "../app.scss";
 
     import PRAlert from "$lib/components/PRAlert.svelte";
-    import { alerts } from "$lib/stores/alertStore";
+    import { alerts } from "$lib/stores/AlertStore";
     import _ from "lodash";
 
     function showAlerts() {
@@ -19,19 +18,18 @@
             message: "Action alert",
             duration: 5000,
             buttonText: "Click Me!",
-
-            buttonAction: () => {
-                alert("Button Action clicked");
-            },
         });
+    }
+
+    function doAlertAction(event: CustomEvent<{ alertId: string }>) {
+        alert(event.detail.alertId);
     }
 </script>
 
-<section class="app">
+<section class="app gradient-surface">
     {#if !_.isEmpty($alerts)}
-        <PRAlert />
+        <PRAlert on:click={doAlertAction} />
     {/if}
-    <!-- <Header /> -->
 
     <main>
         <slot />
@@ -42,12 +40,6 @@
             Show Action Alert
         </button>
     </main>
-
-    <footer>
-        <p class="text-wrap text-center text-3xl">
-            visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit
-        </p>
-    </footer>
 </section>
 
 <style>
@@ -66,23 +58,5 @@
         max-width: 64rem;
         margin: 0 auto;
         box-sizing: border-box;
-    }
-
-    footer {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding: 12px;
-    }
-
-    footer a {
-        font-weight: bold;
-    }
-
-    @media (min-width: 480px) {
-        footer {
-            padding: 12px 0;
-        }
     }
 </style>

@@ -1,5 +1,4 @@
 import type { TAlert, TComponentType } from "$lib/types/ui.types";
-import type { TButtonReturnFunction } from "$lib/types/event.types";
 import { generateRandomDOMId } from "$lib/utils";
 import { derived, writable } from "svelte/store";
 
@@ -7,7 +6,6 @@ interface IShowAlertParams {
     type: TComponentType;
     message?: string;
     buttonText?: string;
-    buttonAction?: () => TButtonReturnFunction;
     duration?: number;
 }
 
@@ -22,7 +20,6 @@ const useAlertStore = () => {
                 type: params.type,
                 message: params.message,
                 buttonText: params.buttonText,
-                buttonAction: params.buttonAction,
                 duration: params.duration ?? 5000,
             };
 

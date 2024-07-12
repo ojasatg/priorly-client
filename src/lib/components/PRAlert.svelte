@@ -1,9 +1,12 @@
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
     import { Alert, Button } from "stwui";
 
     import { COMPONENT_DETAILS_MAP } from "$lib/constants/ui.consts";
     import type { TAlert } from "$lib/types/ui.types";
-    import { alerts } from "$lib/stores/alertStore";
+    import { alerts } from "$lib/stores/AlertStore";
+
+    const dispatchEvent = createEventDispatcher<{ click: { alertId: string } }>();
 
     $: allAlerts = $alerts as TAlert[];
 </script>
@@ -22,7 +25,7 @@
             <Alert.Title class="body-medium" slot="title">{alert.message}</Alert.Title>
             <Alert.Extra slot="extra">
                 {#if alert.buttonText}
-                    <Button on:click={alert.buttonAction?.()}>
+                    <Button on:click={dispatchEvent("click", { alertId: alert.id })}>
                         <span class={COMPONENT_DETAILS_MAP[alert.type].classColor}
                             >{alert.buttonText}</span
                         >

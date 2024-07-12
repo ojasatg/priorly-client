@@ -60,7 +60,7 @@ $type-base-index: list.index($type-steps, "md");
     --font-headline-size: 2.24rem; // 1.6 * ttile
 
     --label-weight: 400;
-    --label-bold-weight: 600;
+    --label-bold-weight: 500;
     --body-weight: 400;
     --title-weight: 500;
     --headline-weight: 600;
@@ -184,7 +184,7 @@ $type-base-index: list.index($type-steps, "md");
 
 .title-large {
     font-family: var(--font-body);
-    line-height: 2;
+    line-height: 1.8;
     font-size: calc(var(--font-title-size) * 1.3);
     font-weight: var(--title-weight);
     letter-spacing: normal;
@@ -193,7 +193,7 @@ $type-base-index: list.index($type-steps, "md");
 
 .title-medium {
     font-family: var(--font-body);
-    line-height: 1.8;
+    line-height: 1.5;
     font-size: var(--font-title-size);
     font-weight: var(--title-weight);
     letter-spacing: 0.015rem;
@@ -202,7 +202,7 @@ $type-base-index: list.index($type-steps, "md");
 
 .title-small {
     font-family: var(--font-body);
-    line-height: 1.6;
+    line-height: 1.2;
     font-size: calc(var(--font-title-size) * 0.76);
     font-weight: var(--title-weight);
     letter-spacing: 0.01rem;

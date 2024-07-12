@@ -8,11 +8,11 @@
     import _ from "lodash";
 
     // lib imports in order
-    import { alerts } from "$lib/stores/alertStore";
+    import { alerts } from "$lib/stores/AlertStore";
     import PRDialog from "$lib/components/PRDialog.svelte";
 
     // schemas and types (in order)
-    import type { TTodoItemSchema, TTodoItemViewSchema, TCreateTodoResponseSchema } from "$schemas";
+    import type { TTodoItemViewSchema, TCreateTodoResponseSchema } from "$schemas";
 
     // services
     import todoService from "$services/todo.service";
@@ -26,11 +26,9 @@
     const selectedTodo = {} as TTodoItemViewSchema;
     let showAddTodoForm = false;
 
-    let allTodos: TTodoItemViewSchema[];
+    let allTodos: TTodoItemViewSchema[] = [];
     let fetchingTodos: boolean;
-
-    let pendingTodos: TTodoItemViewSchema[];
-    let doneTodos: TTodoItemViewSchema[];
+    let fetchTodoError: boolean;
 
     // event catchers
     function onCancel() {
@@ -55,11 +53,6 @@
         allTodos = allTodos; //  reassign to update the UI
     }
 
-    // local utilities
-    function _filterTodos(todos: TTodoItemViewSchema[], filter: Partial<TTodoItemSchema>) {
-        return _.filter(todos, filter) as TTodoItemViewSchema[];
-    }
-
     // functions
     async function getAllTodos() {
         try {
@@ -69,14 +62,16 @@
         } catch (error) {
             alerts.error("Failed to fetch todos, please try again");
             console.error(error);
+            fetchTodoError = true;
         } finally {
             fetchingTodos = false;
         }
     }
 
     // reactive statements
-    $: pendingTodos = _filterTodos(allTodos, { done: false });
-    $: doneTodos = _filterTodos(allTodos, { done: true });
+    $: pinnedTodos = allTodos.filter((todo) => !todo.isDone && todo.isPinned);
+    $: pendingTodos = allTodos.filter((todo) => !todo.isDone && !todo.isPinned);
+    $: doneTodos = allTodos.filter((todo) => todo.isDone);
 
     // lifecycle methods
     onMount(() => {
@@ -85,50 +80,84 @@
 </script>
 
 <section>
-    <section>
-        <section class="mb-4 flex items-center justify-between">
-            <p class="title-medium">My Todos</p>
-            <span
-                use:tooltip={{
-                    placement: "top",
-                    content: "Add a new Todo",
-                    arrow: false,
-                    animation: "scale",
-                }}
-                class="mb-3"
+    <section class="mb-4 flex items-center gap-2">
+        <p class="title-medium">My Todos</p>
+        <span
+            use:tooltip={{
+                placement: "top",
+                content: "Refresh",
+                arrow: false,
+                animation: "scale",
+            }}
+            class="w-fit"
+        >
+            <Button
+                shape="circle"
+                size="lg"
+                on:click={getAllTodos}
+                disabled={fetchingTodos}
+                loading={fetchingTodos}
             >
-                <Button
-                    type="primary"
-                    shape="pill"
-                    size="md"
-                    class="mt-4"
-                    loading={showAddTodoForm}
-                    on:click={() => (showAddTodoForm = true)}
-                >
-                    <span class="i-mdi-plus h-16 w-16" slot="leading" />
-                    <span class="title-small mr-4">Add</span>
-                </Button>
-            </span>
-        </section>
-        {#if fetchingTodos}
-            <TodosWrapperLoader />
-        {:else if !fetchingTodos && !_.isEmpty(allTodos)}
-            <p class="label-bold-medium mb-2">PENDING</p>
-            <TodosWrapper todos={pendingTodos} on:delete={onDelete} />
-            <p class="label-bold-medium mb-2 mt-4">DONE</p>
-            <TodosWrapper todos={doneTodos} on:delete={onDelete} />
-        {:else}
-            <p class="body-medium text-gray-400">No items to show</p>
-        {/if}
+                <span slot="icon" class="i-mdi-refresh h-16 w-16" />
+            </Button>
+        </span>
+        <span
+            use:tooltip={{
+                placement: "top",
+                content: "Add a new Todo",
+                arrow: false,
+                animation: "scale",
+            }}
+            class="mb-3 ml-auto"
+        >
+            <Button
+                type="primary"
+                shape="pill"
+                size="md"
+                class="mt-4"
+                loading={showAddTodoForm}
+                on:click={() => (showAddTodoForm = true)}
+            >
+                <span class="i-mdi-plus h-16 w-16" slot="leading" />
+                <span class="title-small mr-4">Add</span>
+            </Button>
+        </span>
     </section>
-
-    <PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo" scrim>
-        <TodoForm
-            todo={selectedTodo}
-            on:create={onCreate}
-            on:cancel={onCancel}
-            on:close={onCancel}
-            slot="content"
-        />
-    </PRDialog>
+    {#if fetchingTodos}
+        <TodosWrapperLoader />
+    {:else if !fetchingTodos && !fetchTodoError}
+        <section class="grid gap-4">
+            {#if !_.isEmpty(pinnedTodos)}
+                <section>
+                    <p class="label-bold-medium mb-2 text-gray-500">PINNED</p>
+                    <TodosWrapper todos={pinnedTodos} on:delete={onDelete} />
+                </section>
+            {/if}
+            {#if !_.isEmpty(pendingTodos)}
+                <section>
+                    <p class="label-bold-medium mb-2 text-gray-500">PENDING</p>
+                    <TodosWrapper todos={pendingTodos} on:delete={onDelete} />
+                </section>
+            {/if}
+            {#if !_.isEmpty(doneTodos)}
+                <p class="body-medium text-gray-600">Hurray! You're done for now!</p>
+                <section>
+                    <p class="label-bold-medium mb-2 text-gray-500">DONE</p>
+                    <TodosWrapper todos={doneTodos} on:delete={onDelete} />
+                </section>
+            {/if}
+        </section>
+    {:else}
+        <p class="body-medium text-gray-600">No items to show</p>
+    {/if}
 </section>
+
+<PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo" scrim>
+    <TodoForm
+        todo={selectedTodo}
+        on:create={onCreate}
+        on:cancel={onCancel}
+        on:close={onCancel}
+        slot="content"
+    />
+</PRDialog>

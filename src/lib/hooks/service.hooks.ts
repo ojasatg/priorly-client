@@ -13,7 +13,8 @@ import {
     SERVICE_MESSAGES,
 } from "$lib/constants/api.consts";
 import { SuccessResponseSchema, ErrorResponseSchema } from "$lib/schemas/api.schemas";
-import { alerts } from "$lib/stores/alertStore";
+import { alerts } from "$lib/stores/AlertStore";
+
 import type { TAPISuccess } from "$lib/types/api.types";
 
 // import { handleAuthenticationError } from "$handlers/auth.handler";

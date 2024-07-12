@@ -1,10 +1,12 @@
 <script lang="ts">
     // node imports
     import { createEventDispatcher } from "svelte";
-    import { Button } from "stwui";
+    import { Button, Dropdown } from "stwui";
     import tooltip from "stwui/actions/tooltip";
 
+    // lib imports
     import PRDivider from "$lib/components/PRDivider.svelte";
+    import { TODO_ITEM_MENU_ITEMS, ETodoItemMenuKeys } from "$constants/ui.consts";
 
     // local imports
     import { type TTodoItemViewSchema } from "$schemas";
@@ -38,32 +40,62 @@
         });
     }
 
+    function handleMenuItemClick(item: ETodoItemMenuKeys) {
+        alert(item);
+    }
+
+    let showMenu = false;
+
     $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
+    $: description_font_size_class = todo.description.length <= 60 ? "body-large" : "body-medium";
 </script>
 
 <section
     id={`todo-item-${todo.id}`}
-    class="card h-fit w-80 rounded-md bg-white px-4 pb-4 pt-2 shadow-md shadow-gray-400"
+    class="card h-fit w-80 cursor-default rounded-md border border-gray-200 bg-white px-4 pb-4 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
 >
-    <header class="flex items-center justify-between gap-2">
-        <p class="title-medium card-header flex-grow p-0" class:line-through={todo.done}>
+    <header class="flex items-start justify-between gap-2">
+        <p class="title-medium card-header flex-grow p-0" class:line-through={todo.isDone}>
             {todo.title}
         </p>
-        <span
-            use:tooltip={{
-                placement: "top",
-                content: "Edit",
-                arrow: false,
-                animation: "scale",
-            }}
-            class="mt-1"
-        >
-            <Button size="lg" shape="circle" loading={deleting}>
-                <span slot="icon" class="i-mdi-application-edit-outline"> </span>
-            </Button>
-        </span>
+
+        <Dropdown bind:visible={showMenu}>
+            <span
+                use:tooltip={{
+                    placement: "top",
+                    content: "More options",
+                    arrow: false,
+                    animation: "scale",
+                }}
+                class="w-fit"
+                slot="trigger"
+            >
+                <Button
+                    size="sm"
+                    shape="circle"
+                    loading={deleting}
+                    on:click={() => {
+                        showMenu = !showMenu;
+                    }}
+                >
+                    <span slot="icon" class="i-mdi-dots-vertical"> </span>
+                </Button>
+            </span>
+            <Dropdown.Items slot="items">
+                {#each TODO_ITEM_MENU_ITEMS as menuItem}
+                    <Dropdown.Items.Item
+                        on:click={() => handleMenuItemClick(menuItem.key)}
+                        label={menuItem.label}
+                    >
+                        <span slot="icon" class="{menuItem.icon} h-4 w-4" />
+                    </Dropdown.Items.Item>
+                {/each}
+            </Dropdown.Items>
+        </Dropdown>
     </header>
-    <p class="body-medium my-4 text-wrap">{todo.description}</p>
+    <p class="my-4 text-wrap {description_font_size_class}">
+        {todo.description}
+    </p>
     <section class="card-footer mt-2 p-0">
         <section class="flex items-end justify-between">
             <section>
@@ -85,15 +117,21 @@
                     animation: "scale",
                 }}
             >
-                <Button size="lg" shape="circle" loading={deleting} on:click={onDelete}>
+                <Button
+                    size="lg"
+                    shape="circle"
+                    loading={deleting}
+                    class="-mb-2"
+                    on:click={onDelete}
+                >
                     <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error"> </span>
                 </Button>
             </span>
         </section>
 
-        {#if todo.reminder || todo.deadline || todo.completed}
+        {#if todo.reminder || todo.deadline || todo.isDone}
             <PRDivider />
-            <section class="flex flex-col gap-1">
+            <section class="grid gap-1">
                 {#if todo.reminder}
                     <section
                         use:tooltip={{
@@ -102,7 +140,7 @@
                             arrow: false,
                             animation: "scale",
                         }}
-                        class="card-footer flex items-center gap-1 p-0"
+                        class="card-footer flex w-fit items-center gap-1 p-0"
                     >
                         <span class="i-mdi-alarm"></span>
                         <p class="label-medium inline">
@@ -118,7 +156,7 @@
                             arrow: false,
                             animation: "scale",
                         }}
-                        class="card-footer flex items-center gap-1 p-0 {deadline_class}"
+                        class="card-footer flex w-fit items-center gap-1 p-0 {deadline_class}"
                     >
                         <span class="i-mdi-clock-alert-outline"></span>
                         <p class="label-medium inline">
@@ -127,19 +165,19 @@
                     </section>
                 {/if}
 
-                {#if todo.completed}
+                {#if todo.isDone}
                     <section
                         use:tooltip={{
                             placement: "bottom-start",
-                            content: "Completed",
+                            content: "You marked this item as done",
                             arrow: false,
                             animation: "scale",
                         }}
-                        class="card-footer flex items-center gap-1 p-0 text-success"
+                        class="card-footer flex w-fit items-center gap-1 p-0 text-success"
                     >
                         <span class="i-mdi-checkbox-marked-circle-outline"></span>
                         <p class="label-medium inline">
-                            {getFormattedTimestamp(todo.completed)}
+                            {getFormattedTimestamp(todo.completedOn ?? 0)}
                         </p>
                     </section>
                 {/if}

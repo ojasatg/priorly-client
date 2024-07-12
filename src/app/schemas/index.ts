@@ -1,3 +1,4 @@
+export * from "./generic.schema";
 export * from "./view.schemas";
 export * from "./form.schemas";
 export * from "./query.schemas";

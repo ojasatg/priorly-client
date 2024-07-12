@@ -1,28 +1,27 @@
 import z from "zod";
+import { GenericTodoItemSchema } from "./generic.schema";
 
-export const TodoItemSchema = z.object({
-    id: z.string(),
-    title: z.string(),
-    description: z.string().nullish(),
-    done: z.boolean(),
-    created: z.number(),
-    updated: z.number(),
-    deadline: z.number().nullish(),
-    reminder: z.number().nullish(),
-    completed: z.number().nullish(),
-});
+export const TodoItemResponseSchema = GenericTodoItemSchema.merge(
+    z.object({
+        id: z.string(),
+        created: z.number(),
+        updated: z.number(),
+        completedOn: z.number().nullish(),
+        isPinned: z.boolean().nullish(),
+    }),
+);
 
 export const CreateTodoResponseSchema = z.object({
-    todo: TodoItemSchema,
+    todo: TodoItemResponseSchema,
 });
 
 export const AllTodosResponseSchema = z.object({
-    todos: z.array(TodoItemSchema),
+    todos: z.array(TodoItemResponseSchema),
 });
 
 export const DeleteTodoResponseSchema = z.object({ id: z.string() });
 
-export type TTodoItemSchema = z.infer<typeof TodoItemSchema>;
+export type TTodoItemResponseSchema = z.infer<typeof TodoItemResponseSchema>;
 export type TCreateTodoResponseSchema = z.infer<typeof CreateTodoResponseSchema>;
 export type TAllTododsResponseSchema = z.infer<typeof AllTodosResponseSchema>;
 export type TDeleteTodoResponseSchema = z.infer<typeof DeleteTodoResponseSchema>;

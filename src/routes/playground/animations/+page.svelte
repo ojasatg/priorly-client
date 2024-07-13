@@ -22,7 +22,7 @@
 {#if show}
     <section
         class="mx-auto mb-auto mt-48 grid w-96 gap-2 text-wrap bg-yellow-300 p-4 text-justify"
-        transition:fade={{ delay: 250, duration: 2000, axis: "x" }}
+        transition:fade={{ delay: 250, duration: 2000 }}
     >
         {#each arr as a}
             <section id={a} class="h-12 w-full bg-black" transition:slide></section>

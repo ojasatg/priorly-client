@@ -34,4 +34,5 @@ export const TODO_ITEM_MENU_ITEMS: IDropdownItem<ETodoItemMenuKeys, TTodoItemVie
 export enum ETodoToggleType {
     PIN,
     DONE,
+    SELECT,
 }

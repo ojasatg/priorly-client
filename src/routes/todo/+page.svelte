@@ -24,17 +24,15 @@
     import { ETodoToggleType } from "$constants/todo.consts";
 
     // local variables
-    const selectedTodo = {} as TTodoItemViewSchema;
+    const editingTodo = {} as TTodoItemViewSchema;
     let showAddTodoForm = false;
 
     let allTodos: TTodoItemViewSchema[] = [];
+    const selectedTodos = new Set<string>();
     let fetchingTodos: boolean;
     let fetchTodoError: boolean;
 
     // event catchers
-    function cancelTodoCreation() {
-        showAddTodoForm = false;
-    }
 
     // functions
     async function deleteTodo(event: CustomEvent<{ id: string; afterDeletion?: () => void }>) {
@@ -66,6 +64,17 @@
 
         const todoIndex = _.findIndex(allTodos, { id: todoId });
         const oldTodo = allTodos[todoIndex]; // back up the old values
+
+        if (toggleValue === ETodoToggleType.SELECT) {
+            if (oldTodo.isSelected) {
+                oldTodo.isSelected = false;
+            } else {
+                oldTodo.isSelected = true;
+                selectedTodos.add(todoId);
+            }
+            return;
+        }
+
         const changes = {
             isDone: oldTodo.isDone,
             isPinned: oldTodo.isPinned,
@@ -120,8 +129,8 @@
     $: doneTodos = allTodos.filter((todo) => todo.isDone);
 
     // lifecycle methods
-    onMount(() => {
-        getAllTodos();
+    onMount(async () => {
+        await getAllTodos();
     });
 </script>
 
@@ -201,11 +210,11 @@
 
 <PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo" scrim>
     <TodoForm
-        todo={selectedTodo}
+        todo={editingTodo}
         formType="add"
         on:create={createTodo}
-        on:cancel={cancelTodoCreation}
-        on:close={cancelTodoCreation}
+        on:cancel={() => (showAddTodoForm = false)}
+        on:close={() => (showAddTodoForm = false)}
         slot="content"
     />
 </PRDialog>

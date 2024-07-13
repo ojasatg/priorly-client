@@ -45,6 +45,10 @@
         dispatchEvent("toggle", { id: todo.id, toggleValue: ETodoToggleType.DONE });
     }
 
+    function toggleSelected() {
+        dispatchEvent("toggle", { id: todo.id, toggleValue: ETodoToggleType.SELECT });
+    }
+
     function handleMenuItemClick(item: ETodoItemMenuKeys) {
         alert(item);
     }
@@ -56,12 +60,34 @@
     $: toggleDoneIcon = todo.isDone
         ? "i-mdi-checkbox-marked-circle-minus-outline text-error"
         : "i-mdi-checkbox-marked-circle-plus-outline text-success";
+    $: selectIcon = todo.isSelected
+        ? "i-mdi-check-circle text-primary"
+        : "i-mdi-check-circle-outline text-black";
+
+    $: borderColor = todo.isSelected ? "border-primary" : "border-gray-200";
 </script>
 
 <section
-    id={`todo-item-${todo.id}`}
-    class="card h-fit w-80 cursor-default rounded-md border border-gray-200 bg-white px-4 pb-4 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
+    id={`todo-item-card-${todo.id}`}
+    class="card relative h-fit w-80 cursor-default rounded-md border {borderColor} todo-item-card bg-white px-4 pb-4 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
 >
+    <span
+        use:tooltip={{
+            placement: "top",
+            content: todo.isSelected ? "Unselect" : "Select",
+            arrow: false,
+            animation: "scale",
+        }}
+        class="todo-item-card-check absolute -right-2 -top-3 ml-auto w-fit"
+    >
+        <input
+            type="checkbox"
+            bind:checked={todo.isSelected}
+            class="h-6 w-6 {selectIcon}"
+            on:click={toggleSelected}
+        />
+    </span>
+
     <header class="card-header flex items-start">
         <p class="title-medium flex-grow p-0" class:line-through={todo.isDone}>
             {todo.title}
@@ -233,3 +259,14 @@
     cancelText="Cancel"
     on:submit={onDelete}
 />
+
+<style lang="scss">
+    .todo-item-card-check {
+        display: none;
+    }
+    .todo-item-card:hover {
+        .todo-item-card-check {
+            display: block;
+        }
+    }
+</style>

@@ -22,6 +22,10 @@ import {
     TodoDetailsQuerySchema,
     TodoDetailsRequestSchema,
     TodoDetailsResponseSchema,
+    EditTodoQuerySchema,
+    EditTodoRequestSchema,
+    EditTodoResponseSchema,
+    type TEditTodoResponseSchema,
 } from "$schemas";
 import { useCreateService } from "$lib/hooks/service.hooks";
 
@@ -74,16 +78,16 @@ async function edit({
     requestData,
     showAlerts,
 }: IPostAPIParams<TEditTodoRequestSchema, TEditTodoQuerySchema>) {
-    return useTodoService<TDeleteTodoResponseSchema>({
-        url: APIs.TODO.REMOVE,
+    return useTodoService<TEditTodoResponseSchema>({
+        url: APIs.TODO.EDIT,
         options: {
             method: EAPIRequestMethod.PUT,
             query: queryParams,
             body: requestData,
         },
-        querySchema: DeleteTodoQuerySchema,
-        requestSchema: DeleteTodoRequestSchema,
-        responseSchema: DeleteTodoResponseSchema,
+        querySchema: EditTodoQuerySchema,
+        requestSchema: EditTodoRequestSchema,
+        responseSchema: EditTodoResponseSchema,
         showAlerts,
     });
 }

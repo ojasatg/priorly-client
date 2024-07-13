@@ -1,4 +1,5 @@
 import type { IDropdownItem } from "$lib/types/ui.types";
+import type { TTodoItemViewSchema } from "$schemas";
 
 export enum ETodoItemMenuKeys {
     ADD_LABEL = "add_label",
@@ -7,7 +8,7 @@ export enum ETodoItemMenuKeys {
     CONVERT_TO_NOTES = "convert_to_notes",
 }
 
-export const TODO_ITEM_MENU_ITEMS: IDropdownItem<ETodoItemMenuKeys>[] = [
+export const TODO_ITEM_MENU_ITEMS: IDropdownItem<ETodoItemMenuKeys, TTodoItemViewSchema>[] = [
     {
         key: ETodoItemMenuKeys.ADD_LABEL,
         label: "Add a label",

@@ -12,6 +12,7 @@
     // local imports
     import { TODO_ITEM_MENU_ITEMS, ETodoItemMenuKeys } from "$constants/todo.consts";
     import { type TTodoItemViewSchema } from "$schemas";
+    import _ from "lodash";
 
     const CUSTOM_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
         day: "numeric",
@@ -66,6 +67,7 @@
 
     $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
     $: description_font_size_class = todo.description.length <= 60 ? "body-large" : "body-medium";
+    $: loading = pinning || deleting;
 </script>
 
 <section
@@ -77,21 +79,22 @@
             {todo.title}
         </p>
 
-        <span
-            use:tooltip={{
-                placement: "top",
-                content: todo.isPinned ? "Unpin" : "Pin",
-                arrow: false,
-                animation: "scale",
-            }}
-            class="ml-auto w-fit"
-        >
-            <Button size="sm" shape="circle" on:click={togglePin} loading={pinning}>
-                <span slot="icon" class={todo.isPinned ? "i-mdi-pin-off" : "i-mdi-pin-outline"}>
-                </span>
-            </Button>
-        </span>
-
+        {#if !todo.isDone}
+            <span
+                use:tooltip={{
+                    placement: "top",
+                    content: todo.isPinned ? "Unpin" : "Pin",
+                    arrow: false,
+                    animation: "scale",
+                }}
+                class="ml-auto w-fit"
+            >
+                <Button size="sm" shape="circle" on:click={togglePin} {loading}>
+                    <span slot="icon" class={todo.isPinned ? "i-mdi-pin-off" : "i-mdi-pin-outline"}>
+                    </span>
+                </Button>
+            </span>
+        {/if}
         <Dropdown bind:visible={showMenu}>
             <span
                 use:tooltip={{
@@ -115,12 +118,14 @@
             </span>
             <Dropdown.Items slot="items">
                 {#each TODO_ITEM_MENU_ITEMS as menuItem}
-                    <Dropdown.Items.Item
-                        on:click={() => handleMenuItemClick(menuItem.key)}
-                        label={menuItem.label}
-                    >
-                        <span slot="icon" class="{menuItem.icon} h-4 w-4" />
-                    </Dropdown.Items.Item>
+                    {#if !todo.isDone && !_.includes(menuItem.hide, "isDone")}
+                        <Dropdown.Items.Item
+                            on:click={() => handleMenuItemClick(menuItem.key)}
+                            label={menuItem.label}
+                        >
+                            <span slot="icon" class="{menuItem.icon} h-4 w-4" />
+                        </Dropdown.Items.Item>
+                    {/if}
                 {/each}
             </Dropdown.Items>
         </Dropdown>
@@ -154,7 +159,7 @@
                     shape="circle"
                     class="-mb-2"
                     on:click={() => (showDeletePrompt = true)}
-                    loading={deleting}
+                    {loading}
                 >
                     <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error"> </span>
                 </Button>

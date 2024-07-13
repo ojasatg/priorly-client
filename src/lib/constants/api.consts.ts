@@ -6,6 +6,9 @@ export enum EServiceMessageCodes {
     ERROR_VALIDATION_FAILED = "ERROR_VALIDATION_FAILED",
     EMPTY_RESPONSE = "EMPTY_RESPONSE",
     INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
+    SERVER_NOT_REACHABLE = "SERVER_NOT_REACHABLE",
+    NO_INTERNET = "NO_INTERNET",
+    ITEM_NOT_EXISTS = "ITEM_NOT_EXISTS",
 }
 
 export const SERVICE_MESSAGES: { [key in EServiceMessageCodes]?: string } = {
@@ -14,6 +17,9 @@ export const SERVICE_MESSAGES: { [key in EServiceMessageCodes]?: string } = {
     QUERY_WITHOUT_SCHEMA: "Query found but query schema not provided.",
     RESPONSE_VALIDATION_FAILED: "Oops! Something went wrong. Please report this issue.",
     ERROR_VALIDATION_FAILED: "Oops! Something went wrong. Please report this issue.",
+    SERVER_NOT_REACHABLE: "Can't connect to the server right now. Please try again after sometime.",
+    NO_INTERNET: "Can't connect to the server right now. Please check your internet connection",
+    ITEM_NOT_EXISTS: "Requested item does not exist",
 };
 
 export enum EAPIRequestMethod {

@@ -36,6 +36,11 @@ async function createService<TData>({
     responseSchema,
     showAlerts,
 }: ICreateServiceParams): Promise<TData | undefined> {
+    if (!navigator.onLine) {
+        alerts.error(SERVICE_MESSAGES[EServiceMessageCodes.NO_INTERNET]);
+        throw new Error(SERVICE_MESSAGES[EServiceMessageCodes.NO_INTERNET]);
+    }
+
     const baseURL = PUBLIC_API_URI;
     const defaults: FetchOptions = {
         baseURL,
@@ -49,6 +54,11 @@ async function createService<TData>({
                 // if response has any error, show alert here, dont return anything
             } else if (response.status === EServerResponseCodes.INTERNAL_SERVER_ERROR) {
                 throw new Error(EServiceMessageCodes.INTERNAL_SERVER_ERROR);
+            } else if (response.status === EServerResponseCodes.NOT_FOUND) {
+                const _response = response._data; // get the raw response
+                alerts.error(
+                    _response.message ?? SERVICE_MESSAGES[EServiceMessageCodes.ITEM_NOT_EXISTS],
+                );
             }
         },
     };

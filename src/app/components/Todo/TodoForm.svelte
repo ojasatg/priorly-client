@@ -216,12 +216,10 @@
             {/if}
         </section>
         <section class="ml-auto w-fit">
-            <Button on:click={onCancel} size="sm" class="bg-gray-200">
-                <span slot="leading" class="i-mdi-cancel h-6 w-6"></span>
+            <Button on:click={onCancel} size="sm">
                 <span class="body-medium">Cancel</span>
             </Button>
             <Button loading={submitting} type="primary" htmlType="submit" size="sm">
-                <span slot="leading" class="i-mdi-plus h-6 w-6"></span>
                 <span class="body-medium">Add</span>
             </Button>
         </section>

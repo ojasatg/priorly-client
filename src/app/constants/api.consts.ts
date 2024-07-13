@@ -3,7 +3,7 @@ const TODO = {
     CREATE: "/todo/create",
     REMOVE: "/todo/remove",
     DETAILS: "/todo/details",
-    EDIT: "/todoo/edit",
+    EDIT: "/todo/edit",
 };
 
 export const APIs = {

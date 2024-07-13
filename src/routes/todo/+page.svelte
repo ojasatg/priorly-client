@@ -21,6 +21,7 @@
     import TodosWrapperLoader from "$components/loaders/TodosWrapperLoader.svelte";
     import TodosWrapper from "$components/Todo/TodosWrapper.svelte";
     import TodoForm from "$components/Todo/TodoForm.svelte";
+    import { useSleep } from "$lib/utils";
 
     // local variables
     const selectedTodo = {} as TTodoItemViewSchema;
@@ -38,11 +39,17 @@
     // functions
     async function deleteTodo(event: CustomEvent<{ id: string; afterDeletion: () => void }>) {
         const todoId = event.detail.id;
+        const todo = _.find(allTodos, { id: todoId }) as TTodoItemViewSchema; // backup the todo
+        const todoIndex = _.findIndex(allTodos, { id: todoId }); // find the index of the todo before deleting
         try {
+            _.remove(allTodos, { id: todoId }); // delete instantly
+            allTodos = allTodos; // update the ui instantly
             await todoService.remove({ queryParams: { id: todoId }, showAlerts: true });
-            _.remove(allTodos, { id: todoId });
-            allTodos = allTodos; //  reassign to update the UI
         } catch (error) {
+            // incase of error put the todo back
+            await useSleep(2000);
+            allTodos.splice(todoIndex, 0, todo);
+            allTodos = allTodos; // update the ui
             console.error(error);
         } finally {
             event.detail.afterDeletion();
@@ -69,8 +76,35 @@
     }
 
     async function toggleTodoPin(event: CustomEvent<{ id: string; afterToggle: () => void }>) {
-        console.log("pin toggled");
-        event.detail.afterToggle();
+        const todoId = event.detail.id;
+        const todoIndex = _.findIndex(allTodos, { id: todoId });
+
+        const oldTodo = allTodos[todoIndex];
+        const pinStatus = oldTodo.isPinned;
+        try {
+            oldTodo.isPinned = !pinStatus; // toggle instantly
+            allTodos = allTodos; // update the ui
+
+            const response = await todoService.edit({
+                queryParams: { id: todoId },
+                requestData: { changes: { isPinned: !pinStatus } },
+                showAlerts: false,
+            });
+            const updatedTodo = response?.todo;
+            if (!_.isEmpty(updatedTodo)) {
+                allTodos.splice(todoIndex, 1, updatedTodo);
+                allTodos = allTodos;
+            }
+        } catch (error) {
+            oldTodo.isPinned = !oldTodo.isPinned; // undo the toggle
+            allTodos = allTodos; // update the ui
+
+            // show errors
+            alerts.error("Something went wrong! Please try again");
+            console.error(error);
+        } finally {
+            event.detail.afterToggle();
+        }
     }
 
     // reactive statements

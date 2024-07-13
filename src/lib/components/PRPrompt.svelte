@@ -41,31 +41,29 @@
 <Portal>
     {#if modelValue}
         <Modal handleClose={onCancel}>
-            <Modal.Content slot="content">
-                <Modal.Content.Header slot="header">
-                    <section class="title-medium flex items-center gap-2">
-                        <span class="{title_icon} {text_color_class}"></span>
-                        <p class="title-small">{title}</p>
-                    </section>
-                </Modal.Content.Header>
-                <Modal.Content.Body slot="body">
+            <Modal.Content slot="content" class="mt-48 grid gap-4 p-4">
+                <section class="title-medium flex items-center gap-2">
+                    <span class="{title_icon} {text_color_class}"></span>
+                    <p class="title-small">{title}</p>
+                </section>
+
+                <section class="grid gap-1 p-4">
                     <p class="body-medium">{message}</p>
 
                     <section class="mt-1 flex items-center gap-1 {text_color_class} ">
                         <span class="i-mdi-information-outline {text_color_class}"></span>
                         <p class="body-small">{note}</p>
                     </section>
-                </Modal.Content.Body>
-                <Modal.Content.Footer slot="footer">
-                    <section class="ml-auto w-fit">
-                        <Button on:click={onCancel} size="sm" class="text-gray-600">
-                            <span class="body-medium">{cancelText ?? "Cancel"}</span>
-                        </Button>
-                        <Button type={primary_button_type} on:click={onSubmit} size="sm">
-                            <span class="body-medium">{submitText ?? "OK"}</span>
-                        </Button>
-                    </section>
-                </Modal.Content.Footer>
+                </section>
+
+                <section class="ml-auto w-fit">
+                    <Button on:click={onCancel} size="sm" class="text-gray-600">
+                        <span class="body-medium">{cancelText ?? "Cancel"}</span>
+                    </Button>
+                    <Button type={primary_button_type} on:click={onSubmit} size="sm">
+                        <span class="body-medium">{submitText ?? "OK"}</span>
+                    </Button>
+                </section>
             </Modal.Content>
             <Modal.Backdrop handleClose={!scrim ? onCancel : () => {}} slot="backdrop" />
         </Modal>

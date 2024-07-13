@@ -6,11 +6,12 @@
 
     // lib imports
     import PRDivider from "$lib/components/PRDivider.svelte";
-    import { TODO_ITEM_MENU_ITEMS, ETodoItemMenuKeys } from "$constants/ui.consts";
+    import PRPrompt from "$lib/components/PRPrompt.svelte";
+    import { getFormattedTimestamp, getDaysDifferenceFromTimestamp } from "$lib/utils";
 
     // local imports
+    import { TODO_ITEM_MENU_ITEMS, ETodoItemMenuKeys } from "$constants/todo.consts";
     import { type TTodoItemViewSchema } from "$schemas";
-    import { getFormattedTimestamp, getDaysDifferenceFromTimestamp } from "$lib/utils";
 
     const CUSTOM_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
         day: "numeric",
@@ -20,6 +21,9 @@
 
     export let todo: TTodoItemViewSchema;
     let deleting = false;
+    let pinning = false;
+
+    let showDeletePrompt = false;
 
     const daysRemainingFromDeadline = getDaysDifferenceFromTimestamp(todo.deadline ?? 0);
 
@@ -27,6 +31,10 @@
         delete: {
             id: string;
             afterDeletion: () => void;
+        };
+        togglePin: {
+            id: string;
+            afterToggle: () => void;
         };
     }>();
 
@@ -36,6 +44,16 @@
             id: todo.id,
             afterDeletion: () => {
                 deleting = false;
+            },
+        });
+    }
+
+    function togglePin() {
+        pinning = true;
+        dispatchEvent("togglePin", {
+            id: todo.id,
+            afterToggle: () => {
+                pinning = false;
             },
         });
     }
@@ -54,10 +72,25 @@
     id={`todo-item-${todo.id}`}
     class="card h-fit w-80 cursor-default rounded-md border border-gray-200 bg-white px-4 pb-4 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
 >
-    <header class="flex items-start justify-between gap-2">
-        <p class="title-medium card-header flex-grow p-0" class:line-through={todo.isDone}>
+    <header class="card-header flex items-start">
+        <p class="title-medium flex-grow p-0" class:line-through={todo.isDone}>
             {todo.title}
         </p>
+
+        <span
+            use:tooltip={{
+                placement: "top",
+                content: todo.isPinned ? "Unpin" : "Pin",
+                arrow: false,
+                animation: "scale",
+            }}
+            class="ml-auto w-fit"
+        >
+            <Button size="sm" shape="circle" on:click={togglePin} loading={pinning}>
+                <span slot="icon" class={todo.isPinned ? "i-mdi-pin-off" : "i-mdi-pin-outline"}>
+                </span>
+            </Button>
+        </span>
 
         <Dropdown bind:visible={showMenu}>
             <span
@@ -73,7 +106,6 @@
                 <Button
                     size="sm"
                     shape="circle"
-                    loading={deleting}
                     on:click={() => {
                         showMenu = !showMenu;
                     }}
@@ -120,9 +152,9 @@
                 <Button
                     size="lg"
                     shape="circle"
-                    loading={deleting}
                     class="-mb-2"
-                    on:click={onDelete}
+                    on:click={() => (showDeletePrompt = true)}
+                    loading={deleting}
                 >
                     <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error"> </span>
                 </Button>
@@ -185,3 +217,13 @@
         {/if}
     </section>
 </section>
+<PRPrompt
+    bind:modelValue={showDeletePrompt}
+    title="Delete Todo?"
+    message="This todo will be deleted"
+    note="This operation is irreversible"
+    type="error"
+    submitText="Delete"
+    cancelText="Cancel"
+    on:submit={onDelete}
+/>

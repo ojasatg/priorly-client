@@ -5,23 +5,18 @@
     import type { TComponentType } from "$lib/types/ui.types";
     import { COMPONENT_DETAILS_MAP } from "$lib/constants/ui.consts";
 
-    type TBeforeFunction = (...args: unknown[]) => Promise<boolean> | undefined;
-
     export let modelValue = false;
-    export let title;
-    export let message;
+    export let title: string;
+    export let message: string = "";
     export let note = "";
     export let type: TComponentType;
     export let submitText = "";
     export let cancelText = "";
     export let scrim = false;
 
-    export let beforeSubmit: TBeforeFunction | undefined = undefined;
-    export let beforeCancel: TBeforeFunction | undefined = undefined;
-
-    const dispatcEvent = createEventDispatcher<{
-        submit: { success: boolean };
-        cancel: { success: boolean };
+    const dispatchEvent = createEventDispatcher<{
+        submit: null;
+        cancel: null;
     }>();
 
     $: text_color_class = COMPONENT_DETAILS_MAP[type].classColor;
@@ -29,27 +24,17 @@
     $: primary_button_type = COMPONENT_DETAILS_MAP[type].buttonType;
 
     function onSubmit() {
-        if (beforeSubmit && typeof beforeSubmit === "function") {
-            const abort = beforeSubmit();
-            if (abort) {
-                dispatcEvent("submit", { success: false });
-                return;
-            }
+        const shouldContinue = dispatchEvent("submit", null, { cancelable: true });
+        if (shouldContinue) {
+            modelValue = false;
         }
-        dispatcEvent("submit", { success: true });
-        modelValue = false;
     }
 
     function onCancel() {
-        if (beforeCancel && typeof beforeCancel === "function") {
-            const abort = beforeCancel();
-            if (abort) {
-                dispatcEvent("cancel", { success: false });
-                return;
-            }
+        const shouldContinue = dispatchEvent("cancel", null, { cancelable: true });
+        if (shouldContinue) {
+            modelValue = false;
         }
-        dispatcEvent("cancel", { success: true });
-        modelValue = false;
     }
 </script>
 
@@ -58,18 +43,17 @@
         <Modal handleClose={onCancel}>
             <Modal.Content slot="content">
                 <Modal.Content.Header slot="header">
-                    <section class="title-medium flex items-center gap-2 {title_icon}">
-                        <span class={title_icon}></span>
-                        <p>{title}</p>
+                    <section class="title-medium flex items-center gap-2">
+                        <span class="{title_icon} {text_color_class}"></span>
+                        <p class="title-small">{title}</p>
                     </section>
                 </Modal.Content.Header>
                 <Modal.Content.Body slot="body">
-                    <section class="body-medium">
-                        {message}
-                    </section>
-                    <section class="body-small flex items-center gap-2 {text_color_class}">
+                    <p class="body-medium">{message}</p>
+
+                    <section class="mt-1 flex items-center gap-1 {text_color_class} ">
                         <span class="i-mdi-information-outline {text_color_class}"></span>
-                        <p>{note}</p>
+                        <p class="body-small">{note}</p>
                     </section>
                 </Modal.Content.Body>
                 <Modal.Content.Footer slot="footer">

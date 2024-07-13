@@ -31,11 +31,12 @@
     let fetchTodoError: boolean;
 
     // event catchers
-    function onCancel() {
+    function cancelTodoCreation() {
         showAddTodoForm = false;
     }
 
-    async function onDelete(event: CustomEvent<{ id: string; afterDeletion: () => void }>) {
+    // functions
+    async function deleteTodo(event: CustomEvent<{ id: string; afterDeletion: () => void }>) {
         const todoId = event.detail.id;
         try {
             await todoService.deleteTodo({ requestData: { id: todoId }, showAlerts: true });
@@ -48,12 +49,11 @@
         }
     }
 
-    function onCreate(event: CustomEvent<TCreateTodoResponseSchema>) {
+    function createTodo(event: CustomEvent<TCreateTodoResponseSchema>) {
         allTodos.push(event.detail.todo);
         allTodos = allTodos; //  reassign to update the UI
     }
 
-    // functions
     async function getAllTodos() {
         try {
             fetchingTodos = true;
@@ -66,6 +66,11 @@
         } finally {
             fetchingTodos = false;
         }
+    }
+
+    async function toggleTodoPin(event: CustomEvent<{ id: string; afterToggle: () => void }>) {
+        console.log("pin toggled");
+        event.detail.afterToggle();
     }
 
     // reactive statements
@@ -128,22 +133,35 @@
     {:else if !fetchingTodos && !fetchTodoError}
         <section class="grid gap-4">
             {#if !_.isEmpty(pinnedTodos)}
-                <section>
-                    <p class="label-bold-medium mb-2 text-gray-500">PINNED</p>
-                    <TodosWrapper todos={pinnedTodos} on:delete={onDelete} />
+                <section class="mb-2 flex items-start gap-1">
+                    <span class="i-mdi-pin h-4 w-4 text-gray-500" />
+                    <p class="label-bold-medium text-gray-500">PINNED</p>
                 </section>
+                <TodosWrapper
+                    todos={pinnedTodos}
+                    on:delete={deleteTodo}
+                    on:togglePin={toggleTodoPin}
+                />
             {/if}
             {#if !_.isEmpty(pendingTodos)}
-                <section>
-                    <p class="label-bold-medium mb-2 text-gray-500">PENDING</p>
-                    <TodosWrapper todos={pendingTodos} on:delete={onDelete} />
-                </section>
+                <p class="label-bold-medium mb-2 text-gray-500">PENDING</p>
+                <TodosWrapper
+                    todos={pendingTodos}
+                    on:delete={deleteTodo}
+                    on:togglePin={toggleTodoPin}
+                />
             {/if}
             {#if !_.isEmpty(doneTodos)}
-                <p class="body-medium text-gray-600">Hurray! You're done for now!</p>
+                {#if _.isEmpty(pendingTodos)}
+                    <p class="body-medium text-gray-600">Hurray! You're done for now!</p>
+                {/if}
                 <section>
                     <p class="label-bold-medium mb-2 text-gray-500">DONE</p>
-                    <TodosWrapper todos={doneTodos} on:delete={onDelete} />
+                    <TodosWrapper
+                        todos={doneTodos}
+                        on:delete={deleteTodo}
+                        on:togglePin={toggleTodoPin}
+                    />
                 </section>
             {/if}
         </section>
@@ -155,9 +173,9 @@
 <PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo" scrim>
     <TodoForm
         todo={selectedTodo}
-        on:create={onCreate}
-        on:cancel={onCancel}
-        on:close={onCancel}
+        on:create={createTodo}
+        on:cancel={cancelTodoCreation}
+        on:close={cancelTodoCreation}
         slot="content"
     />
 </PRDialog>

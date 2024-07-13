@@ -51,9 +51,9 @@ async function allTodos({ showAlerts, query }: IGetAPIParams<TAllTodosQuerySchem
 
 async function deleteTodo({ requestData, showAlerts }: IPostAPIParams<TDeleteTodoRequestSchema>) {
     return useTodoService<TDeleteTodoResponseSchema>({
-        url: APIs.TODO.DELETE,
+        url: APIs.TODO.REMOVE,
         options: {
-            method: EAPIRequestMethod.POST,
+            method: EAPIRequestMethod.DELETE,
             body: requestData,
         },
         requestSchema: DeleteTodoRequestSchema,

@@ -10,9 +10,9 @@
     const dispatchEvent = createEventDispatcher<{ close: null }>();
 
     function onClose() {
-        const contiune = dispatchEvent("close", null, { cancelable: true });
+        const shouldContinue = dispatchEvent("close", null, { cancelable: true });
         // After dispatch, run beforeClose function. Call event.preventDefault() to abort the further execution.
-        if (contiune) {
+        if (shouldContinue) {
             // only executes when event.preventDefault() is not called
             modelValue = false;
         }

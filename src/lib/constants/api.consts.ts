@@ -19,6 +19,8 @@ export const SERVICE_MESSAGES: { [key in EServiceMessageCodes]?: string } = {
 export enum EAPIRequestMethod {
     GET = "GET",
     POST = "POST",
+    DELETE = "DELETE",
+    PUT = "PUT",
 }
 
 export enum EServerResponseCodes {

@@ -1,7 +1,9 @@
 const TODO = {
-    CREATE: "/todo/create",
     ALL: "/todo/all",
-    DELETE: "/todo/delete",
+    CREATE: "/todo/create",
+    REMOVE: "/todo/remove",
+    DETAILS: "/todo/details",
+    EDIT: "/todoo/edit",
 };
 
 export const APIs = {

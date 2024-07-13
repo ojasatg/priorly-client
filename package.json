@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite dev",
-    "build-dev": "vite build --mode development",
-    "build-prod": "vite build --mode production",
+    "build-dev": "bun lint && vite build --mode development",
+    "build-prod": "rm -rf ./src/routes/playground && bun lint && vite build --mode production",
     "preview": "vite preview",
     "test": "npm run test:integration && npm run test:unit",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -19,7 +19,6 @@
     "@egoist/tailwindcss-icons": "^1.8.1",
     "@fontsource/fira-mono": "^4.5.10",
     "@iconify/svelte": "^4.0.2",
-    "@neoconfetti/svelte": "^1.0.0",
     "@playwright/test": "^1.28.1",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/kit": "^2.0.0",

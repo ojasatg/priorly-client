@@ -33,13 +33,16 @@
 
     <main>
         <slot />
-        <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={showAlerts}>
-            Show Alert
-        </button>
-        <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={showActionAlert}>
-            Show Action Alert
-        </button>
     </main>
+</section>
+
+<section class="fixed bottom-48 left-48">
+    <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={showAlerts}>
+        Show Alert
+    </button>
+    <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={showActionAlert}>
+        Show Action Alert
+    </button>
 </section>
 
 <style>

@@ -13,12 +13,13 @@
         CreateTodoFormSchema,
         type TCreateTodoFormSchema,
         type TCreateTodoResponseSchema,
-        type TTodoItemResponseSchema,
+        type TTodoItemViewSchema,
     } from "$schemas";
     import todoService from "$services/todo.service";
 
     // props
-    export let todo: TTodoItemResponseSchema;
+    export let todo: TTodoItemViewSchema;
+    export let formType: "add" | "edit";
 
     // events
     const dispatchEvent = createEventDispatcher<{
@@ -219,9 +220,15 @@
             <Button on:click={onCancel} size="sm">
                 <span class="body-medium">Cancel</span>
             </Button>
-            <Button loading={submitting} type="primary" htmlType="submit" size="sm">
-                <span class="body-medium">Add</span>
-            </Button>
+            {#if formType === "add"}
+                <Button loading={submitting} type="primary" htmlType="submit" size="sm">
+                    <span class="body-medium">Add</span>
+                </Button>
+            {:else}
+                <Button loading={submitting} type="primary" htmlType="submit" size="sm">
+                    <span class="body-medium">Update</span>
+                </Button>
+            {/if}
         </section>
     </section>
 </form>

@@ -6,6 +6,7 @@ export const GenericTodoItemSchema = z.object({
         .min(1, "Title cannot be empty")
         .max(50, "Title cannot be more that 50 characters long"),
     isDone: z.boolean(),
+    isPinned: z.boolean(),
     description: z.string().max(300, "Description cannot be more than 300 characters long"),
     deadline: z.number().nullish(),
     reminder: z.number().nullish(),

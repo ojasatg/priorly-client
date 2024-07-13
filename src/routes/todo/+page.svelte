@@ -21,7 +21,7 @@
     import TodosWrapperLoader from "$components/loaders/TodosWrapperLoader.svelte";
     import TodosWrapper from "$components/Todo/TodosWrapper.svelte";
     import TodoForm from "$components/Todo/TodoForm.svelte";
-    import { useSleep } from "$lib/utils";
+    import { ETodoToggleType } from "$constants/todo.consts";
 
     // local variables
     const selectedTodo = {} as TTodoItemViewSchema;
@@ -37,7 +37,7 @@
     }
 
     // functions
-    async function deleteTodo(event: CustomEvent<{ id: string; afterDeletion: () => void }>) {
+    async function deleteTodo(event: CustomEvent<{ id: string; afterDeletion?: () => void }>) {
         const todoId = event.detail.id;
         const todo = _.find(allTodos, { id: todoId }) as TTodoItemViewSchema; // backup the todo
         const todoIndex = _.findIndex(allTodos, { id: todoId }); // find the index of the todo before deleting
@@ -47,18 +47,57 @@
             await todoService.remove({ queryParams: { id: todoId }, showAlerts: true });
         } catch (error) {
             // incase of error put the todo back
-            await useSleep(2000);
             allTodos.splice(todoIndex, 0, todo);
             allTodos = allTodos; // update the ui
             console.error(error);
         } finally {
-            event.detail.afterDeletion();
+            event.detail.afterDeletion?.();
         }
     }
 
     function createTodo(event: CustomEvent<TCreateTodoResponseSchema>) {
         allTodos.unshift(event.detail.todo);
         allTodos = allTodos; //  reassign to update the UI
+    }
+
+    async function toggleTodo(event: CustomEvent<{ id: string; toggleValue: ETodoToggleType }>) {
+        const todoId = event.detail.id;
+        const toggleValue = event.detail.toggleValue;
+
+        const todoIndex = _.findIndex(allTodos, { id: todoId });
+        const oldTodo = allTodos[todoIndex]; // back up the old values
+        const changes = {
+            isDone: oldTodo.isDone,
+            isPinned: oldTodo.isPinned,
+        };
+
+        if (toggleValue === ETodoToggleType.PIN) {
+            changes.isPinned = !oldTodo.isPinned;
+        }
+        if (toggleValue === ETodoToggleType.DONE) {
+            if (oldTodo.isDone) {
+                // todo is moving from done to pending, then remove the pin status
+                changes.isPinned = false;
+            }
+            changes.isDone = !oldTodo.isDone;
+        }
+        const newTodo = { ...oldTodo, ...changes };
+
+        allTodos.splice(todoIndex, 1, newTodo); // add the updated todo to the array
+        allTodos = allTodos; // update the ui
+
+        try {
+            await todoService.edit({
+                queryParams: { id: todoId },
+                requestData: { changes },
+                showAlerts: false,
+            });
+        } catch (error) {
+            allTodos.splice(todoIndex, 1, oldTodo); // placing back the old todo in case of any error
+            allTodos = allTodos; // updating the ui
+            alerts.error("Something went wrong! Please try again");
+            console.error(error);
+        }
     }
 
     async function getAllTodos() {
@@ -72,38 +111,6 @@
             fetchTodoError = true;
         } finally {
             fetchingTodos = false;
-        }
-    }
-
-    async function toggleTodoPin(event: CustomEvent<{ id: string; afterToggle: () => void }>) {
-        const todoId = event.detail.id;
-        const todoIndex = _.findIndex(allTodos, { id: todoId });
-
-        const oldTodo = allTodos[todoIndex];
-        const pinStatus = oldTodo.isPinned;
-        try {
-            oldTodo.isPinned = !pinStatus; // toggle instantly
-            allTodos = allTodos; // update the ui
-
-            const response = await todoService.edit({
-                queryParams: { id: todoId },
-                requestData: { changes: { isPinned: !pinStatus } },
-                showAlerts: false,
-            });
-            const updatedTodo = response?.todo;
-            if (!_.isEmpty(updatedTodo)) {
-                allTodos.splice(todoIndex, 1, updatedTodo);
-                allTodos = allTodos;
-            }
-        } catch (error) {
-            oldTodo.isPinned = !oldTodo.isPinned; // undo the toggle
-            allTodos = allTodos; // update the ui
-
-            // show errors
-            alerts.error("Something went wrong! Please try again");
-            console.error(error);
-        } finally {
-            event.detail.afterToggle();
         }
     }
 
@@ -171,42 +178,31 @@
                     <span class="i-mdi-pin h-4 w-4 text-gray-500" />
                     <p class="label-bold-medium text-gray-500">PINNED</p>
                 </section>
-                <TodosWrapper
-                    todos={pinnedTodos}
-                    on:delete={deleteTodo}
-                    on:togglePin={toggleTodoPin}
-                />
+                <TodosWrapper todos={pinnedTodos} on:delete={deleteTodo} on:toggle={toggleTodo} />
             {/if}
             {#if !_.isEmpty(pendingTodos)}
                 <p class="label-bold-medium mb-2 text-gray-500">PENDING</p>
-                <TodosWrapper
-                    todos={pendingTodos}
-                    on:delete={deleteTodo}
-                    on:togglePin={toggleTodoPin}
-                />
+                <TodosWrapper todos={pendingTodos} on:delete={deleteTodo} on:toggle={toggleTodo} />
             {/if}
             {#if !_.isEmpty(doneTodos)}
-                {#if _.isEmpty(pendingTodos)}
-                    <p class="body-medium text-gray-600">Hurray! You're done for now!</p>
+                {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
+                    <p class="body-large">Hurray! You're done for now!</p>
                 {/if}
                 <section>
                     <p class="label-bold-medium mb-2 text-gray-500">DONE</p>
-                    <TodosWrapper
-                        todos={doneTodos}
-                        on:delete={deleteTodo}
-                        on:togglePin={toggleTodoPin}
-                    />
+                    <TodosWrapper todos={doneTodos} on:delete={deleteTodo} on:toggle={toggleTodo} />
                 </section>
             {/if}
         </section>
     {:else}
-        <p class="body-medium text-gray-600">No items to show</p>
+        <p class="body-medium">No items to show</p>
     {/if}
 </section>
 
 <PRDialog bind:modelValue={showAddTodoForm} title="Add Todo" subtitle="Add a new todo" scrim>
     <TodoForm
         todo={selectedTodo}
+        formType="add"
         on:create={createTodo}
         on:cancel={cancelTodoCreation}
         on:close={cancelTodoCreation}

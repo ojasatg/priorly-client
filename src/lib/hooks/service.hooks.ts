@@ -37,7 +37,6 @@ async function createService<TData>({
     showAlerts,
 }: ICreateServiceParams): Promise<TData | undefined> {
     if (!navigator.onLine) {
-        alerts.error(SERVICE_MESSAGES[EServiceMessageCodes.NO_INTERNET]);
         throw new Error(SERVICE_MESSAGES[EServiceMessageCodes.NO_INTERNET]);
     }
 

@@ -30,3 +30,8 @@ export const TODO_ITEM_MENU_ITEMS: IDropdownItem<ETodoItemMenuKeys, TTodoItemVie
         icon: "i-mdi-note-text-outline",
     },
 ];
+
+export enum ETodoToggleType {
+    PIN,
+    DONE,
+}

@@ -8,7 +8,7 @@
 <section>
     <section class="grid grid-cols-3 gap-2">
         {#each todos as todo}
-            <TodoItem {todo} on:delete on:togglePin />
+            <TodoItem {todo} on:delete on:toggle />
         {/each}
     </section>
 </section>

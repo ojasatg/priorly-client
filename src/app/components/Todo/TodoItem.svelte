@@ -10,9 +10,12 @@
     import { getFormattedTimestamp, getDaysDifferenceFromTimestamp } from "$lib/utils";
 
     // local imports
-    import { TODO_ITEM_MENU_ITEMS, ETodoItemMenuKeys } from "$constants/todo.consts";
+    import {
+        TODO_ITEM_MENU_ITEMS,
+        ETodoItemMenuKeys,
+        ETodoToggleType,
+    } from "$constants/todo.consts";
     import { type TTodoItemViewSchema } from "$schemas";
-    import _ from "lodash";
 
     const CUSTOM_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
         day: "numeric",
@@ -21,42 +24,25 @@
     };
 
     export let todo: TTodoItemViewSchema;
-    let deleting = false;
-    let pinning = false;
-
     let showDeletePrompt = false;
 
     const daysRemainingFromDeadline = getDaysDifferenceFromTimestamp(todo.deadline ?? 0);
 
     const dispatchEvent = createEventDispatcher<{
-        delete: {
-            id: string;
-            afterDeletion: () => void;
-        };
-        togglePin: {
-            id: string;
-            afterToggle: () => void;
-        };
+        delete: { id: string };
+        toggle: { id: string; toggleValue: ETodoToggleType };
     }>();
 
     function onDelete() {
-        deleting = true;
-        dispatchEvent("delete", {
-            id: todo.id,
-            afterDeletion: () => {
-                deleting = false;
-            },
-        });
+        dispatchEvent("delete", { id: todo.id });
     }
 
     function togglePin() {
-        pinning = true;
-        dispatchEvent("togglePin", {
-            id: todo.id,
-            afterToggle: () => {
-                pinning = false;
-            },
-        });
+        dispatchEvent("toggle", { id: todo.id, toggleValue: ETodoToggleType.PIN });
+    }
+
+    function toggleDone() {
+        dispatchEvent("toggle", { id: todo.id, toggleValue: ETodoToggleType.DONE });
     }
 
     function handleMenuItemClick(item: ETodoItemMenuKeys) {
@@ -67,7 +53,9 @@
 
     $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
     $: description_font_size_class = todo.description.length <= 60 ? "body-large" : "body-medium";
-    $: loading = pinning || deleting;
+    $: toggleDoneIcon = todo.isDone
+        ? "i-mdi-checkbox-marked-circle-minus-outline text-error"
+        : "i-mdi-checkbox-marked-circle-plus-outline text-success";
 </script>
 
 <section
@@ -89,7 +77,7 @@
                 }}
                 class="ml-auto w-fit"
             >
-                <Button size="sm" shape="circle" on:click={togglePin} {loading}>
+                <Button size="sm" shape="circle" on:click={togglePin}>
                     <span slot="icon" class={todo.isPinned ? "i-mdi-pin-off" : "i-mdi-pin-outline"}>
                     </span>
                 </Button>
@@ -118,7 +106,8 @@
             </span>
             <Dropdown.Items slot="items">
                 {#each TODO_ITEM_MENU_ITEMS as menuItem}
-                    {#if !todo.isDone && !_.includes(menuItem.hide, "isDone")}
+                    <!-- hide priortiy option for done items -->
+                    {#if !(todo.isDone && menuItem.key === ETodoItemMenuKeys.ADD_PRIORIY)}
                         <Dropdown.Items.Item
                             on:click={() => handleMenuItemClick(menuItem.key)}
                             label={menuItem.label}
@@ -134,7 +123,7 @@
         {todo.description}
     </p>
     <section class="card-footer mt-2 p-0">
-        <section class="flex items-end justify-between">
+        <section class="flex items-end">
             <section>
                 <p class="label-medium inline text-gray-600">Created on</p>
                 <p class="label-medium inline text-gray-900">
@@ -149,19 +138,31 @@
             <span
                 use:tooltip={{
                     placement: "top",
+                    content: todo.isDone ? "Mark todo as not done" : "Mark todo as done",
+                    arrow: false,
+                    animation: "scale",
+                }}
+                class="ml-auto"
+            >
+                <Button size="sm" shape="circle" class="-mb-2" on:click={toggleDone}>
+                    <span slot="icon" class="h-4 w-4 {toggleDoneIcon}" />
+                </Button>
+            </span>
+            <span
+                use:tooltip={{
+                    placement: "top",
                     content: "Delete",
                     arrow: false,
                     animation: "scale",
                 }}
             >
                 <Button
-                    size="lg"
+                    size="sm"
                     shape="circle"
                     class="-mb-2"
                     on:click={() => (showDeletePrompt = true)}
-                    {loading}
                 >
-                    <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error"> </span>
+                    <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error" />
                 </Button>
             </span>
         </section>

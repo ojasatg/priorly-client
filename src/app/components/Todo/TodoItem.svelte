@@ -69,7 +69,7 @@
 
 <section
     id={`todo-item-card-${todo.id}`}
-    class="card relative h-fit w-80 cursor-default rounded-md border {borderColor} todo-item-card bg-white px-4 pb-4 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
+    class="card relative h-fit w-80 cursor-default rounded-md border-2 {borderColor} todo-item-card bg-white px-4 pb-4 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
 >
     <span
         use:tooltip={{

@@ -53,7 +53,11 @@ async function createService<TData>({
                 // handleAuthenticationError(...)
                 // if response has any error, show alert here, dont return anything
             } else if (response.status === EServerResponseCodes.INTERNAL_SERVER_ERROR) {
-                throw new Error(EServiceMessageCodes.INTERNAL_SERVER_ERROR);
+                const _response = response._data; // get the raw response
+                alerts.error(
+                    _response.message ??
+                        SERVICE_MESSAGES[EServiceMessageCodes.INTERNAL_SERVER_ERROR],
+                );
             } else if (response.status === EServerResponseCodes.NOT_FOUND) {
                 const _response = response._data; // get the raw response
                 alerts.error(

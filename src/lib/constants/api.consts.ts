@@ -20,6 +20,7 @@ export const SERVICE_MESSAGES: { [key in EServiceMessageCodes]?: string } = {
     SERVER_NOT_REACHABLE: "Can't connect to the server right now. Please try again after sometime.",
     NO_INTERNET: "Can't connect to the server right now. Please check your internet connection",
     ITEM_NOT_EXISTS: "Requested item does not exist",
+    INTERNAL_SERVER_ERROR: "Some error occured from our end. Please try again after sometime",
 };
 
 export enum EAPIRequestMethod {

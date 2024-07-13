@@ -16,13 +16,33 @@ import {
     type TDeleteTodoResponseSchema,
     DeleteTodoRequestSchema,
     DeleteTodoResponseSchema,
+    DeleteTodoQuerySchema,
+    type TEditTodoRequestSchema,
+    type TEditTodoQuerySchema,
+    TodoDetailsQuerySchema,
+    TodoDetailsRequestSchema,
+    TodoDetailsResponseSchema,
 } from "$schemas";
 import { useCreateService } from "$lib/hooks/service.hooks";
 
 const useTodoService = useCreateService();
 
 // Todos
-async function createTodo({ requestData, showAlerts }: IPostAPIParams<TCreateTodoRequestSchema>) {
+async function all({ showAlerts, queryParams }: IGetAPIParams<TAllTodosQuerySchema>) {
+    return useTodoService<TAllTododsResponseSchema>({
+        url: APIs.TODO.ALL,
+        options: {
+            method: EAPIRequestMethod.GET,
+            query: queryParams,
+        },
+        querySchema: AllTodosQuerySchema,
+        requestSchema: AllTodosRequestSchema,
+        responseSchema: AllTodosResponseSchema,
+        showAlerts,
+    });
+}
+
+async function create({ requestData, showAlerts }: IPostAPIParams<TCreateTodoRequestSchema>) {
     return useTodoService<TCreateTodoResponseSchema>({
         url: APIs.TODO.CREATE,
         options: {
@@ -35,27 +55,47 @@ async function createTodo({ requestData, showAlerts }: IPostAPIParams<TCreateTod
     });
 }
 
-async function allTodos({ showAlerts, query }: IGetAPIParams<TAllTodosQuerySchema>) {
+async function details({ showAlerts, queryParams }: IGetAPIParams<TAllTodosQuerySchema>) {
     return useTodoService<TAllTododsResponseSchema>({
-        url: APIs.TODO.ALL,
+        url: APIs.TODO.DETAILS,
         options: {
             method: EAPIRequestMethod.GET,
-            query,
+            query: queryParams,
         },
-        querySchema: AllTodosQuerySchema,
-        requestSchema: AllTodosRequestSchema,
-        responseSchema: AllTodosResponseSchema,
+        querySchema: TodoDetailsQuerySchema,
+        requestSchema: TodoDetailsRequestSchema,
+        responseSchema: TodoDetailsResponseSchema,
         showAlerts,
     });
 }
 
-async function deleteTodo({ requestData, showAlerts }: IPostAPIParams<TDeleteTodoRequestSchema>) {
+async function edit({
+    queryParams,
+    requestData,
+    showAlerts,
+}: IPostAPIParams<TEditTodoRequestSchema, TEditTodoQuerySchema>) {
+    return useTodoService<TDeleteTodoResponseSchema>({
+        url: APIs.TODO.REMOVE,
+        options: {
+            method: EAPIRequestMethod.PUT,
+            query: queryParams,
+            body: requestData,
+        },
+        querySchema: DeleteTodoQuerySchema,
+        requestSchema: DeleteTodoRequestSchema,
+        responseSchema: DeleteTodoResponseSchema,
+        showAlerts,
+    });
+}
+
+async function remove({ queryParams, showAlerts }: IGetAPIParams<TDeleteTodoRequestSchema>) {
     return useTodoService<TDeleteTodoResponseSchema>({
         url: APIs.TODO.REMOVE,
         options: {
             method: EAPIRequestMethod.DELETE,
-            body: requestData,
+            query: queryParams,
         },
+        querySchema: DeleteTodoQuerySchema,
         requestSchema: DeleteTodoRequestSchema,
         responseSchema: DeleteTodoResponseSchema,
         showAlerts,
@@ -63,9 +103,11 @@ async function deleteTodo({ requestData, showAlerts }: IPostAPIParams<TDeleteTod
 }
 
 const todoService = {
-    createTodo,
-    allTodos,
-    deleteTodo,
+    all,
+    create,
+    details,
+    remove,
+    edit,
 };
 
 export default todoService;

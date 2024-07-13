@@ -133,12 +133,12 @@
             <section>
                 <p class="label-medium inline text-gray-600">Created on</p>
                 <p class="label-medium inline text-gray-900">
-                    {getFormattedTimestamp(todo.created, CUSTOM_DATE_OPTIONS)}
+                    {getFormattedTimestamp(todo.createdOn, CUSTOM_DATE_OPTIONS)}
                 </p>
                 <section />
                 <p class="label-medium inline text-gray-600">Last updated on</p>
                 <p class="label-medium inline text-gray-900">
-                    {getFormattedTimestamp(todo.updated, CUSTOM_DATE_OPTIONS)}
+                    {getFormattedTimestamp(todo.updatedOn, CUSTOM_DATE_OPTIONS)}
                 </p>
             </section>
             <span

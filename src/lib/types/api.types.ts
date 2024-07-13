@@ -14,11 +14,11 @@ export type TAPISuccess<TData = undefined> = {
 
 export interface IPostAPIParams<TRequest, TQuery = undefined> {
     requestData: TRequest;
-    query?: TQuery;
+    queryParams?: TQuery;
     showAlerts?: boolean;
 }
 
 export interface IGetAPIParams<TQuery = undefined> {
-    query?: TQuery;
+    queryParams?: TQuery;
     showAlerts?: boolean;
 }

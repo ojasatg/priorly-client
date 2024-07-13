@@ -39,7 +39,7 @@
     async function deleteTodo(event: CustomEvent<{ id: string; afterDeletion: () => void }>) {
         const todoId = event.detail.id;
         try {
-            await todoService.deleteTodo({ requestData: { id: todoId }, showAlerts: true });
+            await todoService.remove({ queryParams: { id: todoId }, showAlerts: true });
             _.remove(allTodos, { id: todoId });
             allTodos = allTodos; //  reassign to update the UI
         } catch (error) {
@@ -50,14 +50,14 @@
     }
 
     function createTodo(event: CustomEvent<TCreateTodoResponseSchema>) {
-        allTodos.push(event.detail.todo);
+        allTodos.unshift(event.detail.todo);
         allTodos = allTodos; //  reassign to update the UI
     }
 
     async function getAllTodos() {
         try {
             fetchingTodos = true;
-            const data = await todoService.allTodos({});
+            const data = await todoService.all({});
             allTodos = data?.todos ?? [];
         } catch (error) {
             alerts.error("Failed to fetch todos, please try again");

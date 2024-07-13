@@ -119,7 +119,7 @@
         };
 
         // if the execution is success then we are guaranteed to have this data otherwise the errors are handled by the service itself
-        const responseData = (await todoService.createTodo({
+        const responseData = (await todoService.create({
             requestData: newTodo,
             showAlerts: true,
         })) as TCreateTodoResponseSchema;

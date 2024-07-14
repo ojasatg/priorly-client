@@ -3,7 +3,7 @@ import { TodoItemResponseSchema } from "./response.schemas";
 
 export const TodoItemViewSchema = TodoItemResponseSchema.merge(
     z.object({
-        isSelected: z.boolean().nullable(),
+        isSelected: z.boolean().nullish(),
     }),
 );
 export type TTodoItemViewSchema = z.infer<typeof TodoItemViewSchema>;

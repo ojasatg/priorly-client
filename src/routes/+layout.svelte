@@ -26,11 +26,12 @@
     }
 </script>
 
-<section class="app gradient-surface">
+<section class="app">
     {#if !_.isEmpty($alerts)}
         <PRAlert on:click={doAlertAction} />
     {/if}
 
+    <!-- Check styles at the bottom of this component -->
     <main>
         <slot />
     </main>

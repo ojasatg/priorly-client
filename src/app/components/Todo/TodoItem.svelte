@@ -31,6 +31,7 @@
     const dispatchEvent = createEventDispatcher<{
         delete: { id: string };
         toggle: { id: string; toggleValue: ETodoToggleType };
+        update: { id: string };
     }>();
 
     function onDelete() {
@@ -53,6 +54,10 @@
         alert(item);
     }
 
+    function updateTodo() {
+        dispatchEvent("update", { id: todo.id });
+    }
+
     let showMenu = false;
 
     $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
@@ -67,10 +72,7 @@
     $: borderColor = todo.isSelected ? "border-primary" : "border-gray-200";
 </script>
 
-<section
-    id={`todo-item-card-${todo.id}`}
-    class="card relative h-fit w-80 cursor-default rounded-md border-2 {borderColor} todo-item-card bg-white px-4 pb-4 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
->
+<section class="todo-item-card relative">
     <span
         use:tooltip={{
             placement: "top",
@@ -78,7 +80,7 @@
             arrow: false,
             animation: "scale",
         }}
-        class="todo-item-card-check absolute -right-2 -top-3 ml-auto w-fit"
+        class="todo-item-card-check absolute -right-1 -top-2 ml-auto w-fit rounded-full"
     >
         <input
             type="checkbox"
@@ -87,168 +89,177 @@
             on:click={toggleSelected}
         />
     </span>
+    <button
+        id={`todo-item-card-${todo.id}`}
+        on:click={updateTodo}
+        class="card h-fit w-80 cursor-default rounded-md border-2 {borderColor} todo-item-card-btn bg-surface px-4 pb-4 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
+    >
+        <header class="card-header flex items-start">
+            <p class="title-medium flex-grow p-0" class:line-through={todo.isDone}>
+                {todo.title}
+            </p>
 
-    <header class="card-header flex items-start">
-        <p class="title-medium flex-grow p-0" class:line-through={todo.isDone}>
-            {todo.title}
+            {#if !todo.isDone}
+                <span
+                    use:tooltip={{
+                        placement: "top",
+                        content: todo.isPinned ? "Unpin" : "Pin",
+                        arrow: false,
+                        animation: "scale",
+                    }}
+                    class="ml-auto w-fit"
+                >
+                    <Button size="sm" shape="circle" on:click={togglePin}>
+                        <span
+                            slot="icon"
+                            class={todo.isPinned ? "i-mdi-pin-off" : "i-mdi-pin-outline"}
+                        >
+                        </span>
+                    </Button>
+                </span>
+            {/if}
+            <Dropdown bind:visible={showMenu}>
+                <span
+                    use:tooltip={{
+                        placement: "top",
+                        content: "More options",
+                        arrow: false,
+                        animation: "scale",
+                    }}
+                    class="w-fit"
+                    slot="trigger"
+                >
+                    <Button
+                        size="sm"
+                        shape="circle"
+                        on:click={() => {
+                            showMenu = !showMenu;
+                        }}
+                    >
+                        <span slot="icon" class="i-mdi-dots-vertical"> </span>
+                    </Button>
+                </span>
+                <Dropdown.Items slot="items">
+                    {#each TODO_ITEM_MENU_ITEMS as menuItem}
+                        <!-- hide priortiy option for done items -->
+                        {#if !(todo.isDone && menuItem.key === ETodoItemMenuKeys.ADD_PRIORIY)}
+                            <Dropdown.Items.Item
+                                on:click={() => handleMenuItemClick(menuItem.key)}
+                                label={menuItem.label}
+                            >
+                                <span slot="icon" class="{menuItem.icon} h-4 w-4" />
+                            </Dropdown.Items.Item>
+                        {/if}
+                    {/each}
+                </Dropdown.Items>
+            </Dropdown>
+        </header>
+        <p class="my-4 text-wrap {description_font_size_class}">
+            {todo.description}
         </p>
-
-        {#if !todo.isDone}
-            <span
-                use:tooltip={{
-                    placement: "top",
-                    content: todo.isPinned ? "Unpin" : "Pin",
-                    arrow: false,
-                    animation: "scale",
-                }}
-                class="ml-auto w-fit"
-            >
-                <Button size="sm" shape="circle" on:click={togglePin}>
-                    <span slot="icon" class={todo.isPinned ? "i-mdi-pin-off" : "i-mdi-pin-outline"}>
-                    </span>
-                </Button>
-            </span>
-        {/if}
-        <Dropdown bind:visible={showMenu}>
-            <span
-                use:tooltip={{
-                    placement: "top",
-                    content: "More options",
-                    arrow: false,
-                    animation: "scale",
-                }}
-                class="w-fit"
-                slot="trigger"
-            >
-                <Button
-                    size="sm"
-                    shape="circle"
-                    on:click={() => {
-                        showMenu = !showMenu;
+        <section class="card-footer mt-2 p-0">
+            <section class="flex items-end">
+                <section>
+                    <p class="label-medium inline text-gray-600">Created on</p>
+                    <p class="label-medium inline text-gray-900">
+                        {getFormattedTimestamp(todo.createdOn, CUSTOM_DATE_OPTIONS)}
+                    </p>
+                    <section />
+                    <p class="label-medium inline text-gray-600">Last updated on</p>
+                    <p class="label-medium inline text-gray-900">
+                        {getFormattedTimestamp(todo.updatedOn, CUSTOM_DATE_OPTIONS)}
+                    </p>
+                </section>
+                <span
+                    use:tooltip={{
+                        placement: "top",
+                        content: todo.isDone ? "Mark todo as not done" : "Mark todo as done",
+                        arrow: false,
+                        animation: "scale",
+                    }}
+                    class="ml-auto"
+                >
+                    <Button size="sm" shape="circle" class="-mb-2" on:click={toggleDone}>
+                        <span slot="icon" class="h-4 w-4 {toggleDoneIcon}" />
+                    </Button>
+                </span>
+                <span
+                    use:tooltip={{
+                        placement: "top",
+                        content: "Delete",
+                        arrow: false,
+                        animation: "scale",
                     }}
                 >
-                    <span slot="icon" class="i-mdi-dots-vertical"> </span>
-                </Button>
-            </span>
-            <Dropdown.Items slot="items">
-                {#each TODO_ITEM_MENU_ITEMS as menuItem}
-                    <!-- hide priortiy option for done items -->
-                    {#if !(todo.isDone && menuItem.key === ETodoItemMenuKeys.ADD_PRIORIY)}
-                        <Dropdown.Items.Item
-                            on:click={() => handleMenuItemClick(menuItem.key)}
-                            label={menuItem.label}
+                    <Button
+                        size="sm"
+                        shape="circle"
+                        class="-mb-2"
+                        on:click={() => (showDeletePrompt = true)}
+                    >
+                        <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error" />
+                    </Button>
+                </span>
+            </section>
+
+            {#if todo.reminder || todo.deadline || todo.isDone}
+                <PRDivider />
+                <section class="grid gap-1">
+                    {#if todo.reminder}
+                        <section
+                            use:tooltip={{
+                                placement: "bottom-start",
+                                content: "Reminder",
+                                arrow: false,
+                                animation: "scale",
+                            }}
+                            class="card-footer flex w-fit items-center gap-1 p-0"
                         >
-                            <span slot="icon" class="{menuItem.icon} h-4 w-4" />
-                        </Dropdown.Items.Item>
+                            <span class="i-mdi-alarm"></span>
+                            <p class="label-medium inline">
+                                {getFormattedTimestamp(todo.reminder)}
+                            </p>
+                        </section>
                     {/if}
-                {/each}
-            </Dropdown.Items>
-        </Dropdown>
-    </header>
-    <p class="my-4 text-wrap {description_font_size_class}">
-        {todo.description}
-    </p>
-    <section class="card-footer mt-2 p-0">
-        <section class="flex items-end">
-            <section>
-                <p class="label-medium inline text-gray-600">Created on</p>
-                <p class="label-medium inline text-gray-900">
-                    {getFormattedTimestamp(todo.createdOn, CUSTOM_DATE_OPTIONS)}
-                </p>
-                <section />
-                <p class="label-medium inline text-gray-600">Last updated on</p>
-                <p class="label-medium inline text-gray-900">
-                    {getFormattedTimestamp(todo.updatedOn, CUSTOM_DATE_OPTIONS)}
-                </p>
-            </section>
-            <span
-                use:tooltip={{
-                    placement: "top",
-                    content: todo.isDone ? "Mark todo as not done" : "Mark todo as done",
-                    arrow: false,
-                    animation: "scale",
-                }}
-                class="ml-auto"
-            >
-                <Button size="sm" shape="circle" class="-mb-2" on:click={toggleDone}>
-                    <span slot="icon" class="h-4 w-4 {toggleDoneIcon}" />
-                </Button>
-            </span>
-            <span
-                use:tooltip={{
-                    placement: "top",
-                    content: "Delete",
-                    arrow: false,
-                    animation: "scale",
-                }}
-            >
-                <Button
-                    size="sm"
-                    shape="circle"
-                    class="-mb-2"
-                    on:click={() => (showDeletePrompt = true)}
-                >
-                    <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error" />
-                </Button>
-            </span>
+                    {#if todo.deadline}
+                        <section
+                            use:tooltip={{
+                                placement: "bottom-start",
+                                content: "Deadline",
+                                arrow: false,
+                                animation: "scale",
+                            }}
+                            class="card-footer flex w-fit items-center gap-1 p-0 {deadline_class}"
+                        >
+                            <span class="i-mdi-clock-alert-outline"></span>
+                            <p class="label-medium inline">
+                                {getFormattedTimestamp(todo.deadline, CUSTOM_DATE_OPTIONS)}
+                            </p>
+                        </section>
+                    {/if}
+
+                    {#if todo.isDone}
+                        <section
+                            use:tooltip={{
+                                placement: "bottom-start",
+                                content: "You marked this item as done",
+                                arrow: false,
+                                animation: "scale",
+                            }}
+                            class="card-footer flex w-fit items-center gap-1 p-0 text-success"
+                        >
+                            <span class="i-mdi-checkbox-marked-circle-outline"></span>
+                            <p class="label-medium inline">
+                                {getFormattedTimestamp(todo.completedOn ?? 0)}
+                            </p>
+                        </section>
+                    {/if}
+                </section>
+            {/if}
         </section>
-
-        {#if todo.reminder || todo.deadline || todo.isDone}
-            <PRDivider />
-            <section class="grid gap-1">
-                {#if todo.reminder}
-                    <section
-                        use:tooltip={{
-                            placement: "bottom-start",
-                            content: "Reminder",
-                            arrow: false,
-                            animation: "scale",
-                        }}
-                        class="card-footer flex w-fit items-center gap-1 p-0"
-                    >
-                        <span class="i-mdi-alarm"></span>
-                        <p class="label-medium inline">
-                            {getFormattedTimestamp(todo.reminder)}
-                        </p>
-                    </section>
-                {/if}
-                {#if todo.deadline}
-                    <section
-                        use:tooltip={{
-                            placement: "bottom-start",
-                            content: "Deadline",
-                            arrow: false,
-                            animation: "scale",
-                        }}
-                        class="card-footer flex w-fit items-center gap-1 p-0 {deadline_class}"
-                    >
-                        <span class="i-mdi-clock-alert-outline"></span>
-                        <p class="label-medium inline">
-                            {getFormattedTimestamp(todo.deadline, CUSTOM_DATE_OPTIONS)}
-                        </p>
-                    </section>
-                {/if}
-
-                {#if todo.isDone}
-                    <section
-                        use:tooltip={{
-                            placement: "bottom-start",
-                            content: "You marked this item as done",
-                            arrow: false,
-                            animation: "scale",
-                        }}
-                        class="card-footer flex w-fit items-center gap-1 p-0 text-success"
-                    >
-                        <span class="i-mdi-checkbox-marked-circle-outline"></span>
-                        <p class="label-medium inline">
-                            {getFormattedTimestamp(todo.completedOn ?? 0)}
-                        </p>
-                    </section>
-                {/if}
-            </section>
-        {/if}
-    </section>
+    </button>
 </section>
+
 <PRPrompt
     bind:modelValue={showDeletePrompt}
     title="Delete Todo?"

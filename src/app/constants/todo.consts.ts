@@ -36,3 +36,8 @@ export enum ETodoToggleType {
     DONE,
     SELECT,
 }
+
+export enum ETodoFormType {
+    ADD,
+    EDIT,
+}

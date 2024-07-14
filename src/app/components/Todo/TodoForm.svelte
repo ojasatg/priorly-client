@@ -11,7 +11,6 @@
     // local imports
     import {
         CreateTodoFormSchema,
-        type TCreateTodoFormSchema,
         type TCreateTodoResponseSchema,
         type TTodoItemViewSchema,
     } from "$schemas";
@@ -77,9 +76,9 @@
 
             return errors;
         },
-        onSubmit: async (values: TCreateTodoFormSchema) => {
+        onSubmit: async () => {
             submitting = true;
-            const responseData = await createTodo(values);
+            const responseData = await createTodo();
             return responseData;
         },
         onSuccess: (response) => {
@@ -106,15 +105,14 @@
         dispatchEvent("cancel");
     }
 
-    async function createTodo(todo: TCreateTodoFormSchema) {
+    async function createTodo() {
         const deadlineTimestamp = deadline ? getTimestampFromDate(deadline) : undefined;
         const reminderTimestamp = reminder ? getTimestampFromDate(reminder) : undefined;
 
         const newTodo = {
-            ...todo,
-            title: todo.title.trim(),
-            description: todo.description?.trim() ?? "",
-            isDone: todo.isDone ?? false,
+            title: title.trim(),
+            description: description?.trim() ?? "",
+            isDone: isDone ?? false,
             deadline: deadlineTimestamp,
             reminder: reminderTimestamp,
         };

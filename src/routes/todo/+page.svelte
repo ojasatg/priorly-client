@@ -54,7 +54,9 @@
     }
 
     function createTodo(event: CustomEvent<TCreateTodoResponseSchema>) {
-        allTodos.unshift(event.detail.todo);
+        const newTodo = event.detail.todo;
+
+        allTodos.unshift(newTodo);
         allTodos = allTodos; //  reassign to update the UI
     }
 

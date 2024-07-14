@@ -7,6 +7,8 @@ export const TodoItemResponseSchema = GenericTodoItemSchema.merge(
         createdOn: z.number(),
         updatedOn: z.number(),
         completedOn: z.number().nullish(),
+        isPinned: z.boolean().nullish(),
+        isSelected: z.boolean().nullish(),
     }),
 );
 

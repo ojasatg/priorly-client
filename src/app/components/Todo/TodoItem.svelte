@@ -81,7 +81,7 @@
             arrow: false,
             animation: "scale",
         }}
-        class="hover-buttons absolute -right-1 -top-2 ml-auto w-fit rounded-full bg-gray-100"
+        class="hover-buttons absolute -right-1 -top-3 ml-auto w-fit rounded-full"
     >
         <input
             type="checkbox"
@@ -227,7 +227,7 @@
         </span>
     </section>
 
-    <Dropdown bind:visible={showMenu} class="absolute bottom-2 right-2">
+    <Dropdown bind:visible={showMenu} class="absolute bottom-2 right-4">
         <span
             use:tooltip={{
                 placement: "top",

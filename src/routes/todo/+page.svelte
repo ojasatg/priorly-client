@@ -78,7 +78,8 @@
     function afterUpdateTodo(event: CustomEvent<TEditTodoResponseSchema>) {
         const updatedTodo = event.detail.todo;
         const todoIdx = _.findIndex(allTodos, { id: updatedTodo.id });
-        allTodos.splice(todoIdx, 1, updatedTodo);
+        allTodos.splice(todoIdx, 1);
+        allTodos.unshift(updatedTodo);
         allTodos = allTodos;
     }
 
@@ -116,7 +117,9 @@
         }
         const newTodo = { ...oldTodo, ...changes };
 
-        allTodos.splice(todoIndex, 1, newTodo); // add the updated todo to the array
+        allTodos.splice(todoIndex, 1); // removed the old todo from array
+        // add the updated todo to the start of the array so that filter works properly - this won't work on reactive statements, as api is called after updating ui
+        allTodos.unshift(newTodo);
         allTodos = allTodos; // update the ui
 
         try {
@@ -126,7 +129,9 @@
                 showAlerts: false,
             });
         } catch (error) {
-            allTodos.splice(todoIndex, 1, oldTodo); // placing back the old todo in case of any error
+            // in case some error happens in the backend while updating
+            allTodos.splice(0, 1); // remove the updated todo from the first index
+            allTodos.splice(todoIndex, 0, oldTodo); // placing back the old todo in case of any error
             allTodos = allTodos; // updating the ui
             alerts.error("Something went wrong! Please try again");
             console.error(error);
@@ -138,6 +143,7 @@
             fetchingTodos = true;
             const data = await todoService.all({});
             allTodos = data?.todos ?? [];
+            allTodos = _.orderBy(allTodos, ["updatedOn"], "desc");
         } catch (error) {
             alerts.error("Failed to fetch todos, please try again");
             console.error(error);
@@ -153,9 +159,9 @@
     }
 
     // reactive statements
-    $: pinnedTodos = allTodos.filter((todo) => !todo.isDone && todo.isPinned);
-    $: pendingTodos = allTodos.filter((todo) => !todo.isDone && !todo.isPinned);
-    $: doneTodos = allTodos.filter((todo) => todo.isDone);
+    $: pinnedTodos = _.filter(allTodos, (todo) => !todo.isDone && todo.isPinned);
+    $: pendingTodos = _.filter(allTodos, (todo) => !todo.isDone && !todo.isPinned);
+    $: doneTodos = _.filter(allTodos, (todo) => todo.isDone);
 
     // lifecycle methods
     onMount(async () => {

@@ -220,6 +220,7 @@
     bind:modelValue={showAddTodoForm}
     title={todoFormType === ETodoFormType.ADD ? "Add Todo" : "Edit Todo"}
     subtitle={todoFormType === ETodoFormType.ADD ? "Add a new todo" : "Edit this todo"}
+    showCloseBtn
     scrim
 >
     <TodoForm

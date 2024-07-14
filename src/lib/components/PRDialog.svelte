@@ -6,8 +6,9 @@
     export let title;
     export let subtitle = "";
     export let scrim = false;
+    export let showCloseBtn = false;
 
-    const dispatchEvent = createEventDispatcher<{ close: null }>();
+    const dispatchEvent = createEventDispatcher<{ close: null; iconClick: null }>();
 
     function onClose() {
         const shouldContinue = dispatchEvent("close", null, { cancelable: true });
@@ -26,9 +27,11 @@
                     <section class="flex flex-col justify-between">
                         <section class="flex items-center justify-between">
                             <p class="title-medium">{title}</p>
-                            <Button shape="circle" size="lg" on:click={onClose}>
-                                <span slot="icon" class="title-medium i-mdi-close h-8 w-8"> </span>
-                            </Button>
+                            {#if showCloseBtn}
+                                <Button shape="circle" size="lg" on:click={onClose}>
+                                    <span slot="icon" class="title-medium i-mdi-close h-8 w-8" />
+                                </Button>
+                            {/if}
                         </section>
                         <p class="body-small">{subtitle}</p>
                     </section>

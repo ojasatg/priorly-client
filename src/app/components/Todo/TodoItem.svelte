@@ -72,7 +72,8 @@
     $: borderColor = todo.isSelected ? "border-primary" : "border-gray-200";
 </script>
 
-<section class="todo-item-card relative">
+<section class="todo-item-card relative h-fit">
+    <!-- Buttons or features that we don't want to get disturbed by the click on main card - uses relative positioning to place the elements -->
     <span
         use:tooltip={{
             placement: "top",
@@ -80,7 +81,7 @@
             arrow: false,
             animation: "scale",
         }}
-        class="todo-item-card-check absolute -right-1 -top-2 ml-auto w-fit rounded-full"
+        class="hover-buttons absolute -right-1 -top-2 ml-auto w-fit rounded-full bg-gray-100"
     >
         <input
             type="checkbox"
@@ -89,71 +90,38 @@
             on:click={toggleSelected}
         />
     </span>
+
+    {#if !todo.isDone}
+        <span
+            use:tooltip={{
+                placement: "top",
+                content: todo.isPinned ? "Unpin" : "Pin",
+                arrow: false,
+                animation: "scale",
+            }}
+            class="hover-buttons absolute right-4 top-2 w-fit"
+        >
+            <Button size="md" shape="circle" on:click={togglePin}>
+                <span
+                    slot="icon"
+                    class={todo.isPinned ? "i-mdi-pin-off h-8 w-8" : "i-mdi-pin-outline h-8 w-8"}
+                >
+                </span>
+            </Button>
+        </span>
+    {/if}
+
     <button
         id={`todo-item-card-${todo.id}`}
         on:click={updateTodo}
-        class="card h-fit w-80 cursor-default rounded-md border-2 {borderColor} todo-item-card-btn bg-surface px-4 pb-4 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
+        class="card h-fit w-80 cursor-default rounded-md border-2 {borderColor} todo-item-card-btn bg-surface px-4 pb-12 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
     >
-        <header class="card-header flex items-start">
-            <p class="title-medium flex-grow p-0" class:line-through={todo.isDone}>
-                {todo.title}
-            </p>
-
-            {#if !todo.isDone}
-                <span
-                    use:tooltip={{
-                        placement: "top",
-                        content: todo.isPinned ? "Unpin" : "Pin",
-                        arrow: false,
-                        animation: "scale",
-                    }}
-                    class="ml-auto w-fit"
-                >
-                    <Button size="sm" shape="circle" on:click={togglePin}>
-                        <span
-                            slot="icon"
-                            class={todo.isPinned ? "i-mdi-pin-off" : "i-mdi-pin-outline"}
-                        >
-                        </span>
-                    </Button>
-                </span>
-            {/if}
-            <Dropdown bind:visible={showMenu}>
-                <span
-                    use:tooltip={{
-                        placement: "top",
-                        content: "More options",
-                        arrow: false,
-                        animation: "scale",
-                    }}
-                    class="w-fit"
-                    slot="trigger"
-                >
-                    <Button
-                        size="sm"
-                        shape="circle"
-                        on:click={() => {
-                            showMenu = !showMenu;
-                        }}
-                    >
-                        <span slot="icon" class="i-mdi-dots-vertical"> </span>
-                    </Button>
-                </span>
-                <Dropdown.Items slot="items">
-                    {#each TODO_ITEM_MENU_ITEMS as menuItem}
-                        <!-- hide priortiy option for done items -->
-                        {#if !(todo.isDone && menuItem.key === ETodoItemMenuKeys.ADD_PRIORIY)}
-                            <Dropdown.Items.Item
-                                on:click={() => handleMenuItemClick(menuItem.key)}
-                                label={menuItem.label}
-                            >
-                                <span slot="icon" class="{menuItem.icon} h-4 w-4" />
-                            </Dropdown.Items.Item>
-                        {/if}
-                    {/each}
-                </Dropdown.Items>
-            </Dropdown>
-        </header>
+        <p
+            class="card-header title-medium mr-2 flex flex-grow items-start p-0"
+            class:line-through={todo.isDone}
+        >
+            {todo.title}
+        </p>
         <p class="my-4 text-wrap {description_font_size_class}">
             {todo.description}
         </p>
@@ -170,36 +138,6 @@
                         {getFormattedTimestamp(todo.updatedOn, CUSTOM_DATE_OPTIONS)}
                     </p>
                 </section>
-                <span
-                    use:tooltip={{
-                        placement: "top",
-                        content: todo.isDone ? "Mark todo as not done" : "Mark todo as done",
-                        arrow: false,
-                        animation: "scale",
-                    }}
-                    class="ml-auto"
-                >
-                    <Button size="sm" shape="circle" class="-mb-2" on:click={toggleDone}>
-                        <span slot="icon" class="h-4 w-4 {toggleDoneIcon}" />
-                    </Button>
-                </span>
-                <span
-                    use:tooltip={{
-                        placement: "top",
-                        content: "Delete",
-                        arrow: false,
-                        animation: "scale",
-                    }}
-                >
-                    <Button
-                        size="sm"
-                        shape="circle"
-                        class="-mb-2"
-                        on:click={() => (showDeletePrompt = true)}
-                    >
-                        <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error" />
-                    </Button>
-                </span>
             </section>
 
             {#if todo.reminder || todo.deadline || todo.isDone}
@@ -258,6 +196,72 @@
             {/if}
         </section>
     </button>
+
+    <!-- Buttons or features that we don't want to get disturbed by the click on main card - uses relative positioning to place the elements -->
+    <section class="hover-buttons absolute bottom-2 left-2">
+        <span
+            use:tooltip={{
+                placement: "top",
+                content: todo.isDone ? "Mark todo as not done" : "Mark todo as done",
+                arrow: false,
+                animation: "scale",
+            }}
+            class="ml-auto"
+        >
+            <Button size="sm" shape="circle" on:click={toggleDone}>
+                <span slot="icon" class="h-4 w-4 {toggleDoneIcon}" />
+            </Button>
+        </span>
+
+        <span
+            use:tooltip={{
+                placement: "top",
+                content: "Delete",
+                arrow: false,
+                animation: "scale",
+            }}
+        >
+            <Button size="sm" shape="circle" on:click={() => (showDeletePrompt = true)}>
+                <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error" />
+            </Button>
+        </span>
+    </section>
+
+    <Dropdown bind:visible={showMenu} class="absolute bottom-2 right-2">
+        <span
+            use:tooltip={{
+                placement: "top",
+                content: "More options",
+                arrow: false,
+                animation: "scale",
+            }}
+            class="w-fit"
+            slot="trigger"
+        >
+            <Button
+                size="sm"
+                shape="circle"
+                on:click={() => {
+                    showMenu = !showMenu;
+                }}
+            >
+                <span slot="icon" class="hover-buttons i-mdi-dots-vertical"> </span>
+            </Button>
+        </span>
+        <Dropdown.Items slot="items">
+            {#each TODO_ITEM_MENU_ITEMS as menuItem}
+                <!-- hide priortiy option for done items -->
+                {#if !(todo.isDone && menuItem.key === ETodoItemMenuKeys.ADD_PRIORIY)}
+                    <Dropdown.Items.Item
+                        on:click={() => handleMenuItemClick(menuItem.key)}
+                        label={menuItem.label}
+                    >
+                        <span slot="icon" class="{menuItem.icon} h-4 w-4" />
+                    </Dropdown.Items.Item>
+                {/if}
+            {/each}
+        </Dropdown.Items>
+    </Dropdown>
 </section>
 
 <PRPrompt
@@ -272,11 +276,11 @@
 />
 
 <style lang="scss">
-    .todo-item-card-check {
+    .hover-buttons {
         display: none;
     }
     .todo-item-card:hover {
-        .todo-item-card-check {
+        .hover-buttons {
             display: block;
         }
     }

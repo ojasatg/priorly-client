@@ -189,9 +189,15 @@
     $: validateDeadlineReminder(deadline, reminder);
     $: setTodoFormErrors("deadline", [deadlineFieldErrors]);
     $: setTodoFormErrors("reminder", [reminderFieldErrors]);
+    $: showDetails = !!title || !!description || !!deadline || !!reminder;
 </script>
 
-<form use:addTodoForm class="grid gap-4 {classNames}">
+<form
+    use:addTodoForm
+    class="fixed left-[50%] z-20 mx-auto -ml-[24rem] grid w-[48rem] gap-4 {classNames} rounded-md p-4"
+    class:shadow-lg={showDetails}
+    class:bg-white={showDetails}
+>
     <section class="flex items-center gap-2">
         <Input
             name="title"
@@ -203,7 +209,7 @@
             class="w-full flex-grow"
         />
 
-        {#if !!title && !isDone}
+        {#if showDetails && !isDone}
             <span
                 use:tooltip={{
                     placement: "top",
@@ -226,7 +232,7 @@
     </section>
 
     <!-- if title or description -->
-    {#if !!title || !!description}
+    {#if showDetails}
         <section transition:slide>
             <TextArea
                 name="description"

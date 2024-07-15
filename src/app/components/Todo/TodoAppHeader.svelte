@@ -1,9 +1,10 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import { Button } from "stwui";
+    import { Button, Input } from "stwui";
     import { tooltip } from "stwui/actions";
 
     export let refreshing;
+    export let todoSearchVal = "";
 
     const dispatchEvent = createEventDispatcher<{
         refresh: null;
@@ -11,8 +12,10 @@
     }>();
 </script>
 
-<section class="mb-4 flex items-center gap-2">
-    <p class="title-medium">My Todos</p>
+<section
+    class="border-b-1 gradient-surface z-10 my-4 mb-8 flex items-center gap-2 border-b-2 border-gray-200 px-4 pb-4"
+>
+    <p class="title-medium">Todos</p>
     <span
         use:tooltip={{
             placement: "top",
@@ -32,4 +35,13 @@
             <span slot="icon" class="i-mdi-refresh h-16 w-16" />
         </Button>
     </span>
+
+    <Input
+        name="todo-search"
+        placeholder="Search todo..."
+        bind:value={todoSearchVal}
+        type="text"
+        allowClear
+        class="ml-auto"
+    />
 </section>

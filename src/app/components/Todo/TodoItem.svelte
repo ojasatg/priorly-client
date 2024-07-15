@@ -61,7 +61,8 @@
     let showMenu = false;
 
     $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
-    $: description_font_size_class = todo.description.length <= 60 ? "body-large" : "body-medium";
+    $: description_font_size_class =
+        todo.description && todo.description.length <= 60 ? "body-large" : "body-medium";
     $: toggleDoneIcon = todo.isDone
         ? "i-mdi-checkbox-marked-circle-minus-outline text-error"
         : "i-mdi-checkbox-marked-circle-plus-outline text-success";
@@ -72,7 +73,7 @@
     $: borderColor = todo.isSelected ? "border-primary" : "border-gray-200";
 </script>
 
-<section class="todo-item-card relative h-fit">
+<section class="todo-item-card relative h-fit w-fit">
     <!-- Buttons or features that we don't want to get disturbed by the click on main card - uses relative positioning to place the elements -->
     <span
         use:tooltip={{

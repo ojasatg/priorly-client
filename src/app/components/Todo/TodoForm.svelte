@@ -23,6 +23,7 @@
     // props
     export let todo: TTodoItemViewSchema | undefined = undefined;
     export let formType: ETodoFormType;
+    export let classNames = "";
 
     // events
     const dispatchEvent = createEventDispatcher<{
@@ -190,7 +191,7 @@
     $: setTodoFormErrors("reminder", [reminderFieldErrors]);
 </script>
 
-<form use:addTodoForm class="grid gap-4">
+<form use:addTodoForm class="grid gap-4 {classNames}">
     <section class="flex items-center gap-2">
         <Input
             name="title"

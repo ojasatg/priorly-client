@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const GenericTodoItemSchema = z.object({
-    title: z.string().nullish(),
+    title: z.string().max(60, "Title cannot be more than 60 characters").nullish(),
     isDone: z.boolean(),
     isPinned: z.boolean(),
     description: z

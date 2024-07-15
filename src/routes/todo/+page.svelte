@@ -58,12 +58,6 @@
         }
     }
 
-    function beforeCreateTodo() {
-        editingTodo = undefined;
-        todoFormType = ETodoFormType.ADD;
-        showAddTodoForm = true;
-    }
-
     function afterCreateTodo(event: CustomEvent<TCreateTodoResponseSchema>) {
         const newTodo = { ...event.detail.todo, isSelected: false };
         allTodos.unshift(newTodo);
@@ -171,18 +165,16 @@
     });
 </script>
 
-<TodoAppHeader
-    refreshing={fetchingTodos}
-    updating={showAddTodoForm}
-    on:refresh={getAllTodos}
-    on:addTodo={beforeCreateTodo}
-/>
+<TodoAppHeader refreshing={fetchingTodos} on:refresh={getAllTodos} />
+
+<TodoForm formType={ETodoFormType.ADD} on:create={afterCreateTodo} />
+
 {#if fetchingTodos}
-    <TodosWrapperLoader />
+    <TodosWrapperLoader classNames="mt-4" />
 {:else if !fetchingTodos && !fetchTodoError}
     <section class="grid gap-4">
         {#if !_.isEmpty(pinnedTodos)}
-            <section class="mb-2 flex items-start gap-1">
+            <section class="mb-2 mt-4 flex items-start gap-1">
                 <span class="i-mdi-pin h-4 w-4 text-gray-500" />
                 <p class="label-bold-medium text-gray-500">PINNED</p>
             </section>

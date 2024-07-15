@@ -4,7 +4,10 @@ export const GenericTodoItemSchema = z.object({
     title: z.string().nullish(),
     isDone: z.boolean(),
     isPinned: z.boolean(),
-    description: z.string().max(300, "Description cannot be more than 300 characters long"),
+    description: z
+        .string()
+        .max(300, "Description cannot be more than 300 characters long")
+        .nullish(),
     deadline: z.number().nullish(),
     reminder: z.number().nullish(),
     color: z

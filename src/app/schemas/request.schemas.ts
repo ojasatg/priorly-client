@@ -1,7 +1,11 @@
 import z from "zod";
 import { GenericTodoItemSchema } from "./generic.schema";
 
-export const CreateTodoRequestSchema = GenericTodoItemSchema;
+export const CreateTodoRequestSchema = GenericTodoItemSchema.merge(
+    z.object({
+        isDone: z.boolean().nullish(),
+    }),
+);
 export const EditTodoRequestSchema = z.object({
     changes: GenericTodoItemSchema.merge(
         z.object({

@@ -17,6 +17,8 @@
     } from "$schemas";
     import todoService from "$services/todo.service";
     import { ETodoFormType } from "$constants/todo.consts";
+    import { slide } from "svelte/transition";
+    import _ from "lodash";
 
     // props
     export let todo: TTodoItemViewSchema | undefined = undefined;
@@ -89,6 +91,9 @@
                 errors["reminder"] = [reminderFieldErrors];
             }
 
+            if (!_.isEmpty(errors)) {
+                console.error("Form errors: ", errors);
+            }
             return errors;
         },
         onSubmit: async () => {
@@ -186,115 +191,143 @@
 </script>
 
 <form use:addTodoForm class="grid gap-4">
-    <section class="grid gap-2">
+    <section class="flex items-center gap-2">
         <Input
             name="title"
-            placeholder="Enter a title"
+            placeholder="Add a todo..."
             bind:value={title}
             type="text"
             error={$addTodoFormErrors.title?.[0]}
             allowClear
-        >
-            <p slot="label" class="label-medium">Title</p>
-        </Input>
+            class="w-full flex-grow"
+        />
 
-        <TextArea
-            name="description"
-            placeholder="Add a description"
-            bind:value={description}
-            type="text"
-            error={$addTodoFormErrors.description?.[0]}
-            allowClear
-        >
-            <p slot="label" class="label-medium">Description</p>
-        </TextArea>
+        {#if !!title && !isDone}
+            <span
+                use:tooltip={{
+                    placement: "top",
+                    content: isPinned ? "Unpin" : "Pin",
+                    arrow: false,
+                    animation: "scale",
+                }}
+                transition:slide
+                class="w-fit"
+            >
+                <Button size="lg" shape="circle" on:click={() => (isPinned = !isPinned)}>
+                    <span
+                        slot="icon"
+                        class={isPinned ? "i-mdi-pin-off h-12 w-12" : "i-mdi-pin-outline h-12 w-12"}
+                    >
+                    </span>
+                </Button>
+            </span>
+        {/if}
     </section>
-    <section class="mb-2 grid gap-4">
-        <section class="flex items-center gap-8">
-            <CheckboxGroup>
-                <CheckboxGroup.Checkbox name="isDone" value="isDone" bind:checked={isDone}>
-                    <CheckboxGroup.Checkbox.Label slot="label" class="label-medium"
-                        >Mark as done</CheckboxGroup.Checkbox.Label
-                    >
-                </CheckboxGroup.Checkbox>
-            </CheckboxGroup>
 
-            <CheckboxGroup>
-                <CheckboxGroup.Checkbox name="isPinned" value="isPinned" bind:checked={isPinned}>
-                    <CheckboxGroup.Checkbox.Label slot="label" class="label-medium"
-                        >Pin this todo</CheckboxGroup.Checkbox.Label
-                    >
-                </CheckboxGroup.Checkbox>
-            </CheckboxGroup>
+    <!-- if title or description -->
+    {#if !!title || !!description}
+        <section transition:slide>
+            <TextArea
+                name="description"
+                placeholder="Add a description"
+                bind:value={description}
+                type="text"
+                error={$addTodoFormErrors.description?.[0]}
+                allowClear
+            >
+                <p slot="label" class="label-medium">Description</p>
+            </TextArea>
+            <section class="my-2 grid gap-4">
+                <section class="flex items-center gap-8">
+                    {#if formType === ETodoFormType.EDIT}
+                        <CheckboxGroup>
+                            <CheckboxGroup.Checkbox
+                                name="isDone"
+                                value="isDone"
+                                bind:checked={isDone}
+                            >
+                                <CheckboxGroup.Checkbox.Label slot="label" class="label-medium"
+                                    >Mark as done</CheckboxGroup.Checkbox.Label
+                                >
+                            </CheckboxGroup.Checkbox>
+                        </CheckboxGroup>
+                    {/if}
+                </section>
+
+                {#if !isDone}
+                    <section transition:slide class="grid gap-2">
+                        <DatePicker
+                            name="deadline"
+                            label="Deadline"
+                            placeholder="Pick a deadline"
+                            bind:value={deadline}
+                            error={$addTodoFormErrors.deadline?.[0]}
+                            allowClear
+                        >
+                            <DatePicker.Label slot="label">
+                                <section class="flex items-center gap-2">
+                                    <p class="body-small">Deadline</p>
+                                    <span
+                                        class="i-mdi-information-outline h-4 w-4 text-primary"
+                                        use:tooltip={{
+                                            placement: "right",
+                                            content: "Set a deadline in your Google calendar",
+                                            arrow: false,
+                                            animation: "scale",
+                                        }}
+                                    >
+                                    </span>
+                                </section>
+                                <section class="flex w-full items-center gap-2"></section>
+                            </DatePicker.Label></DatePicker
+                        >
+
+                        <DatePicker
+                            name="reminder"
+                            label="Reminder"
+                            placeholder="Add a reminder"
+                            bind:value={reminder}
+                            error={$addTodoFormErrors.reminder?.[0]}
+                            showTime
+                            allowClear
+                            class="flex-auto"
+                        >
+                            <DatePicker.Label slot="label">
+                                <section class="flex items-center gap-2">
+                                    <p class="body-small">Reminder</p>
+                                    <span
+                                        class="i-mdi-information-outline h-4 w-4 text-primary"
+                                        use:tooltip={{
+                                            placement: "right",
+                                            content: "Add a Reminder in your Google Calendar",
+                                            arrow: false,
+                                            animation: "scale",
+                                        }}
+                                    >
+                                    </span>
+                                </section>
+                            </DatePicker.Label></DatePicker
+                        >
+                    </section>
+                {/if}
+            </section>
+            <section class="ml-auto mt-2 w-fit">
+                <Button
+                    on:click={formType === ETodoFormType.EDIT ? onCancel : () => resetValues()}
+                    size="sm"
+                >
+                    <span class="body-medium">Cancel</span>
+                </Button>
+                {#if formType === ETodoFormType.ADD}
+                    <Button loading={submitting} type="primary" htmlType="submit" size="sm">
+                        <span class="body-medium">Add</span>
+                    </Button>
+                {:else}
+                    <Button loading={submitting} type="primary" htmlType="submit" size="sm">
+                        <span class="body-medium">Save</span>
+                    </Button>
+                {/if}
+            </section>
         </section>
-
-        {#if !isDone}
-            <DatePicker
-                name="deadline"
-                label="Deadline"
-                placeholder="Pick a deadline"
-                bind:value={deadline}
-                error={$addTodoFormErrors.deadline?.[0]}
-                allowClear
-            >
-                <DatePicker.Label slot="label">
-                    <section class="flex items-center gap-2">
-                        <p class="body-small">Deadline</p>
-                        <span
-                            class="i-mdi-information-outline h-4 w-4 text-primary"
-                            use:tooltip={{
-                                placement: "right",
-                                content: "Set a deadline in your Google calendar",
-                                arrow: false,
-                                animation: "scale",
-                            }}
-                        >
-                        </span>
-                    </section>
-                    <section class="flex w-full items-center gap-2"></section>
-                </DatePicker.Label></DatePicker
-            >
-
-            <DatePicker
-                name="reminder"
-                label="Reminder"
-                placeholder="Add a reminder"
-                bind:value={reminder}
-                error={$addTodoFormErrors.reminder?.[0]}
-                showTime
-                allowClear
-                class="flex-auto"
-            >
-                <DatePicker.Label slot="label">
-                    <section class="flex items-center gap-2">
-                        <p class="body-small">Reminder</p>
-                        <span
-                            class="i-mdi-information-outline h-4 w-4 text-primary"
-                            use:tooltip={{
-                                placement: "right",
-                                content: "Add a Reminder in your Google Calendar",
-                                arrow: false,
-                                animation: "scale",
-                            }}
-                        >
-                        </span>
-                    </section>
-                </DatePicker.Label></DatePicker
-            >
-        {/if}
-    </section>
-    <section class="ml-auto w-fit">
-        <Button on:click={onCancel} size="sm">
-            <span class="body-medium">Cancel</span>
-        </Button>
-        {#if formType === ETodoFormType.ADD}
-            <Button loading={submitting} type="primary" htmlType="submit" size="sm">
-                <span class="body-medium">Add</span>
-            </Button>
-        {:else}
-            <Button loading={submitting} type="primary" htmlType="submit" size="sm">
-                <span class="body-medium">Save</span>
-            </Button>
-        {/if}
-    </section>
+    {/if}
 </form>

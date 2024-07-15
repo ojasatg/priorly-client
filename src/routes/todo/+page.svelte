@@ -26,6 +26,7 @@
     import TodoAppHeader from "$components/Todo/TodoAppHeader.svelte";
     import TodoForm from "$components/Todo/TodoForm.svelte";
     import { getCurrentTimeStamp } from "$lib/utils";
+    import { Divider } from "stwui";
 
     // local variables
     let editingTodo: TTodoItemViewSchema | undefined = undefined;
@@ -170,54 +171,56 @@
 
     <TodoForm formType={ETodoFormType.ADD} on:create={afterCreateTodo} classNames="" />
 
-    <section class="mx-auto mt-36 h-[80vh] w-[64rem] overflow-y-scroll overscroll-none pb-32">
-        <p class="title-large">My Todos</p>
-        {#if fetchingTodos}
-            <TodosWrapperLoader classNames="mt-4" />
-        {:else if !fetchingTodos && !fetchTodoError}
-            <section class="grid gap-4">
-                {#if !_.isEmpty(pinnedTodos)}
-                    <section class="mb-2 mt-4 flex items-start gap-1">
-                        <span class="i-mdi-pin h-4 w-4 text-gray-500" />
-                        <p class="label-bold-medium text-gray-500">PINNED</p>
-                    </section>
-                    <TodosWrapper
-                        todos={pinnedTodos}
-                        on:delete={deleteTodo}
-                        on:toggle={toggleTodo}
-                        on:update={beforeUpdateTodo}
-                    />
-                {/if}
-                {#if !_.isEmpty(pendingTodos)}
-                    <p class="label-bold-medium mb-2 text-gray-500">PENDING</p>
-                    <TodosWrapper
-                        todos={pendingTodos}
-                        on:delete={deleteTodo}
-                        on:toggle={toggleTodo}
-                        on:update={beforeUpdateTodo}
-                    />
-                {/if}
-                {#if !_.isEmpty(doneTodos)}
-                    {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
-                        <p class="body-large">Hurray! You're done for now!</p>
-                    {/if}
-                    <section>
-                        <p class="label-bold-medium mb-2 text-gray-500">DONE</p>
+    <section class="mx-auto mt-32 grid w-[64rem]">
+        <Divider class="my-0" />
+        <section class="h-[68vh] overflow-y-scroll overscroll-none px-4">
+            {#if fetchingTodos}
+                <TodosWrapperLoader classNames="mt-4" />
+            {:else if !fetchingTodos && !fetchTodoError}
+                <section>
+                    {#if !_.isEmpty(pinnedTodos)}
+                        <section class="mb-2 mt-4 flex items-start gap-1">
+                            <span class="i-mdi-pin h-4 w-4 text-gray-500" />
+                            <p class="label-bold-medium text-gray-500">PINNED</p>
+                        </section>
                         <TodosWrapper
-                            todos={doneTodos}
+                            todos={pinnedTodos}
                             on:delete={deleteTodo}
                             on:toggle={toggleTodo}
                             on:update={beforeUpdateTodo}
                         />
-                    </section>
-                {/if}
-            </section>
-        {:else}
-            <section class=" text-gray-400">
-                <div class="i-mdi-document h-12 w-12" />
-                <p class="title-large">Notes you add will appear here</p>
-            </section>
-        {/if}
+                    {/if}
+                    {#if !_.isEmpty(pendingTodos)}
+                        <p class="label-bold-medium mb-1 mt-2 text-gray-500">PENDING</p>
+                        <TodosWrapper
+                            todos={pendingTodos}
+                            on:delete={deleteTodo}
+                            on:toggle={toggleTodo}
+                            on:update={beforeUpdateTodo}
+                        />
+                    {/if}
+                    {#if !_.isEmpty(doneTodos)}
+                        {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
+                            <p class="body-large">Hurray! You're done for now!</p>
+                        {/if}
+                        <section>
+                            <p class="label-bold-medium mb-1 mt-2 text-gray-500">DONE</p>
+                            <TodosWrapper
+                                todos={doneTodos}
+                                on:delete={deleteTodo}
+                                on:toggle={toggleTodo}
+                                on:update={beforeUpdateTodo}
+                            />
+                        </section>
+                    {/if}
+                </section>
+            {:else}
+                <section class=" text-gray-400">
+                    <div class="i-mdi-document h-12 w-12" />
+                    <p class="title-large">Notes you add will appear here</p>
+                </section>
+            {/if}
+        </section>
     </section>
 </section>
 <PRDialog

@@ -1,6 +1,6 @@
 <script lang="ts">
     // node imports
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import { Button, CheckboxGroup, DatePicker, Input, TextArea } from "stwui";
     import tooltip from "stwui/actions/tooltip";
     import { createForm } from "felte";
@@ -19,6 +19,7 @@
     import { ETodoFormType } from "$constants/todo.consts";
     import { slide } from "svelte/transition";
     import _ from "lodash";
+    import type { MouseEventHandler } from "svelte/elements";
 
     // props
     export let todo: TTodoItemViewSchema | undefined = undefined;
@@ -72,11 +73,7 @@
     }
 
     // local consts
-    const {
-        form: addTodoForm,
-        errors: addTodoFormErrors,
-        setErrors: setTodoFormErrors,
-    } = createForm({
+    const todoForm = createForm({
         // extend: validator({ schema: CreateTodoFormSchema }), - automatic validation
         validate: (values) => {
             // custom validation
@@ -125,7 +122,7 @@
             submitting = false;
         },
     });
-
+    const { form: addTodoForm, errors: addTodoFormErrors, setErrors: setTodoFormErrors } = todoForm;
     // local functions
     function resetValues() {
         title = "";
@@ -185,18 +182,40 @@
         return responseData;
     }
 
+    function detectKeyDowns(event: { keyCode: number }) {
+        if (event.keyCode === 27) {
+            resetValues();
+        } else if (event.keyCode === 13) {
+            todoForm.handleSubmit();
+        }
+    }
+
+    function handleClickOutsideForm(event: MouseEvent) {
+        if (!event.target?.closest("#todo-form")) {
+            // if clicked outside of the form
+            todoForm.handleSubmit();
+        }
+    }
+
     // reactive statements
     $: validateDeadlineReminder(deadline, reminder);
     $: setTodoFormErrors("deadline", [deadlineFieldErrors]);
     $: setTodoFormErrors("reminder", [reminderFieldErrors]);
     $: showDetails = !!title || !!description || !!deadline || !!reminder;
+
+    onMount(() => {
+        document?.addEventListener("click", handleClickOutsideForm, false);
+    });
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <form
+    id="todo-form"
     use:addTodoForm
     class="fixed left-[50%] z-20 mx-auto -ml-[24rem] grid w-[48rem] gap-4 {classNames} rounded-md p-4"
     class:shadow-lg={showDetails}
     class:bg-white={showDetails}
+    on:keydown={detectKeyDowns}
 >
     <section class="flex items-center gap-2">
         <Input
@@ -233,7 +252,7 @@
 
     <!-- if title or description -->
     {#if showDetails}
-        <section transition:slide>
+        <section transition:slide={{ duration: 500 }}>
             <TextArea
                 name="description"
                 placeholder="Add a description"
@@ -262,14 +281,15 @@
                 </section>
 
                 {#if !isDone}
-                    <section transition:slide class="grid gap-2">
+                    <section transition:slide class="grid w-full grid-cols-2 gap-2">
                         <DatePicker
                             name="deadline"
                             label="Deadline"
                             placeholder="Pick a deadline"
                             bind:value={deadline}
-                            error={$addTodoFormErrors.deadline?.[0]}
+                            min={new Date()}
                             allowClear
+                            error={$addTodoFormErrors.deadline?.[0]}
                         >
                             <DatePicker.Label slot="label">
                                 <section class="flex items-center gap-2">
@@ -285,7 +305,6 @@
                                     >
                                     </span>
                                 </section>
-                                <section class="flex w-full items-center gap-2"></section>
                             </DatePicker.Label></DatePicker
                         >
 
@@ -294,10 +313,10 @@
                             label="Reminder"
                             placeholder="Add a reminder"
                             bind:value={reminder}
-                            error={$addTodoFormErrors.reminder?.[0]}
                             showTime
                             allowClear
-                            class="flex-auto"
+                            min={new Date()}
+                            error={$addTodoFormErrors.reminder?.[0]}
                         >
                             <DatePicker.Label slot="label">
                                 <section class="flex items-center gap-2">

@@ -92,6 +92,10 @@
             return errors;
         },
         onSubmit: async () => {
+            if (!title && !description) {
+                return;
+            }
+
             submitting = true;
             if (formType === ETodoFormType.ADD) {
                 const responseData = await createTodo();

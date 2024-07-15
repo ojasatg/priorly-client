@@ -116,15 +116,19 @@
         on:click={updateTodo}
         class="card h-fit w-80 cursor-default rounded-md border-2 {borderColor} todo-item-card-btn bg-surface px-4 pb-12 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
     >
-        <p
-            class="card-header title-medium mr-2 flex flex-grow items-start p-0"
-            class:line-through={todo.isDone}
-        >
-            {todo.title}
-        </p>
-        <p class="my-4 text-wrap {description_font_size_class}">
-            {todo.description}
-        </p>
+        {#if !!todo.title}
+            <p
+                class="card-header title-medium mr-2 flex flex-grow items-start p-0"
+                class:line-through={todo.isDone}
+            >
+                {todo.title}
+            </p>
+        {/if}
+        {#if !!todo.description}
+            <p class="mr-4 text-wrap {description_font_size_class}">
+                {todo.description}
+            </p>
+        {/if}
         <section class="card-footer mt-2 p-0">
             <section class="flex items-end">
                 <section>

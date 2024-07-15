@@ -3,7 +3,11 @@ import { GenericTodoItemSchema } from "./generic.schema";
 
 export const CreateTodoRequestSchema = GenericTodoItemSchema;
 export const EditTodoRequestSchema = z.object({
-    changes: GenericTodoItemSchema.partial(),
+    changes: GenericTodoItemSchema.merge(
+        z.object({
+            completedOn: z.number().nullable(),
+        }),
+    ).partial(),
 });
 export const AllTodosRequestSchema = z.object({});
 export const DeleteTodoRequestSchema = z.object({});

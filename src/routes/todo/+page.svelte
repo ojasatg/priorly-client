@@ -14,6 +14,7 @@
         TTodoItemViewSchema,
         TCreateTodoResponseSchema,
         TEditTodoResponseSchema,
+        TTodoItemResponseSchema,
     } from "$schemas";
 
     // services
@@ -24,6 +25,7 @@
     import TodosWrapper from "$components/Todo/TodosWrapper.svelte";
     import TodoAppHeader from "$components/Todo/TodoAppHeader.svelte";
     import TodoForm from "$components/Todo/TodoForm.svelte";
+    import { getCurrentTimeStamp } from "$lib/utils";
 
     // local variables
     let editingTodo: TTodoItemViewSchema | undefined = undefined;
@@ -100,20 +102,20 @@
             return;
         }
 
-        const changes = {
-            isDone: oldTodo.isDone,
-            isPinned: oldTodo.isPinned,
-        };
+        const changes: Partial<TTodoItemResponseSchema> = {};
 
         if (toggleValue === ETodoToggleType.PIN) {
             changes.isPinned = !oldTodo.isPinned;
         }
         if (toggleValue === ETodoToggleType.DONE) {
             if (oldTodo.isDone) {
-                // todo is moving from done to pending, then remove the pin status
+                // todo is moving from pinned to done, then remove the pin status
                 changes.isPinned = false;
             }
             changes.isDone = !oldTodo.isDone;
+            if (changes.isDone) {
+                changes.completedOn = getCurrentTimeStamp();
+            }
         }
         const newTodo = { ...oldTodo, ...changes };
 

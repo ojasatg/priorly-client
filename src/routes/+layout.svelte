@@ -5,21 +5,21 @@
     import { alerts } from "$lib/stores/AlertStore";
     import _ from "lodash";
 
-    function showAlerts() {
-        alerts.success("success!", 3000);
-        alerts.info("info!", 3000);
-        alerts.warning("warning!", 3000);
-        alerts.error("error!", 3000);
-    }
+    // function showAlerts() {
+    //     alerts.success("success!", 3000);
+    //     alerts.info("info!", 3000);
+    //     alerts.warning("warning!", 3000);
+    //     alerts.error("error!", 3000);
+    // }
 
-    function showActionAlert() {
-        alerts.showAlert({
-            type: "success",
-            message: "Action alert",
-            duration: 5000,
-            buttonText: "Click Me!",
-        });
-    }
+    // function showActionAlert() {
+    //     alerts.showAlert({
+    //         type: "success",
+    //         message: "Action alert",
+    //         duration: 5000,
+    //         buttonText: "Click Me!",
+    //     });
+    // }
 
     function doAlertAction(event: CustomEvent<{ alertId: string }>) {
         alert(event.detail.alertId);
@@ -37,14 +37,14 @@
     </main>
 </section>
 
-<section class="fixed bottom-48 left-48">
+<!-- <section class="fixed bottom-48 left-48">
     <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={showAlerts}>
         Show Alert
     </button>
     <button class="mt-8 w-fit bg-primary p-2 text-surface" on:click={showActionAlert}>
         Show Action Alert
     </button>
-</section>
+</section> -->
 
 <style>
     .app {

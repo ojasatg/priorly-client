@@ -1,9 +1,10 @@
 <script lang="ts">
     // node imports
-    import { createEventDispatcher, onDestroy, onMount } from "svelte";
+    import { createEventDispatcher, onMount } from "svelte";
     import { Button, CheckboxGroup, DatePicker, Input, TextArea } from "stwui";
     import tooltip from "stwui/actions/tooltip";
     import { createForm } from "felte";
+    import _ from "lodash";
 
     // lib imports
     import { getTimestampFromDate } from "$lib/utils";
@@ -18,8 +19,6 @@
     import todoService from "$services/todo.service";
     import { ETodoFormType } from "$constants/todo.consts";
     import { slide } from "svelte/transition";
-    import _ from "lodash";
-    import type { MouseEventHandler } from "svelte/elements";
 
     // props
     export let todo: TTodoItemViewSchema | undefined = undefined;

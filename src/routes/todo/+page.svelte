@@ -24,7 +24,8 @@
     import TodosWrapperLoader from "$components/loaders/TodosWrapperLoader.svelte";
     import TodosWrapper from "$components/Todo/TodosWrapper.svelte";
     import TodoAppHeader from "$components/Todo/TodoAppHeader.svelte";
-    import TodoForm from "$components/Todo/TodoForm.svelte";
+    import TodoAddForm from "$components/Todo/TodoAddForm.svelte";
+    import TodoEditForm from "$components/Todo/TodoEditForm.svelte";
     import { getCurrentTimeStamp } from "$lib/utils";
     import { Divider } from "stwui";
 
@@ -169,7 +170,7 @@
 <section>
     <TodoAppHeader refreshing={fetchingTodos} on:refresh={getAllTodos} />
 
-    <TodoForm formType={ETodoFormType.ADD} on:create={afterCreateTodo} classNames="" />
+    <TodoAddForm formType={ETodoFormType.ADD} on:create={afterCreateTodo} classNames="" />
 
     <section class="mx-auto mt-32 grid w-[64rem]">
         <Divider class="my-0" />
@@ -230,7 +231,7 @@
     showCloseBtn
     scrim
 >
-    <TodoForm
+    <TodoEditForm
         bind:todo={editingTodo}
         formType={todoFormType}
         on:create={afterCreateTodo}

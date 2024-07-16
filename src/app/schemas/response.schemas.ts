@@ -1,9 +1,11 @@
 import z from "zod";
-import { GenericTodoItemSchema } from "./generic.schema";
+import { CreateTodoRequestSchema } from "./request.schemas";
 
-export const TodoItemResponseSchema = GenericTodoItemSchema.merge(
+export const TodoItemResponseSchema = CreateTodoRequestSchema.merge(
     z.object({
         id: z.string(),
+        isDone: z.boolean(),
+        isPinned: z.boolean(),
         createdOn: z.number(),
         updatedOn: z.number(),
         completedOn: z.number().nullish(),

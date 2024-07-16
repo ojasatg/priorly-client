@@ -170,7 +170,7 @@
 <section>
     <TodoAppHeader refreshing={fetchingTodos} on:refresh={getAllTodos} />
 
-    <TodoAddForm formType={ETodoFormType.ADD} on:create={afterCreateTodo} classNames="" />
+    <TodoAddForm on:create={afterCreateTodo} classNames="" />
 
     <section class="mx-auto mt-32 grid w-[64rem]">
         <Divider class="my-0" />
@@ -216,8 +216,8 @@
                     {/if}
                 </section>
             {:else}
-                <section class=" text-gray-400">
-                    <div class="i-mdi-document h-12 w-12" />
+                <section class="text-gray-400">
+                    <div class="i-mdi-document mt-4 h-12 w-12" />
                     <p class="title-large">Notes you add will appear here</p>
                 </section>
             {/if}

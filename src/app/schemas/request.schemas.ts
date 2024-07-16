@@ -1,17 +1,18 @@
 import z from "zod";
-import { GenericTodoItemSchema } from "./generic.schema";
 
-export const CreateTodoRequestSchema = GenericTodoItemSchema.merge(
-    z.object({
-        isDone: z.boolean().nullish(),
-    }),
-);
+export const CreateTodoRequestSchema = z.object({
+    title: z.string().max(60, "Title cannot be more than 60 characters").nullish(),
+    isPinned: z.boolean(),
+    description: z
+        .string()
+        .max(300, "Description cannot be more than 300 characters long")
+        .nullish(),
+    deadline: z.number().nullish(),
+    reminder: z.number().nullish(),
+    color: z.string().nullish(),
+});
 export const EditTodoRequestSchema = z.object({
-    changes: GenericTodoItemSchema.merge(
-        z.object({
-            completedOn: z.number().nullable(),
-        }),
-    ).partial(),
+    changes: CreateTodoRequestSchema.partial(),
 });
 export const AllTodosRequestSchema = z.object({});
 export const DeleteTodoRequestSchema = z.object({});

@@ -24,6 +24,7 @@ const config = {
             $constants: "./src/app/constants",
             $types: "./src/app/types",
             $services: "./src/app/services",
+            $utils: "./src/app/utils",
         },
     },
 };

@@ -1,7 +1,8 @@
 <script lang="ts">
     // node imports
     import { createEventDispatcher, onMount } from "svelte";
-    import { Button, CheckboxGroup, DatePicker, Input, TextArea } from "stwui";
+    import { slide } from "svelte/transition";
+    import { Button, DatePicker, Input, TextArea } from "stwui";
     import tooltip from "stwui/actions/tooltip";
     import { createForm } from "felte";
     import _ from "lodash";
@@ -14,15 +15,11 @@
         CreateTodoFormSchema,
         type TCreateTodoResponseSchema,
         type TEditTodoResponseSchema,
-        type TTodoItemViewSchema,
     } from "$schemas";
     import todoService from "$services/todo.service";
-    import { ETodoFormType } from "$constants/todo.consts";
-    import { slide } from "svelte/transition";
+    import { validateDeadlineReminder } from "$utils/datetime.utils";
 
     // props
-    export let todo: TTodoItemViewSchema | undefined = undefined;
-    export let formType: ETodoFormType;
     export let classNames = "";
 
     // events
@@ -34,42 +31,16 @@
     }>();
 
     // local variables
-    let title = todo?.title ?? "";
-    let description = todo?.description ?? "";
+    let title = "";
+    let description = "";
 
-    let deadline: Date | undefined = todo?.deadline ? new Date(todo.deadline * 1000) : undefined;
-    let reminder: Date | undefined = todo?.reminder ? new Date(todo.reminder * 1000) : undefined;
+    let deadline: Date | undefined;
+    let reminder: Date | undefined;
     let reminderFieldErrors = "";
     let deadlineFieldErrors = "";
 
-    let isDone = todo?.isDone ?? false;
-    let isPinned = todo?.isPinned ?? false;
-
+    let isPinned = false;
     let submitting = false;
-
-    function validateDeadlineReminder(deadline?: Date, reminder?: Date) {
-        // Some manual validation because date time component is not working correctly
-        const deadlineTimestamp = deadline ? getTimestampFromDate(deadline) : undefined;
-        const reminderTimestamp = reminder ? getTimestampFromDate(reminder) : undefined;
-
-        const today = new Date();
-        const todayTimestamp = getTimestampFromDate(today);
-
-        if (deadlineTimestamp && deadlineTimestamp <= todayTimestamp) {
-            deadlineFieldErrors = "Deadline cannot be lesser than today's date";
-        } else if (reminderTimestamp && reminderTimestamp <= todayTimestamp) {
-            reminderFieldErrors = "Reminder cannot be lesser than current date and time";
-        } else if (
-            deadlineTimestamp &&
-            reminderTimestamp &&
-            reminderTimestamp > deadlineTimestamp
-        ) {
-            reminderFieldErrors = "Reminder cannot be after the Deadline";
-        } else {
-            deadlineFieldErrors = "";
-            reminderFieldErrors = "";
-        }
-    }
 
     // local consts
     const todoForm = createForm({
@@ -97,24 +68,14 @@
             if (!title && !description) {
                 return;
             }
-
             submitting = true;
-            if (formType === ETodoFormType.ADD) {
-                const responseData = await createTodo();
-                return responseData;
-            } else {
-                const responseData = await updateTodo();
-                return responseData;
-            }
+            const responseData = await createTodo();
+            return responseData;
         },
         onSuccess: (response) => {
             submitting = false;
             resetValues();
-            if (formType === ETodoFormType.ADD) {
-                dispatchEvent("create", response as TCreateTodoResponseSchema);
-            } else {
-                dispatchEvent("update", response as TEditTodoResponseSchema);
-            }
+            dispatchEvent("create", response as TCreateTodoResponseSchema);
             dispatchEvent("close");
         },
         onError() {
@@ -126,14 +87,9 @@
     function resetValues() {
         title = "";
         description = "";
-        isDone = false;
         isPinned = false;
         deadline = undefined;
         reminder = undefined;
-    }
-
-    function onCancel() {
-        dispatchEvent("cancel");
     }
 
     async function createTodo() {
@@ -143,7 +99,6 @@
         const newTodo = {
             title: title.trim(),
             description: description?.trim() ?? "",
-            isDone: isDone ?? false,
             isPinned: isPinned ?? false,
             deadline: deadlineTimestamp,
             reminder: reminderTimestamp,
@@ -158,29 +113,6 @@
         return responseData;
     }
 
-    async function updateTodo() {
-        const todoId = todo?.id as string; // guarnteed value
-        const deadlineTimestamp = deadline ? getTimestampFromDate(deadline) : undefined;
-        const reminderTimestamp = reminder ? getTimestampFromDate(reminder) : undefined;
-
-        const changes = {
-            title,
-            description,
-            isDone,
-            isPinned,
-            deadline: deadlineTimestamp,
-            reminder: reminderTimestamp,
-        };
-
-        const responseData = await todoService.edit({
-            queryParams: { id: todoId },
-            requestData: { changes },
-            showAlerts: true,
-        });
-
-        return responseData;
-    }
-
     function detectKeyDowns(event: { keyCode: number }) {
         if (event.keyCode === 27) {
             resetValues();
@@ -188,14 +120,20 @@
     }
 
     function handleClickOutsideForm(event: MouseEvent) {
-        if (!event.target?.closest("#todo-form")) {
+        if (!(event.target as HTMLElement)?.closest("#todo-form")) {
             // if clicked outside of the form
             todoForm.handleSubmit();
         }
     }
 
+    function setDateErrors(deadline?: Date, reminder?: Date) {
+        const { deadlineErrors, reminderErrors } = validateDeadlineReminder(deadline, reminder);
+        deadlineFieldErrors = deadlineErrors;
+        reminderFieldErrors = reminderErrors;
+    }
+
     // reactive statements
-    $: validateDeadlineReminder(deadline, reminder);
+    $: setDateErrors(deadline, reminder);
     $: setTodoFormErrors("deadline", [deadlineFieldErrors]);
     $: setTodoFormErrors("reminder", [reminderFieldErrors]);
     $: showDetails = !!title || !!description || !!deadline || !!reminder;
@@ -225,7 +163,7 @@
             class="w-full flex-grow"
         />
 
-        {#if showDetails && !isDone}
+        {#if showDetails}
             <span
                 use:tooltip={{
                     placement: "top",
@@ -252,6 +190,7 @@
         <section transition:slide={{ duration: 500 }}>
             <TextArea
                 name="description"
+                id="todo-create-form-description"
                 placeholder="Add a description"
                 bind:value={description}
                 type="text"
@@ -260,96 +199,70 @@
             >
                 <p slot="label" class="label-medium">Description</p>
             </TextArea>
-            <section class="my-2 grid gap-4">
-                <section class="flex items-center gap-8">
-                    {#if formType === ETodoFormType.EDIT}
-                        <CheckboxGroup>
-                            <CheckboxGroup.Checkbox
-                                name="isDone"
-                                value="isDone"
-                                bind:checked={isDone}
-                            >
-                                <CheckboxGroup.Checkbox.Label slot="label" class="label-medium"
-                                    >Mark as done</CheckboxGroup.Checkbox.Label
-                                >
-                            </CheckboxGroup.Checkbox>
-                        </CheckboxGroup>
-                    {/if}
-                </section>
 
-                {#if !isDone}
-                    <section transition:slide class="grid w-full grid-cols-2 gap-2">
-                        <DatePicker
-                            name="deadline"
-                            label="Deadline"
-                            placeholder="Pick a deadline"
-                            bind:value={deadline}
-                            min={new Date()}
-                            allowClear
-                            error={$addTodoFormErrors.deadline?.[0]}
-                        >
-                            <DatePicker.Label slot="label">
-                                <section class="flex items-center gap-2">
-                                    <p class="body-small">Deadline</p>
-                                    <span
-                                        class="i-mdi-information-outline h-4 w-4 text-primary"
-                                        use:tooltip={{
-                                            placement: "right",
-                                            content: "Set a deadline in your Google calendar",
-                                            arrow: false,
-                                            animation: "scale",
-                                        }}
-                                    >
-                                    </span>
-                                </section>
-                            </DatePicker.Label></DatePicker
-                        >
-
-                        <DatePicker
-                            name="reminder"
-                            label="Reminder"
-                            placeholder="Add a reminder"
-                            bind:value={reminder}
-                            showTime
-                            allowClear
-                            min={new Date()}
-                            error={$addTodoFormErrors.reminder?.[0]}
-                        >
-                            <DatePicker.Label slot="label">
-                                <section class="flex items-center gap-2">
-                                    <p class="body-small">Reminder</p>
-                                    <span
-                                        class="i-mdi-information-outline h-4 w-4 text-primary"
-                                        use:tooltip={{
-                                            placement: "right",
-                                            content: "Add a Reminder in your Google Calendar",
-                                            arrow: false,
-                                            animation: "scale",
-                                        }}
-                                    >
-                                    </span>
-                                </section>
-                            </DatePicker.Label></DatePicker
-                        >
-                    </section>
-                {/if}
-            </section>
-            <section class="ml-auto mt-2 w-fit">
-                <Button
-                    on:click={formType === ETodoFormType.EDIT ? onCancel : () => resetValues()}
-                    size="sm"
+            <section transition:slide class="mt-4 grid w-full grid-cols-2 gap-2">
+                <DatePicker
+                    name="deadline"
+                    label="Deadline"
+                    placeholder="Pick a deadline"
+                    bind:value={deadline}
+                    min={new Date()}
+                    allowClear
+                    error={$addTodoFormErrors.deadline?.[0]}
                 >
+                    <DatePicker.Label slot="label">
+                        <section class="flex items-center gap-2">
+                            <p class="body-small">Deadline</p>
+                            <span
+                                class="i-mdi-information-outline h-4 w-4 text-primary"
+                                use:tooltip={{
+                                    placement: "right",
+                                    content: "Set a deadline in your Google calendar",
+                                    arrow: false,
+                                    animation: "scale",
+                                }}
+                            >
+                            </span>
+                        </section>
+                    </DatePicker.Label></DatePicker
+                >
+
+                <DatePicker
+                    name="reminder"
+                    label="Reminder"
+                    placeholder="Add a reminder"
+                    bind:value={reminder}
+                    showTime
+                    allowClear
+                    min={new Date()}
+                    error={$addTodoFormErrors.reminder?.[0]}
+                >
+                    <DatePicker.Label slot="label">
+                        <section class="flex items-center gap-2">
+                            <p class="body-small">Reminder</p>
+                            <span
+                                class="i-mdi-information-outline h-4 w-4 text-primary"
+                                use:tooltip={{
+                                    placement: "right",
+                                    content: "Add a Reminder in your Google Calendar",
+                                    arrow: false,
+                                    animation: "scale",
+                                }}
+                            >
+                            </span>
+                        </section>
+                    </DatePicker.Label></DatePicker
+                >
+            </section>
+
+            <section class="ml-auto mt-2 w-fit">
+                <Button on:click={resetValues} size="sm">
                     <span class="body-medium">Cancel</span>
                 </Button>
-                {#if formType === ETodoFormType.ADD}
-                    <Button loading={submitting} type="primary" htmlType="submit" size="sm">
-                        <span class="body-medium">Add</span>
-                    </Button>
-                {:else}
-                    <Button loading={submitting} type="primary" htmlType="submit" size="sm">
-                        <span class="body-medium">Save</span>
-                    </Button>
-                {/if}
+
+                <Button loading={submitting} type="primary" htmlType="submit" size="sm">
+                    <span class="body-medium">Add</span>
+                </Button>
             </section>
         </section>
     {/if}

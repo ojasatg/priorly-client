@@ -1,12 +1,11 @@
 import { z } from "zod";
-import { GenericTodoItemSchema } from "./generic.schema";
+import { CreateTodoRequestSchema } from "./request.schemas";
 
-export const CreateTodoFormSchema = GenericTodoItemSchema.merge(
+export const CreateTodoFormSchema = CreateTodoRequestSchema.merge(
     z.object({
         deadline: z.string().nullish(),
         reminder: z.string().nullish(),
         isPinned: z.boolean().nullish(),
-        isDone: z.boolean().nullish(),
     }),
 );
 

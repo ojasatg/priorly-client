@@ -9,12 +9,12 @@
     import PRDialog from "$lib/components/PRDialog.svelte";
 
     // schemas and types (in order)
-    import { ETodoFormType, ETodoToggleType } from "$constants/todo.consts";
+    import { ETodoToggleType } from "$constants/todo.consts";
     import type {
         TTodoItemViewSchema,
         TCreateTodoResponseSchema,
         TEditTodoResponseSchema,
-        TTodoItemResponseSchema,
+        TEditTodoChangesSchema,
     } from "$schemas";
 
     // services
@@ -30,9 +30,8 @@
     import { Divider } from "stwui";
 
     // local variables
-    let editingTodo: TTodoItemViewSchema | undefined = undefined;
-    let todoFormType = ETodoFormType.ADD;
-    let showAddTodoForm = false;
+    let editingTodo: TTodoItemViewSchema;
+    let showUpdateTodoForm = false;
 
     let allTodos: TTodoItemViewSchema[] = [];
     const selectedTodos = new Set<string>();
@@ -68,9 +67,8 @@
 
     function beforeUpdateTodo(event: CustomEvent<{ id: string }>) {
         const todoId = event.detail.id;
-        todoFormType = ETodoFormType.EDIT;
-        editingTodo = _.find(allTodos, { id: todoId });
-        showAddTodoForm = true;
+        editingTodo = _.find(allTodos, { id: todoId })!;
+        showUpdateTodoForm = true;
     }
 
     function afterUpdateTodo(event: CustomEvent<TEditTodoResponseSchema>) {
@@ -98,22 +96,23 @@
             return;
         }
 
-        const changes: Partial<TTodoItemResponseSchema> = {};
+        const changes: TEditTodoChangesSchema = {};
 
         if (toggleValue === ETodoToggleType.PIN) {
             changes.isPinned = !oldTodo.isPinned;
         }
         if (toggleValue === ETodoToggleType.DONE) {
-            if (oldTodo.isDone) {
-                // todo is moving from pinned to done, then remove the pin status
-                changes.isPinned = false;
-            }
             changes.isDone = !oldTodo.isDone;
+
             if (changes.isDone) {
+                changes.isPinned = false;
                 changes.completedOn = getCurrentTimeStamp();
+                changes.reminder = undefined;
+                changes.deadline = undefined;
             }
         }
-        const newTodo = { ...oldTodo, ...changes };
+
+        const newTodo = { ...oldTodo, ...changes, isDone: changes.isDone ?? false };
 
         allTodos.splice(todoIndex, 1); // removed the old todo from array
         // add the updated todo to the start of the array so that filter works properly - this won't work on reactive statements, as api is called after updating ui
@@ -152,8 +151,8 @@
     }
 
     function closeTodoForm() {
-        editingTodo = undefined;
-        showAddTodoForm = false;
+        editingTodo = {} as TTodoItemViewSchema;
+        showUpdateTodoForm = false;
     }
 
     // reactive statements
@@ -170,13 +169,15 @@
 <section>
     <TodoAppHeader refreshing={fetchingTodos} on:refresh={getAllTodos} />
 
-    <TodoAddForm on:create={afterCreateTodo} classNames="" />
+    {#if !showUpdateTodoForm}
+        <TodoAddForm on:create={afterCreateTodo} _class="" />
+    {/if}
 
     <section class="mx-auto mt-32 grid w-[64rem]">
         <Divider class="my-0" />
-        <section class="h-[68vh] overflow-y-scroll overscroll-none px-4">
+        <section class="h-[76vh] overflow-y-scroll overscroll-none px-4">
             {#if fetchingTodos}
-                <TodosWrapperLoader classNames="mt-4" />
+                <TodosWrapperLoader _class="mt-4" />
             {:else if !fetchingTodos && !fetchTodoError}
                 <section>
                     {#if !_.isEmpty(pinnedTodos)}
@@ -224,20 +225,22 @@
         </section>
     </section>
 </section>
-<PRDialog
-    bind:modelValue={showAddTodoForm}
-    title={todoFormType === ETodoFormType.ADD ? "Add Todo" : "Edit Todo"}
-    subtitle={todoFormType === ETodoFormType.ADD ? "Add a new todo" : "Edit this todo"}
-    showCloseBtn
-    scrim
->
-    <TodoEditForm
-        bind:todo={editingTodo}
-        formType={todoFormType}
-        on:create={afterCreateTodo}
-        on:update={afterUpdateTodo}
-        on:cancel={closeTodoForm}
-        on:close={closeTodoForm}
-        slot="content"
-    />
-</PRDialog>
+{#if !_.isEmpty(editingTodo)}
+    <PRDialog
+        bind:modelValue={showUpdateTodoForm}
+        title="Edit Todo"
+        subtitle="Edit this todo"
+        showCloseBtn
+        scrim
+        _class="mt-16"
+    >
+        <TodoEditForm
+            bind:todo={editingTodo}
+            on:create={afterCreateTodo}
+            on:update={afterUpdateTodo}
+            on:cancel={closeTodoForm}
+            on:close={closeTodoForm}
+            slot="content"
+        />
+    </PRDialog>
+{/if}

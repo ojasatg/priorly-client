@@ -20,7 +20,7 @@
     import { validateDeadlineReminder } from "$utils/datetime.utils";
 
     // props
-    export let classNames = "";
+    export let _class = "";
 
     // events
     const dispatchEvent = createEventDispatcher<{
@@ -113,14 +113,14 @@
         return responseData;
     }
 
-    function detectKeyDowns(event: { keyCode: number }) {
-        if (event.keyCode === 27) {
+    function detectKeyDowns(event: KeyboardEvent) {
+        if (event.key === "Escape") {
             resetValues();
         }
     }
 
     function handleClickOutsideForm(event: MouseEvent) {
-        if (!(event.target as HTMLElement)?.closest("#todo-form")) {
+        if (!(event.target as HTMLElement)?.closest("#add-todo-form")) {
             // if clicked outside of the form
             todoForm.handleSubmit();
         }
@@ -145,9 +145,9 @@
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <form
-    id="todo-form"
+    id="add-todo-form"
     use:addTodoForm
-    class="fixed left-[50%] z-20 mx-auto -ml-[24rem] grid w-[48rem] gap-4 {classNames} rounded-md p-4"
+    class="fixed left-[50%] z-20 mx-auto -ml-[24rem] grid w-[48rem] gap-4 {_class} rounded-md p-4"
     class:shadow-lg={showDetails}
     class:bg-white={showDetails}
     on:keydown={detectKeyDowns}

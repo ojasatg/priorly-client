@@ -7,6 +7,8 @@
     export let subtitle = "";
     export let scrim = false;
     export let showCloseBtn = false;
+    export let allowEscape = false;
+    export let _class = "";
 
     const dispatchEvent = createEventDispatcher<{ close: null; iconClick: null }>();
 
@@ -18,10 +20,17 @@
             modelValue = false;
         }
     }
+
+    function detectKeyDowns(event: KeyboardEvent) {
+        if (event.key === "Escape" && allowEscape) {
+            modelValue = false;
+        }
+    }
 </script>
 
 <Portal>
-    {#if modelValue}<Modal handleClose={onClose}>
+    {#if modelValue}
+        <Modal handleClose={onClose} class={_class} on:keydown={detectKeyDowns}>
             <Modal.Content slot="content">
                 <Modal.Content.Header slot="header">
                     <section class="flex flex-col justify-between">
@@ -40,8 +49,11 @@
                     <slot name="content" />
                 </Modal.Content.Body>
             </Modal.Content>
-            <Modal.Backdrop handleClose={!scrim ? onClose : () => {}} slot="backdrop"
-            ></Modal.Backdrop>
+            <Modal.Backdrop
+                handleClose={!scrim ? onClose : () => {}}
+                slot="backdrop"
+                class={scrim ? "cursor-default" : ""}
+            />
         </Modal>
     {/if}
 </Portal>

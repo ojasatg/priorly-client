@@ -3,11 +3,11 @@
     import TodoItem from "./TodoItem.svelte";
 
     export let todos: TTodoItemViewSchema[];
-    export let classNames = "";
+    export let _class = "";
 </script>
 
 <section>
-    <section class="grid grid-cols-3 gap-2 {classNames}">
+    <section class="grid grid-cols-3 gap-2 {_class}">
         {#each todos as todo}
             <TodoItem {todo} on:delete on:toggle on:update />
         {/each}

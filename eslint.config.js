@@ -20,7 +20,7 @@ export default [
         },
     },
     {
-        files: ["**/*.svelte", "**/*.ts", "**/*.js", "**/*.json"],
+        files: ["**/*.svelte", "**/*.ts", "**/*.js"],
         languageOptions: {
             parserOptions: {
                 parser: ts.parser,

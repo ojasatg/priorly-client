@@ -152,7 +152,6 @@
             bind:value={title}
             type="text"
             error={$addTodoFormErrors.title?.[0]}
-            allowClear
             class="w-full flex-grow"
         />
 
@@ -184,7 +183,6 @@
         bind:value={description}
         type="text"
         error={$addTodoFormErrors.description?.[0]}
-        allowClear
     >
         <p slot="label" class="label-medium">Description</p>
     </TextArea>
@@ -207,7 +205,6 @@
                     placeholder="Pick a deadline"
                     bind:value={deadline}
                     min={new Date()}
-                    allowClear
                     error={$addTodoFormErrors.deadline?.[0]}
                 >
                     <DatePicker.Label slot="label">
@@ -233,7 +230,6 @@
                     placeholder="Add a reminder"
                     bind:value={reminder}
                     showTime
-                    allowClear
                     min={new Date()}
                     error={$addTodoFormErrors.reminder?.[0]}
                 >

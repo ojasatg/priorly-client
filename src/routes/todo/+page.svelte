@@ -175,9 +175,9 @@
     {#if !showUpdateTodoForm}
         <TodoAddForm
             on:create={afterCreateTodo}
-            _class="w-[48rem] fixed left-[40%] -ml-[24rem] z-20"
+            _class="w-[48rem] fixed left-[43%] -ml-[24rem] z-20"
         />
-        <button class="fixed right-[15%] top-[14%]">Filters here</button>
+        <button class="fixed right-[25%] top-[14%]">Filters here</button>
     {/if}
 
     <section class="mx-auto mt-32 grid w-[64rem] px-4">

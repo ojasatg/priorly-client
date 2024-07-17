@@ -49,7 +49,7 @@
             // custom validation
             const result = CreateTodoFormSchema.safeParse(values);
 
-            const errors = result.error?.formErrors.fieldErrors || {};
+            let errors = result.error?.formErrors.fieldErrors || {};
 
             if (deadlineFieldErrors) {
                 errors["deadline"] = [deadlineFieldErrors];
@@ -59,9 +59,15 @@
                 errors["reminder"] = [reminderFieldErrors];
             }
 
+            if (!showDetails) {
+                // there are no errors when form is not opened
+                errors = {};
+            }
+
             if (!_.isEmpty(errors)) {
                 console.error("Form errors: ", errors);
             }
+
             return errors;
         },
         onSubmit: async () => {

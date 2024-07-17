@@ -11,6 +11,7 @@
         getFormattedTimestamp,
         getDaysDifferenceFromTimestamp,
         getCurrentTimeDifferenceInText,
+        cn,
     } from "$lib/utils";
 
     // local imports
@@ -71,18 +72,11 @@
         showColorPalette = false;
     }
 
-    $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
-    $: description_font_size_class =
-        todo.description && todo.description.length <= 60 ? "body-large" : "body-medium";
-    $: toggleDoneIcon = todo.isDone
-        ? "i-mdi-checkbox-marked-circle-minus-outline text-error"
-        : "i-mdi-checkbox-marked-circle-plus-outline text-success";
+    // Conditional styles
     $: selectIcon =
         todo.isSelected && selectionMode
             ? "i-mdi-check-circle text-primary"
             : "i-mdi-check-circle-outline text-black";
-
-    $: borderColor = todo.isSelected && selectionMode ? "border-primary" : "border-gray-200";
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -95,7 +89,7 @@
             arrow: false,
             animation: "scale",
         }}
-        class="hover-buttons absolute -right-1 -top-3 ml-auto w-fit rounded-full"
+        class="hover-buttons absolute -right-2 -top-3 ml-auto w-fit rounded-full"
     >
         <input
             type="checkbox"
@@ -128,7 +122,11 @@
     <button
         id={`todo-item-card-${todo.id}`}
         on:click={updateTodo}
-        class="card h-fit w-80 cursor-default rounded-md border-2 {borderColor} todo-item-card-btn bg-surface px-4 pb-12 pt-2 text-left hover:shadow-lg hover:shadow-gray-300"
+        class="card todo-item-card-btn h-fit w-80 cursor-default rounded-md border-2 bg-surface px-4 pb-12 pt-2 text-left hover:shadow-lg hover:shadow-gray-300 {cn(
+            {
+                'border-primary': todo.isSelected && selectionMode,
+            },
+        )}"
     >
         {#if !!todo.title}
             <p
@@ -139,7 +137,12 @@
             </p>
         {/if}
         {#if !!todo.description}
-            <p class="mr-4 text-wrap {description_font_size_class}">
+            <p
+                class="w-72 overflow-hidden text-ellipsis whitespace-nowrap text-wrap {cn({
+                    'body-medium': todo.description.length > 30,
+                    'body-large': todo.description.length <= 30,
+                })}"
+            >
                 {todo.description}
             </p>
         {/if}
@@ -185,9 +188,11 @@
                                 arrow: false,
                                 animation: "scale",
                             }}
-                            class="card-footer flex w-fit items-center gap-1 p-0 {deadline_class}"
+                            class="card-footer flex w-fit items-center gap-1 p-0 {cn({
+                                'text-error': daysRemainingFromDeadline < 7,
+                            })}"
                         >
-                            <span class="i-mdi-clock-alert-outline"></span>
+                            <span class="i-mdi-clock-alert-outline" />
                             <p class="label-medium inline">
                                 {getFormattedTimestamp(todo.deadline, CUSTOM_DATE_OPTIONS)}
                             </p>
@@ -227,7 +232,13 @@
             class="ml-auto"
         >
             <Button size="sm" shape="circle" on:click={toggleDone}>
-                <span slot="icon" class="h-4 w-4 {toggleDoneIcon}" />
+                <span
+                    slot="icon"
+                    class="h-4 w-4 {cn({
+                        'i-mdi-checkbox-marked-circle-minus-outline text-error': todo.isDone,
+                        'i-mdi-checkbox-marked-circle-plus-outline text-success': !todo.isDone,
+                    })}"
+                />
             </Button>
         </span>
 

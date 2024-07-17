@@ -1,7 +1,10 @@
 import z from "zod";
 
 export const CreateTodoRequestSchema = z.object({
-    title: z.string().max(60, "Title cannot be more than 60 characters").nullish(),
+    title: z
+        .string()
+        .min(1, "Title is required")
+        .max(60, "Title cannot be more than 60 characters"),
     isPinned: z.boolean(),
     description: z
         .string()
@@ -15,7 +18,7 @@ export const CreateTodoRequestSchema = z.object({
 export const EditTodoChangesSchema = CreateTodoRequestSchema.merge(
     z.object({
         completedOn: z.number().nullish(),
-        isDone: z.boolean().nullish(),
+        isDone: z.boolean(),
     }),
 ).partial();
 

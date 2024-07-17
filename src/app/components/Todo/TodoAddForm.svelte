@@ -158,7 +158,7 @@
             placeholder="Add a todo..."
             bind:value={title}
             type="text"
-            error={$addTodoFormErrors.title?.[0]}
+            error={showDetails ? $addTodoFormErrors.title?.[0] : undefined}
             class="w-full flex-grow"
         />
 

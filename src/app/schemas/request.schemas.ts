@@ -8,7 +8,7 @@ export const CreateTodoRequestSchema = z.object({
     isPinned: z.boolean(),
     description: z
         .string()
-        .max(300, "Description cannot be more than 300 characters long")
+        .max(150, "Description cannot be more than 150 characters long")
         .nullish(),
     deadline: z.number().nullish(),
     reminder: z.number().nullish(),

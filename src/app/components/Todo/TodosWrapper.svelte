@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { TTodoItemViewSchema } from "$schemas";
-    import TodoItem from "./TodoItem.svelte";
+    import TodoItemCard from "./TodoItemCard.svelte";
 
     export let todos: TTodoItemViewSchema[];
     export let selectionMode = false;
@@ -10,7 +10,7 @@
 <section>
     <section class="grid grid-cols-3 gap-2 {_class}">
         {#each todos as todo}
-            <TodoItem {todo} {selectionMode} on:delete on:toggle on:update />
+            <TodoItemCard {todo} {selectionMode} on:delete on:toggle on:update />
         {/each}
     </section>
 </section>

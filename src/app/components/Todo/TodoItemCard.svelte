@@ -107,7 +107,7 @@
                 arrow: false,
                 animation: "scale",
             }}
-            class="hover-buttons absolute right-4 top-2 w-fit"
+            class="hover-buttons absolute right-2 top-2 w-fit"
         >
             <Button size="md" shape="circle" on:click={togglePin}>
                 <span
@@ -130,7 +130,7 @@
     >
         {#if !!todo.title}
             <p
-                class="card-header title-medium mr-2 flex flex-grow items-start p-0"
+                class="card-header title-medium mr-8 flex flex-grow items-start p-0"
                 class:line-through={todo.isDone}
             >
                 {todo.title}
@@ -188,9 +188,9 @@
                                 arrow: false,
                                 animation: "scale",
                             }}
-                            class="card-footer flex w-fit items-center gap-1 p-0 {cn({
-                                'text-error': daysRemainingFromDeadline < 7,
-                            })}"
+                            class={cn("card-footer flex w-fit items-center gap-1 p-0", {
+                                "text-error": daysRemainingFromDeadline < 7,
+                            })}
                         >
                             <span class="i-mdi-clock-alert-outline" />
                             <p class="label-medium inline">

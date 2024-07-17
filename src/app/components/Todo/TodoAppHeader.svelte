@@ -20,7 +20,7 @@
     </Button>
 
     <span class="headline-medium i-mdi-document ml-12 text-yellow-400" />
-    <p class="title-medium text-gray-400">Todos</p>
+    <p class="title-medium text-gray-600">Todos</p>
     <span
         use:tooltip={{
             placement: "top",
@@ -37,7 +37,7 @@
             disabled={refreshing}
             loading={refreshing}
         >
-            <span slot="icon" class="i-mdi-refresh h-16 w-16" />
+            <span slot="icon" class="i-mdi-refresh h-16 w-16 text-gray-600" />
         </Button>
     </span>
 

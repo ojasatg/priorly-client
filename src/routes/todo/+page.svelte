@@ -35,6 +35,7 @@
 
     let allTodos: TTodoItemViewSchema[] = [];
     const selectedTodos = new Set<string>();
+    let selectionMode = false;
     let fetchingTodos: boolean;
     let fetchTodoError: boolean;
 
@@ -89,10 +90,12 @@
         if (toggleValue === ETodoToggleType.SELECT) {
             if (oldTodo.isSelected) {
                 oldTodo.isSelected = false;
+                selectedTodos.delete(todoId);
             } else {
                 oldTodo.isSelected = true;
                 selectedTodos.add(todoId);
             }
+            selectionMode = selectedTodos.size > 0;
             return;
         }
 
@@ -181,21 +184,23 @@
             {:else if !fetchingTodos && !fetchTodoError}
                 <section>
                     {#if !_.isEmpty(pinnedTodos)}
-                        <section class="mb-2 mt-4 flex items-start gap-1">
+                        <section class="mb-2 ml-2 mt-4 flex items-start gap-1">
                             <span class="i-mdi-pin h-4 w-4 text-gray-500" />
                             <p class="label-bold-medium text-gray-500">PINNED</p>
                         </section>
                         <TodosWrapper
                             todos={pinnedTodos}
+                            {selectionMode}
                             on:delete={deleteTodo}
                             on:toggle={toggleTodo}
                             on:update={beforeUpdateTodo}
                         />
                     {/if}
                     {#if !_.isEmpty(pendingTodos)}
-                        <p class="label-bold-medium mb-1 mt-2 text-gray-500">PENDING</p>
+                        <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">PENDING</p>
                         <TodosWrapper
                             todos={pendingTodos}
+                            {selectionMode}
                             on:delete={deleteTodo}
                             on:toggle={toggleTodo}
                             on:update={beforeUpdateTodo}
@@ -206,9 +211,10 @@
                             <p class="body-large">Hurray! You're done for now!</p>
                         {/if}
                         <section>
-                            <p class="label-bold-medium mb-1 mt-2 text-gray-500">DONE</p>
+                            <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">DONE</p>
                             <TodosWrapper
                                 todos={doneTodos}
+                                {selectionMode}
                                 on:delete={deleteTodo}
                                 on:toggle={toggleTodo}
                                 on:update={beforeUpdateTodo}

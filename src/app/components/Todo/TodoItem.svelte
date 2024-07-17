@@ -28,7 +28,11 @@
     };
 
     export let todo: TTodoItemViewSchema;
+    export let selectionMode = false;
+
     let showDeletePrompt = false;
+    let showMenu = false;
+    let showColorPalette = false;
 
     const daysRemainingFromDeadline = getDaysDifferenceFromTimestamp(todo.deadline ?? 0);
 
@@ -62,7 +66,10 @@
         dispatchEvent("update", { id: todo.id });
     }
 
-    let showMenu = false;
+    function resetMenus() {
+        showMenu = false;
+        showColorPalette = false;
+    }
 
     $: deadline_class = daysRemainingFromDeadline < 7 ? "text-error" : "";
     $: description_font_size_class =
@@ -70,14 +77,16 @@
     $: toggleDoneIcon = todo.isDone
         ? "i-mdi-checkbox-marked-circle-minus-outline text-error"
         : "i-mdi-checkbox-marked-circle-plus-outline text-success";
-    $: selectIcon = todo.isSelected
-        ? "i-mdi-check-circle text-primary"
-        : "i-mdi-check-circle-outline text-black";
+    $: selectIcon =
+        todo.isSelected && selectionMode
+            ? "i-mdi-check-circle text-primary"
+            : "i-mdi-check-circle-outline text-black";
 
-    $: borderColor = todo.isSelected ? "border-primary" : "border-gray-200";
+    $: borderColor = todo.isSelected && selectionMode ? "border-primary" : "border-gray-200";
 </script>
 
-<section class="todo-item-card relative h-fit w-fit">
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<section class="todo-item-card relative h-fit w-fit" on:mouseleave={resetMenus}>
     <!-- Buttons or features that we don't want to get disturbed by the click on main card - uses relative positioning to place the elements -->
     <span
         use:tooltip={{
@@ -234,9 +243,35 @@
                 <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error" />
             </Button>
         </span>
+
+        <Dropdown bind:visible={showColorPalette}>
+            <span
+                use:tooltip={{
+                    placement: "top",
+                    content: "Add color",
+                    arrow: false,
+                    animation: "scale",
+                }}
+                class="w-fit"
+                slot="trigger"
+            >
+                <Button
+                    size="sm"
+                    shape="circle"
+                    on:click={() => (showColorPalette = !showColorPalette)}
+                >
+                    <span slot="icon" class="i-mdi-palette-outline h-4 w-4" />
+                </Button>
+            </span>
+            <Dropdown.Items slot="items" class="flex gap-2">
+                <Dropdown.Items.Item label="Item 1" />
+                <Dropdown.Items.Item label="Item 2" />
+                <Dropdown.Items.Item label="Item 3" />
+            </Dropdown.Items>
+        </Dropdown>
     </section>
 
-    <Dropdown bind:visible={showMenu} class="absolute bottom-2 right-4">
+    <Dropdown bind:visible={showMenu} class="absolute bottom-2 right-2">
         <span
             use:tooltip={{
                 placement: "top",
@@ -247,15 +282,14 @@
             class="w-fit"
             slot="trigger"
         >
-            <Button
-                size="sm"
-                shape="circle"
+            <button
+                class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
                 on:click={() => {
                     showMenu = !showMenu;
                 }}
             >
-                <span slot="icon" class="hover-buttons i-mdi-dots-vertical"> </span>
-            </Button>
+                <span class="hover-buttons i-mdi-dots-vertical"> </span>
+            </button>
         </span>
         <Dropdown.Items slot="items">
             {#each TODO_ITEM_MENU_ITEMS as menuItem}

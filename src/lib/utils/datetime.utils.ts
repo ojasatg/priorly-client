@@ -1,4 +1,5 @@
 import moment from "moment";
+import { appendPlural } from "./ui.utils";
 
 export function getTimestampFromDate(date: Date) {
     return date.getTime() / 1000;
@@ -64,23 +65,26 @@ export function getCurrentTimeDifferenceInText(date: Date | number) {
     const diff = moment.duration(currentDate.diff(inputDate));
 
     if (diff.asSeconds() < 60) {
-        return `${Math.floor(diff.asSeconds())} seconds ago`;
+        const seconds = Math.floor(diff.asSeconds());
+        return `${seconds} ${appendPlural("second", seconds)} ago`;
     } else if (diff.asMinutes() < 60) {
-        return `${Math.floor(diff.asMinutes())} minutes ago`;
+        const minutes = Math.floor(diff.asMinutes());
+        return `${minutes} ${appendPlural("minute", minutes)} ago`;
     } else if (diff.asHours() < 24) {
-        return `${Math.floor(diff.asHours())} hours ago`;
+        const hours = Math.floor(diff.asHours());
+        return `${hours} ${appendPlural("hour", hours)} ago`;
     } else if (diff.asMonths() < 12) {
         const months = Math.floor(diff.asMonths());
-        currentDate.subtract(months, "months");
-        const days = currentDate.diff(inputDate, "days");
-        return `${months} months ${days} days ago`;
+        // currentDate.subtract(months, "months");
+        // const days = currentDate.diff(inputDate, "days");
+        return `${months} ${appendPlural("month", months)} ago`;
     } else {
         const years = currentDate.diff(inputDate, "years");
-        currentDate.subtract(years, "years");
+        // currentDate.subtract(years, "years");
         // const months = currentDate.diff(inputDate, "months");
         // currentDate.subtract(months, "months");
         // const days = currentDate.diff(inputDate, "days");
         // return `${years} years ${months} months ${days} days ago`;
-        return `${years} years ago`;
+        return `${years} ${appendPlural("year", years)} ago`;
     }
 }

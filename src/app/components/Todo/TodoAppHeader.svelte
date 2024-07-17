@@ -15,7 +15,12 @@
 <section
     class="border-b-1 gradient-surface z-10 my-4 mb-8 flex items-center gap-2 border-b-2 border-gray-200 px-4 pb-4"
 >
-    <p class="title-medium">Todos</p>
+    <Button size="lg" shape="circle">
+        <span slot="icon" class="title-large i-mdi-menu text-gray-500" />
+    </Button>
+
+    <span class="headline-medium i-mdi-document ml-12 text-yellow-400" />
+    <p class="title-medium text-gray-400">Todos</p>
     <span
         use:tooltip={{
             placement: "top",
@@ -38,10 +43,10 @@
 
     <Input
         name="todo-search"
-        placeholder="Search todo..."
+        placeholder="Search todos..."
         bind:value={todoSearchVal}
         type="text"
         allowClear
-        class="ml-auto"
+        class="ml-8 w-[32rem]"
     />
 </section>

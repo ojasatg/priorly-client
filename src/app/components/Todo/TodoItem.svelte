@@ -7,7 +7,11 @@
     // lib imports
     import PRDivider from "$lib/components/PRDivider.svelte";
     import PRPrompt from "$lib/components/PRPrompt.svelte";
-    import { getFormattedTimestamp, getDaysDifferenceFromTimestamp } from "$lib/utils";
+    import {
+        getFormattedTimestamp,
+        getDaysDifferenceFromTimestamp,
+        getCurrentTimeDifferenceInText,
+    } from "$lib/utils";
 
     // local imports
     import {
@@ -133,14 +137,14 @@
         <section class="card-footer mt-2 p-0">
             <section class="flex items-end">
                 <section>
-                    <p class="label-medium inline text-gray-600">Created on</p>
+                    <p class="label-medium inline text-gray-600">Created</p>
                     <p class="label-medium inline text-gray-900">
-                        {getFormattedTimestamp(todo.createdOn, CUSTOM_DATE_OPTIONS)}
+                        {getCurrentTimeDifferenceInText(todo.createdOn)}
                     </p>
                     <section />
-                    <p class="label-medium inline text-gray-600">Last updated on</p>
+                    <p class="label-medium inline text-gray-600">Edited</p>
                     <p class="label-medium inline text-gray-900">
-                        {getFormattedTimestamp(todo.updatedOn, CUSTOM_DATE_OPTIONS)}
+                        {getCurrentTimeDifferenceInText(todo.updatedOn)}
                     </p>
                 </section>
             </section>

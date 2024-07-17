@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export function getTimestampFromDate(date: Date) {
     return date.getTime() / 1000;
 }
@@ -46,4 +48,39 @@ export function addDaysToDate(date: Date, days: number) {
 
 export function useSleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function getCurrentTimeDifferenceInText(date: Date | number) {
+    const currentDate = moment();
+    let inputDate;
+    if (typeof date === "number") {
+        // handling Unix Timestamp format
+        inputDate = moment(date * 1000);
+    } else {
+        // handling js date object
+        inputDate = moment(date);
+    }
+
+    const diff = moment.duration(currentDate.diff(inputDate));
+
+    if (diff.asSeconds() < 60) {
+        return `${Math.floor(diff.asSeconds())} seconds ago`;
+    } else if (diff.asMinutes() < 60) {
+        return `${Math.floor(diff.asMinutes())} minutes ago`;
+    } else if (diff.asHours() < 24) {
+        return `${Math.floor(diff.asHours())} hours ago`;
+    } else if (diff.asMonths() < 12) {
+        const months = Math.floor(diff.asMonths());
+        currentDate.subtract(months, "months");
+        const days = currentDate.diff(inputDate, "days");
+        return `${months} months ${days} days ago`;
+    } else {
+        const years = currentDate.diff(inputDate, "years");
+        currentDate.subtract(years, "years");
+        // const months = currentDate.diff(inputDate, "months");
+        // currentDate.subtract(months, "months");
+        // const days = currentDate.diff(inputDate, "days");
+        // return `${years} years ${months} months ${days} days ago`;
+        return `${years} years ago`;
+    }
 }

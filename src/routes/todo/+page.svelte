@@ -173,12 +173,16 @@
     <TodoAppHeader refreshing={fetchingTodos} on:refresh={getAllTodos} />
 
     {#if !showUpdateTodoForm}
-        <TodoAddForm on:create={afterCreateTodo} _class="" />
+        <TodoAddForm
+            on:create={afterCreateTodo}
+            _class="w-[48rem] fixed left-[40%] -ml-[24rem] z-20"
+        />
+        <button class="fixed right-[15%] top-[14%]">Filters here</button>
     {/if}
 
-    <section class="mx-auto mt-32 grid w-[64rem]">
+    <section class="mx-auto mt-32 grid w-[64rem] px-4">
         <Divider class="my-0" />
-        <section class="h-[76vh] overflow-y-scroll overscroll-none px-4">
+        <section class="h-[76vh] overflow-y-scroll overscroll-none">
             {#if fetchingTodos}
                 <TodosWrapperLoader _class="mt-4" />
             {:else if !fetchingTodos && !fetchTodoError}

@@ -147,7 +147,7 @@
 <form
     id="add-todo-form"
     use:addTodoForm
-    class="fixed left-[50%] z-20 mx-auto -ml-[24rem] grid w-[48rem] gap-4 {_class} rounded-md p-4"
+    class="grid gap-4 {_class} rounded-md p-4"
     class:shadow-lg={showDetails}
     class:bg-white={showDetails}
     on:keydown={detectKeyDowns}

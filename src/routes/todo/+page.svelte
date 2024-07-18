@@ -70,8 +70,11 @@
 
     function beforeUpdateTodo(event: CustomEvent<{ id: string }>) {
         const todoId = event.detail.id;
-        editingTodo = _.find(allTodos, { id: todoId })!;
-        showUpdateTodoForm = true;
+        if (!selectionMode) {
+            // only show the update form when it is not in selection mode
+            editingTodo = _.find(allTodos, { id: todoId })!;
+            showUpdateTodoForm = true;
+        }
     }
 
     function afterUpdateTodo(event: CustomEvent<TEditTodoResponseSchema>) {
@@ -161,6 +164,22 @@
         showUpdateTodoForm = false;
     }
 
+    function addEventListenerToTurnOffSelectionMode() {
+        const appBody = document?.getElementById("priorly-app-body");
+        appBody?.addEventListener("click", function (event: MouseEvent) {
+            // Check if the click target is a todo-item-card or inside it
+            if (!(event.target as HTMLElement)?.closest(".todo-item-card") && selectionMode) {
+                // Click was outside any todo-item-card
+                selectionMode = false;
+                selectedTodos = [];
+                _.map(allTodos, (todo) => {
+                    todo.isSelected = false;
+                });
+                allTodos = allTodos;
+            }
+        });
+    }
+
     // reactive statements
     $: pinnedTodos = _.filter(allTodos, (todo) => !todo.isDone && todo.isPinned);
     $: pendingTodos = _.filter(allTodos, (todo) => !todo.isDone && !todo.isPinned);
@@ -169,6 +188,7 @@
     // lifecycle methods
     onMount(async () => {
         await getAllTodos();
+        addEventListenerToTurnOffSelectionMode();
     });
 </script>
 
@@ -188,9 +208,9 @@
     </section>
 {/if}
 
-<section class="mx-auto mt-32 grid w-[64rem] px-4">
+<section class="mx-auto mt-32 grid w-[68rem] px-4">
     <Divider class="my-0" />
-    <section class="h-[76vh] overflow-y-scroll overscroll-none">
+    <section class="h-[76vh] w-full overflow-y-scroll overscroll-none p-4">
         {#if fetchingTodos}
             <TodosWrapperLoader _class="mt-4" />
         {:else if !fetchingTodos && !fetchTodoError}

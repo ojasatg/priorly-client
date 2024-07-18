@@ -80,7 +80,7 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<section class="todo-item-card relative h-fit w-fit" on:mouseleave={resetMenus}>
+<section class="todo-item-card relative h-fit w-[20rem]" on:mouseleave={resetMenus}>
     <!-- Buttons or features that we don't want to get disturbed by the click on main card - uses relative positioning to place the elements -->
     <span
         use:tooltip={{

@@ -28,9 +28,25 @@ export const TodoDetailsResponseSchema = z.object({
 
 export const EditTodoResponseSchema = TodoDetailsResponseSchema;
 
+export const TodoBulkOperationResponseSchema = z.object({
+    success: z.array(
+        z.object({
+            id: z.string(),
+            message: z.string(),
+        }),
+    ),
+    error: z.array(
+        z.object({
+            id: z.string(),
+            message: z.string(),
+        }),
+    ),
+});
+
 export type TTodoItemResponseSchema = z.infer<typeof TodoItemResponseSchema>;
 export type TCreateTodoResponseSchema = z.infer<typeof CreateTodoResponseSchema>;
 export type TAllTododsResponseSchema = z.infer<typeof AllTodosResponseSchema>;
 export type TDeleteTodoResponseSchema = z.infer<typeof DeleteTodoResponseSchema>;
 export type TTodoDetailsResponseSchema = z.infer<typeof TodoDetailsResponseSchema>;
 export type TEditTodoResponseSchema = z.infer<typeof EditTodoResponseSchema>;
+export type TTodoBulkOperationResponseSchema = z.infer<typeof TodoBulkOperationResponseSchema>;

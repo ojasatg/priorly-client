@@ -8,12 +8,14 @@
     import PRPrompt from "$lib/components/PRPrompt.svelte";
 
     // schemas
-    import { ETodoToggleType } from "$constants/todo.consts";
-    import type { TTodoItemViewSchema } from "$schemas";
+    import { ETodoBulkOperation, ETodoToggleType } from "$constants/todo.consts";
+    import type { TTodoBulkOperationResponseSchema, TTodoItemViewSchema } from "$schemas";
+    import todoService from "$services/todo.service";
+    import { alerts } from "$lib/stores/AlertStore";
 
     // services
 
-    export let refreshing;
+    export let refreshing = false;
     export let todoSearchVal = "";
     export let selectedTodos: TTodoItemViewSchema[] = [];
     export let allTodos: TTodoItemViewSchema[] = [];
@@ -24,11 +26,35 @@
         refresh: null;
         addTodo: null;
         bulkToggle: { todos: TTodoItemViewSchema[]; action: ETodoToggleType };
+        resetSelection: null;
     }>();
 
     // bulk delete api
     async function bulkDelete() {
-        console.log(selectedTodos);
+        const toBeDeleted = _.intersection(allTodos, selectedTodos);
+        refreshing = true;
+        allTodos = _.difference(allTodos, toBeDeleted);
+        let response: TTodoBulkOperationResponseSchema | undefined;
+        try {
+            response = await todoService.bulk({
+                requestData: {
+                    ids: _.map(selectedTodos, (todo) => todo.id),
+                    operation: ETodoBulkOperation.DELETE,
+                },
+                showAlerts: false,
+            });
+            console.info(response);
+            alerts.success("Todos deleted successfully");
+        } catch (error) {
+            // put back everything when deletion fails
+            _.concat(allTodos, toBeDeleted);
+            allTodos = allTodos;
+            console.error(error);
+            alerts.error("Cannot delete todos");
+        } finally {
+            refreshing = false;
+            dispatchEvent("resetSelection");
+        }
     }
 
     // bulk pin api
@@ -96,7 +122,13 @@
             }}
             class="ml-2 mt-1 w-fit"
         >
-            <Button size="lg" shape="circle" on:click={bulkTogglePin}>
+            <Button
+                size="lg"
+                shape="circle"
+                loading={refreshing}
+                disabled={refreshing}
+                on:click={bulkTogglePin}
+            >
                 <span
                     slot="icon"
                     class={cn("h-12 w-12", {
@@ -116,7 +148,13 @@
             }}
             class="ml-2 mt-1 w-fit"
         >
-            <Button size="lg" shape="circle" on:click={bulkToggleDone}>
+            <Button
+                size="lg"
+                shape="circle"
+                loading={refreshing}
+                disabled={refreshing}
+                on:click={bulkToggleDone}
+            >
                 <span
                     slot="icon"
                     class={cn("h-12 w-12", {
@@ -136,7 +174,13 @@
             }}
             class="ml-auto mt-1 w-fit"
         >
-            <Button size="lg" shape="circle" on:click={() => (showDeletePrompt = true)}>
+            <Button
+                size="lg"
+                shape="circle"
+                loading={refreshing}
+                disabled={refreshing}
+                on:click={() => (showDeletePrompt = true)}
+            >
                 <span slot="icon" class="i-carbon-trash-can h-12 w-12 text-error" />
             </Button>
         </span>

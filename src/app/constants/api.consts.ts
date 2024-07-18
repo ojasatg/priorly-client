@@ -4,6 +4,7 @@ const TODO = {
     REMOVE: "/todo/remove",
     DETAILS: "/todo/details",
     EDIT: "/todo/edit",
+    BULK: "/todo/bulk",
 };
 
 export const APIs = {

@@ -164,18 +164,22 @@
         showUpdateTodoForm = false;
     }
 
+    function resetSelectionMode() {
+        selectionMode = false;
+        selectedTodos = [];
+        _.map(allTodos, (todo) => {
+            todo.isSelected = false;
+        });
+        allTodos = allTodos;
+    }
+
     function addEventListenerToTurnOffSelectionMode() {
         const appBody = document?.getElementById("priorly-app-body");
         appBody?.addEventListener("click", function (event: MouseEvent) {
             // Check if the click target is a todo-item-card or inside it
             if (!(event.target as HTMLElement)?.closest(".todo-item-card") && selectionMode) {
                 // Click was outside any todo-item-card
-                selectionMode = false;
-                selectedTodos = [];
-                _.map(allTodos, (todo) => {
-                    todo.isSelected = false;
-                });
-                allTodos = allTodos;
+                resetSelectionMode();
             }
         });
     }
@@ -197,6 +201,7 @@
     bind:selectedTodos
     refreshing={fetchingTodos}
     on:refresh={getAllTodos}
+    on:resetSelection={resetSelectionMode}
 />
 
 {#if !showUpdateTodoForm}
@@ -221,8 +226,8 @@
                         <p class="label-bold-medium text-gray-500">PINNED</p>
                     </section>
                     <TodosWrapper
-                        todos={pinnedTodos}
-                        {selectionMode}
+                        bind:todos={pinnedTodos}
+                        bind:selectionMode
                         on:delete={deleteTodo}
                         on:toggle={toggleTodo}
                         on:update={beforeUpdateTodo}
@@ -231,8 +236,8 @@
                 {#if !_.isEmpty(pendingTodos)}
                     <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">PENDING</p>
                     <TodosWrapper
-                        todos={pendingTodos}
-                        {selectionMode}
+                        bind:todos={pendingTodos}
+                        bind:selectionMode
                         on:delete={deleteTodo}
                         on:toggle={toggleTodo}
                         on:update={beforeUpdateTodo}
@@ -245,8 +250,8 @@
                     <section>
                         <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">DONE</p>
                         <TodosWrapper
-                            todos={doneTodos}
-                            {selectionMode}
+                            bind:todos={doneTodos}
+                            bind:selectionMode
                             on:delete={deleteTodo}
                             on:toggle={toggleTodo}
                             on:update={beforeUpdateTodo}

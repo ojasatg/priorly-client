@@ -1,3 +1,4 @@
+import { ETodoBulkOperation } from "$constants/todo.consts";
 import z from "zod";
 
 export const CreateTodoRequestSchema = z.object({
@@ -29,9 +30,15 @@ export const AllTodosRequestSchema = z.object({});
 export const DeleteTodoRequestSchema = z.object({});
 export const TodoDetailsRequestSchema = z.object({});
 
+export const TodoBulkOperationRequestSchema = z.object({
+    ids: z.array(z.string()),
+    operation: z.nativeEnum(ETodoBulkOperation),
+});
+
 export type TCreateTodoRequestSchema = z.infer<typeof CreateTodoRequestSchema>;
 export type TEditTodoChangesSchema = z.infer<typeof EditTodoChangesSchema>;
 export type TEditTodoRequestSchema = z.infer<typeof EditTodoRequestSchema>;
 export type TAllTodosRequestSchema = z.infer<typeof AllTodosRequestSchema>;
 export type TDeleteTodoRequestSchema = z.infer<typeof DeleteTodoRequestSchema>;
 export type TTodoDetailsRequestSchema = z.infer<typeof TodoDetailsRequestSchema>;
+export type TTodoBulkOperationRequestSchema = z.infer<typeof TodoBulkOperationRequestSchema>;

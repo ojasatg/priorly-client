@@ -57,6 +57,7 @@
 
     function toggleSelected() {
         dispatchEvent("toggle", { id: todo.id, action: ETodoToggleType.SELECT });
+        todo = todo;
     }
 
     function handleMenuItemClick(item: ETodoItemMenuKeys) {
@@ -73,8 +74,9 @@
     }
 
     // Conditional styles
+    $: selected = todo.isSelected;
     $: selectIcon =
-        todo.isSelected && selectionMode
+        selected && selectionMode
             ? "i-mdi-check-circle text-primary"
             : "i-mdi-check-circle-outline text-black";
 </script>
@@ -85,7 +87,7 @@
     <span
         use:tooltip={{
             placement: "top",
-            content: todo.isSelected ? "Unselect" : "Select",
+            content: selected ? "Unselect" : "Select",
             arrow: false,
             animation: "scale",
         }}
@@ -93,13 +95,13 @@
     >
         <input
             type="checkbox"
-            bind:checked={todo.isSelected}
+            bind:checked={selected}
             class="h-6 w-6 {selectIcon}"
             on:click={toggleSelected}
         />
     </span>
 
-    {#if !todo.isDone}
+    {#if !(todo.isDone || selectionMode)}
         <span
             use:tooltip={{
                 placement: "top",
@@ -121,10 +123,10 @@
 
     <button
         id={`todo-item-card-${todo.id}`}
-        on:click={updateTodo}
+        on:click={selectionMode ? toggleSelected : updateTodo}
         class="card todo-item-card-btn h-fit w-80 cursor-default rounded-md border-2 bg-surface px-4 pb-12 pt-2 text-left hover:shadow-lg hover:shadow-gray-300 {cn(
             {
-                'border-primary': todo.isSelected && selectionMode,
+                'border-primary': selected && selectionMode,
             },
         )}"
     >
@@ -221,101 +223,103 @@
     </button>
 
     <!-- Buttons or features that we don't want to get disturbed by the click on main card - uses relative positioning to place the elements -->
-    <section class="hover-buttons absolute bottom-2 left-2">
-        <span
-            use:tooltip={{
-                placement: "top",
-                content: todo.isDone ? "Mark todo as not done" : "Mark todo as done",
-                arrow: false,
-                animation: "scale",
-            }}
-            class="ml-auto"
-        >
-            <Button size="sm" shape="circle" on:click={toggleDone}>
-                <span
-                    slot="icon"
-                    class="h-4 w-4 {cn({
-                        'i-mdi-checkbox-marked-circle-minus-outline text-error': todo.isDone,
-                        'i-mdi-checkbox-marked-circle-plus-outline text-success': !todo.isDone,
-                    })}"
-                />
-            </Button>
-        </span>
-
-        <span
-            use:tooltip={{
-                placement: "top",
-                content: "Delete",
-                arrow: false,
-                animation: "scale",
-            }}
-        >
-            <Button size="sm" shape="circle" on:click={() => (showDeletePrompt = true)}>
-                <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error" />
-            </Button>
-        </span>
-
-        <Dropdown bind:visible={showColorPalette}>
+    {#if !selectionMode}
+        <section class="hover-buttons absolute bottom-2 left-2">
             <span
                 use:tooltip={{
                     placement: "top",
-                    content: "Add color",
+                    content: todo.isDone ? "Mark todo as not done" : "Mark todo as done",
+                    arrow: false,
+                    animation: "scale",
+                }}
+                class="ml-auto"
+            >
+                <Button size="sm" shape="circle" on:click={toggleDone}>
+                    <span
+                        slot="icon"
+                        class="h-4 w-4 {cn({
+                            'i-mdi-checkbox-marked-circle-minus-outline text-error': todo.isDone,
+                            'i-mdi-checkbox-marked-circle-plus-outline text-success': !todo.isDone,
+                        })}"
+                    />
+                </Button>
+            </span>
+
+            <span
+                use:tooltip={{
+                    placement: "top",
+                    content: "Delete",
+                    arrow: false,
+                    animation: "scale",
+                }}
+            >
+                <Button size="sm" shape="circle" on:click={() => (showDeletePrompt = true)}>
+                    <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error" />
+                </Button>
+            </span>
+
+            <Dropdown bind:visible={showColorPalette}>
+                <span
+                    use:tooltip={{
+                        placement: "top",
+                        content: "Add color",
+                        arrow: false,
+                        animation: "scale",
+                    }}
+                    class="w-fit"
+                    slot="trigger"
+                >
+                    <Button
+                        size="sm"
+                        shape="circle"
+                        on:click={() => (showColorPalette = !showColorPalette)}
+                    >
+                        <span slot="icon" class="i-mdi-palette-outline h-4 w-4" />
+                    </Button>
+                </span>
+                <Dropdown.Items slot="items" class="flex gap-2">
+                    <Dropdown.Items.Item label="Item 1" />
+                    <Dropdown.Items.Item label="Item 2" />
+                    <Dropdown.Items.Item label="Item 3" />
+                </Dropdown.Items>
+            </Dropdown>
+        </section>
+
+        <Dropdown bind:visible={showMenu} class="absolute bottom-2 right-2">
+            <span
+                use:tooltip={{
+                    placement: "top",
+                    content: "More options",
                     arrow: false,
                     animation: "scale",
                 }}
                 class="w-fit"
                 slot="trigger"
             >
-                <Button
-                    size="sm"
-                    shape="circle"
-                    on:click={() => (showColorPalette = !showColorPalette)}
+                <button
+                    class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
+                    on:click={() => {
+                        showMenu = !showMenu;
+                    }}
                 >
-                    <span slot="icon" class="i-mdi-palette-outline h-4 w-4" />
-                </Button>
+                    <span class="hover-buttons i-mdi-dots-vertical"> </span>
+                </button>
             </span>
-            <Dropdown.Items slot="items" class="flex gap-2">
-                <Dropdown.Items.Item label="Item 1" />
-                <Dropdown.Items.Item label="Item 2" />
-                <Dropdown.Items.Item label="Item 3" />
+            <Dropdown.Items slot="items">
+                {#each TODO_ITEM_MENU_ITEMS as menuItem}
+                    <!-- hide priortiy option for done items -->
+                    {#if !(todo.isDone && menuItem.key === ETodoItemMenuKeys.ADD_PRIORIY)}
+                        <Dropdown.Items.Item
+                            on:click={() => handleMenuItemClick(menuItem.key)}
+                            label={menuItem.label}
+                        >
+                            <span slot="icon" class="{menuItem.icon} h-4 w-4" />
+                        </Dropdown.Items.Item>
+                    {/if}
+                {/each}
             </Dropdown.Items>
         </Dropdown>
-    </section>
-
-    <Dropdown bind:visible={showMenu} class="absolute bottom-2 right-2">
-        <span
-            use:tooltip={{
-                placement: "top",
-                content: "More options",
-                arrow: false,
-                animation: "scale",
-            }}
-            class="w-fit"
-            slot="trigger"
-        >
-            <button
-                class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100"
-                on:click={() => {
-                    showMenu = !showMenu;
-                }}
-            >
-                <span class="hover-buttons i-mdi-dots-vertical"> </span>
-            </button>
-        </span>
-        <Dropdown.Items slot="items">
-            {#each TODO_ITEM_MENU_ITEMS as menuItem}
-                <!-- hide priortiy option for done items -->
-                {#if !(todo.isDone && menuItem.key === ETodoItemMenuKeys.ADD_PRIORIY)}
-                    <Dropdown.Items.Item
-                        on:click={() => handleMenuItemClick(menuItem.key)}
-                        label={menuItem.label}
-                    >
-                        <span slot="icon" class="{menuItem.icon} h-4 w-4" />
-                    </Dropdown.Items.Item>
-                {/if}
-            {/each}
-        </Dropdown.Items>
-    </Dropdown>
+    {/if}
 </section>
 
 <PRPrompt

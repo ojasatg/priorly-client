@@ -1,3 +1,7 @@
+import {
+    TodoBulkOperationRequestSchema,
+    type TTodoBulkOperationRequestSchema,
+} from "./../schemas/request.schemas";
 import type { IGetAPIParams, IPostAPIParams } from "$lib/types/api.types";
 import { EAPIRequestMethod } from "$lib/constants/api.consts";
 import { APIs } from "$constants/api.consts";
@@ -26,6 +30,9 @@ import {
     EditTodoRequestSchema,
     EditTodoResponseSchema,
     type TEditTodoResponseSchema,
+    TodoBulkOperationQuerySchema,
+    TodoBulkOperationResponseSchema,
+    type TTodoBulkOperationResponseSchema,
 } from "$schemas";
 import { useCreateService } from "$lib/hooks/service.hooks";
 
@@ -106,12 +113,27 @@ async function remove({ queryParams, showAlerts }: IGetAPIParams<TDeleteTodoRequ
     });
 }
 
+async function bulk({ requestData, showAlerts }: IPostAPIParams<TTodoBulkOperationRequestSchema>) {
+    return useTodoService<TTodoBulkOperationResponseSchema>({
+        url: APIs.TODO.BULK,
+        options: {
+            method: EAPIRequestMethod.DELETE,
+            body: requestData,
+        },
+        querySchema: TodoBulkOperationQuerySchema,
+        requestSchema: TodoBulkOperationRequestSchema,
+        responseSchema: TodoBulkOperationResponseSchema,
+        showAlerts,
+    });
+}
+
 const todoService = {
     all,
     create,
     details,
     remove,
     edit,
+    bulk,
 };
 
 export default todoService;

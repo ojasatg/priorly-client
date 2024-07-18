@@ -145,7 +145,7 @@
 
 <PRPrompt
     bind:model={showDeletePrompt}
-    title="Delete Todo?"
+    title="Delete Selected Todos?"
     message="All selected todos will be deleted"
     note="This operation is irreversible"
     type="error"

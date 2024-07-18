@@ -39,7 +39,7 @@
 
     const dispatchEvent = createEventDispatcher<{
         delete: { id: string };
-        toggle: { id: string; toggleValue: ETodoToggleType };
+        toggle: { id: string; action: ETodoToggleType };
         update: { id: string };
     }>();
 
@@ -48,15 +48,15 @@
     }
 
     function togglePin() {
-        dispatchEvent("toggle", { id: todo.id, toggleValue: ETodoToggleType.PIN });
+        dispatchEvent("toggle", { id: todo.id, action: ETodoToggleType.PIN });
     }
 
     function toggleDone() {
-        dispatchEvent("toggle", { id: todo.id, toggleValue: ETodoToggleType.DONE });
+        dispatchEvent("toggle", { id: todo.id, action: ETodoToggleType.DONE });
     }
 
     function toggleSelected() {
-        dispatchEvent("toggle", { id: todo.id, toggleValue: ETodoToggleType.SELECT });
+        dispatchEvent("toggle", { id: todo.id, action: ETodoToggleType.SELECT });
     }
 
     function handleMenuItemClick(item: ETodoItemMenuKeys) {
@@ -319,7 +319,7 @@
 </section>
 
 <PRPrompt
-    bind:modelValue={showDeletePrompt}
+    bind:model={showDeletePrompt}
     title="Delete Todo?"
     message="This todo will be deleted"
     note="This operation is irreversible"

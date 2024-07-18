@@ -1,12 +1,14 @@
 <script lang="ts">
     // svelte imports
     import { onMount } from "svelte";
+    import { Divider } from "stwui";
     // other modules
     import _ from "lodash";
 
     // lib imports in order
     import { alerts } from "$lib/stores/AlertStore";
     import PRDialog from "$lib/components/PRDialog.svelte";
+    import { getCurrentTimeStamp } from "$lib/utils";
 
     // schemas and types (in order)
     import { ETodoToggleType } from "$constants/todo.consts";
@@ -26,16 +28,16 @@
     import TodoAppHeader from "$components/Todo/TodoAppHeader.svelte";
     import TodoAddForm from "$components/Todo/TodoAddForm.svelte";
     import TodoEditForm from "$components/Todo/TodoEditForm.svelte";
-    import { getCurrentTimeStamp } from "$lib/utils";
-    import { Divider } from "stwui";
 
     // local variables
     let editingTodo: TTodoItemViewSchema;
     let showUpdateTodoForm = false;
 
     let allTodos: TTodoItemViewSchema[] = [];
-    const selectedTodos = new Set<string>();
+    let selectedTodos: TTodoItemViewSchema[] = [];
+
     let selectionMode = false;
+
     let fetchingTodos: boolean;
     let fetchTodoError: boolean;
 
@@ -80,31 +82,32 @@
         allTodos = allTodos;
     }
 
-    async function toggleTodo(event: CustomEvent<{ id: string; toggleValue: ETodoToggleType }>) {
+    async function toggleTodo(event: CustomEvent<{ id: string; action: ETodoToggleType }>) {
         const todoId = event.detail.id;
-        const toggleValue = event.detail.toggleValue;
+        const action = event.detail.action;
 
         const todoIndex = _.findIndex(allTodos, { id: todoId });
         const oldTodo = allTodos[todoIndex]; // back up the old values
 
-        if (toggleValue === ETodoToggleType.SELECT) {
+        if (action === ETodoToggleType.SELECT) {
             if (oldTodo.isSelected) {
                 oldTodo.isSelected = false;
-                selectedTodos.delete(todoId);
+                _.remove(selectedTodos, (todo) => todo.id === todoId);
             } else {
                 oldTodo.isSelected = true;
-                selectedTodos.add(todoId);
+                selectedTodos.push(oldTodo);
             }
-            selectionMode = selectedTodos.size > 0;
+            selectedTodos = selectedTodos; // update the ui
+            selectionMode = selectedTodos.length > 0;
             return;
         }
 
         const changes: TEditTodoChangesSchema = {};
 
-        if (toggleValue === ETodoToggleType.PIN) {
+        if (action === ETodoToggleType.PIN) {
             changes.isPinned = !oldTodo.isPinned;
         }
-        if (toggleValue === ETodoToggleType.DONE) {
+        if (action === ETodoToggleType.DONE) {
             changes.isDone = !oldTodo.isDone;
 
             if (changes.isDone) {
@@ -169,75 +172,80 @@
     });
 </script>
 
-<section>
-    <TodoAppHeader refreshing={fetchingTodos} on:refresh={getAllTodos} />
+<TodoAppHeader
+    bind:allTodos
+    bind:selectedTodos
+    refreshing={fetchingTodos}
+    on:refresh={getAllTodos}
+/>
 
-    {#if !showUpdateTodoForm}
-        <TodoAddForm
-            on:create={afterCreateTodo}
-            _class="w-[48rem] fixed left-[43%] -ml-[24rem] z-20"
-        />
-        <button class="fixed right-[25%] top-[14%]">Filters here</button>
-    {/if}
+{#if !showUpdateTodoForm}
+    <section
+        class="fixed left-[15rem] top-32 z-20 mx-auto -ml-[7.5rem] flex w-[60rem] items-start gap-4"
+    >
+        <TodoAddForm on:create={afterCreateTodo} _class="flex-grow" />
+        <button class="mr-8 mt-7">Filters here</button>
+    </section>
+{/if}
 
-    <section class="mx-auto mt-32 grid w-[64rem] px-4">
-        <Divider class="my-0" />
-        <section class="h-[76vh] overflow-y-scroll overscroll-none">
-            {#if fetchingTodos}
-                <TodosWrapperLoader _class="mt-4" />
-            {:else if !fetchingTodos && !fetchTodoError}
-                <section>
-                    {#if !_.isEmpty(pinnedTodos)}
-                        <section class="mb-2 ml-2 mt-4 flex items-start gap-1">
-                            <span class="i-mdi-pin h-4 w-4 text-gray-500" />
-                            <p class="label-bold-medium text-gray-500">PINNED</p>
-                        </section>
+<section class="mx-auto mt-32 grid w-[64rem] px-4">
+    <Divider class="my-0" />
+    <section class="h-[76vh] overflow-y-scroll overscroll-none">
+        {#if fetchingTodos}
+            <TodosWrapperLoader _class="mt-4" />
+        {:else if !fetchingTodos && !fetchTodoError}
+            <section>
+                {#if !_.isEmpty(pinnedTodos)}
+                    <section class="mb-2 ml-2 mt-4 flex items-start gap-1">
+                        <span class="i-mdi-pin h-4 w-4 text-gray-500" />
+                        <p class="label-bold-medium text-gray-500">PINNED</p>
+                    </section>
+                    <TodosWrapper
+                        todos={pinnedTodos}
+                        {selectionMode}
+                        on:delete={deleteTodo}
+                        on:toggle={toggleTodo}
+                        on:update={beforeUpdateTodo}
+                    />
+                {/if}
+                {#if !_.isEmpty(pendingTodos)}
+                    <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">PENDING</p>
+                    <TodosWrapper
+                        todos={pendingTodos}
+                        {selectionMode}
+                        on:delete={deleteTodo}
+                        on:toggle={toggleTodo}
+                        on:update={beforeUpdateTodo}
+                    />
+                {/if}
+                {#if !_.isEmpty(doneTodos)}
+                    {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
+                        <p class="body-large">Hurray! You're done for now!</p>
+                    {/if}
+                    <section>
+                        <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">DONE</p>
                         <TodosWrapper
-                            todos={pinnedTodos}
+                            todos={doneTodos}
                             {selectionMode}
                             on:delete={deleteTodo}
                             on:toggle={toggleTodo}
                             on:update={beforeUpdateTodo}
                         />
-                    {/if}
-                    {#if !_.isEmpty(pendingTodos)}
-                        <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">PENDING</p>
-                        <TodosWrapper
-                            todos={pendingTodos}
-                            {selectionMode}
-                            on:delete={deleteTodo}
-                            on:toggle={toggleTodo}
-                            on:update={beforeUpdateTodo}
-                        />
-                    {/if}
-                    {#if !_.isEmpty(doneTodos)}
-                        {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
-                            <p class="body-large">Hurray! You're done for now!</p>
-                        {/if}
-                        <section>
-                            <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">DONE</p>
-                            <TodosWrapper
-                                todos={doneTodos}
-                                {selectionMode}
-                                on:delete={deleteTodo}
-                                on:toggle={toggleTodo}
-                                on:update={beforeUpdateTodo}
-                            />
-                        </section>
-                    {/if}
-                </section>
-            {:else}
-                <section class="text-gray-400">
-                    <div class="i-mdi-document mt-4 h-12 w-12" />
-                    <p class="title-large">Notes you add will appear here</p>
-                </section>
-            {/if}
-        </section>
+                    </section>
+                {/if}
+            </section>
+        {:else}
+            <section class="text-gray-400">
+                <div class="i-mdi-document mt-4 h-12 w-12" />
+                <p class="title-large">Notes you add will appear here</p>
+            </section>
+        {/if}
     </section>
 </section>
+
 {#if !_.isEmpty(editingTodo)}
     <PRDialog
-        bind:modelValue={showUpdateTodoForm}
+        bind:model={showUpdateTodoForm}
         title="Edit Todo"
         subtitle="Edit this todo"
         showCloseBtn

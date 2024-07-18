@@ -204,7 +204,7 @@
                 <p slot="label" class="label-medium">Description</p>
             </TextArea>
 
-            <section transition:slide class="mt-4 grid w-full grid-cols-2 gap-2">
+            <section class="mt-4 grid w-full grid-cols-2 gap-2">
                 <DatePicker
                     name="deadline"
                     label="Deadline"

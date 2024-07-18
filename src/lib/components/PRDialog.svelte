@@ -2,7 +2,7 @@
     import { Portal, Modal, Button } from "stwui";
     import { createEventDispatcher } from "svelte";
 
-    export let modelValue: boolean;
+    export let model: boolean;
     export let title;
     export let subtitle = "";
     export let scrim = false;
@@ -16,13 +16,13 @@
         // After dispatch, run beforeClose function. Call event.preventDefault() to abort the further execution.
         if (shouldContinue) {
             // only executes when event.preventDefault() is not called
-            modelValue = false;
+            model = false;
         }
     }
 </script>
 
 <Portal>
-    {#if modelValue}
+    {#if model}
         <Modal handleClose={onClose} class={_class}>
             <Modal.Content slot="content">
                 <Modal.Content.Header slot="header">

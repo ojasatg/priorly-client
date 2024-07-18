@@ -5,7 +5,7 @@
     import type { TComponentType } from "$lib/types/ui.types";
     import { COMPONENT_DETAILS_MAP } from "$lib/constants/ui.consts";
 
-    export let modelValue = false;
+    export let model = false;
     export let title: string;
     export let message: string = "";
     export let note = "";
@@ -26,20 +26,20 @@
     function onSubmit() {
         const shouldContinue = dispatchEvent("submit", null, { cancelable: true });
         if (shouldContinue) {
-            modelValue = false;
+            model = false;
         }
     }
 
     function onCancel() {
         const shouldContinue = dispatchEvent("cancel", null, { cancelable: true });
         if (shouldContinue) {
-            modelValue = false;
+            model = false;
         }
     }
 </script>
 
 <Portal>
-    {#if modelValue}
+    {#if model}
         <Modal handleClose={onCancel}>
             <Modal.Content slot="content" class="mt-48 grid gap-4 p-4">
                 <section class="title-medium flex items-center gap-2">

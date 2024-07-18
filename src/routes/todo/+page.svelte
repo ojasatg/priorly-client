@@ -85,6 +85,7 @@
         allTodos = allTodos;
     }
 
+    // services
     async function toggleTodo(event: CustomEvent<{ id: string; action: ETodoToggleType }>) {
         const todoId = event.detail.id;
         const action = event.detail.action;
@@ -102,6 +103,7 @@
             }
             selectedTodos = selectedTodos; // update the ui
             selectionMode = selectedTodos.length > 0;
+
             return;
         }
 
@@ -174,7 +176,7 @@
     }
 
     function addEventListenerToTurnOffSelectionMode() {
-        const appBody = document?.getElementById("priorly-app-body");
+        const appBody = document?.getElementById("todos-container");
         appBody?.addEventListener("click", function (event: MouseEvent) {
             // Check if the click target is a todo-item-card or inside it
             if (!(event.target as HTMLElement)?.closest(".todo-item-card") && selectionMode) {
@@ -203,68 +205,69 @@
     on:refresh={getAllTodos}
     on:resetSelection={resetSelectionMode}
 />
+<section id="todos-container">
+    {#if !showUpdateTodoForm}
+        <section
+            class="fixed left-[15rem] top-32 z-20 mx-auto -ml-[7.5rem] flex w-[60rem] items-start gap-4"
+        >
+            <TodoAddForm on:create={afterCreateTodo} _class="flex-grow" />
+            <button class="mr-8 mt-7">Filters here</button>
+        </section>
+    {/if}
 
-{#if !showUpdateTodoForm}
-    <section
-        class="fixed left-[15rem] top-32 z-20 mx-auto -ml-[7.5rem] flex w-[60rem] items-start gap-4"
-    >
-        <TodoAddForm on:create={afterCreateTodo} _class="flex-grow" />
-        <button class="mr-8 mt-7">Filters here</button>
-    </section>
-{/if}
-
-<section class="mx-auto mt-32 grid w-[68rem] px-4">
-    <Divider class="my-0" />
-    <section class="h-[76vh] w-full overflow-y-scroll overscroll-none p-4">
-        {#if fetchingTodos}
-            <TodosWrapperLoader _class="mt-4" />
-        {:else if !fetchingTodos && !fetchTodoError}
-            <section>
-                {#if !_.isEmpty(pinnedTodos)}
-                    <section class="mb-2 ml-2 mt-4 flex items-start gap-1">
-                        <span class="i-mdi-pin h-4 w-4 text-gray-500" />
-                        <p class="label-bold-medium text-gray-500">PINNED</p>
-                    </section>
-                    <TodosWrapper
-                        bind:todos={pinnedTodos}
-                        bind:selectionMode
-                        on:delete={deleteTodo}
-                        on:toggle={toggleTodo}
-                        on:update={beforeUpdateTodo}
-                    />
-                {/if}
-                {#if !_.isEmpty(pendingTodos)}
-                    <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">PENDING</p>
-                    <TodosWrapper
-                        bind:todos={pendingTodos}
-                        bind:selectionMode
-                        on:delete={deleteTodo}
-                        on:toggle={toggleTodo}
-                        on:update={beforeUpdateTodo}
-                    />
-                {/if}
-                {#if !_.isEmpty(doneTodos)}
-                    {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
-                        <p class="body-large">Hurray! You're done for now!</p>
-                    {/if}
-                    <section>
-                        <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">DONE</p>
+    <section class="mx-auto mt-32 grid w-[68rem] px-4">
+        <Divider class="my-0" />
+        <section class="h-[76vh] w-full overflow-y-scroll overscroll-none p-4">
+            {#if fetchingTodos}
+                <TodosWrapperLoader _class="mt-4" />
+            {:else if !fetchingTodos && !fetchTodoError}
+                <section>
+                    {#if !_.isEmpty(pinnedTodos)}
+                        <section class="mb-2 ml-2 mt-4 flex items-start gap-1">
+                            <span class="i-mdi-pin h-4 w-4 text-gray-500" />
+                            <p class="label-bold-medium text-gray-500">PINNED</p>
+                        </section>
                         <TodosWrapper
-                            bind:todos={doneTodos}
+                            bind:todos={pinnedTodos}
                             bind:selectionMode
                             on:delete={deleteTodo}
                             on:toggle={toggleTodo}
                             on:update={beforeUpdateTodo}
                         />
-                    </section>
-                {/if}
-            </section>
-        {:else}
-            <section class="text-gray-400">
-                <div class="i-mdi-document mt-4 h-12 w-12" />
-                <p class="title-large">Notes you add will appear here</p>
-            </section>
-        {/if}
+                    {/if}
+                    {#if !_.isEmpty(pendingTodos)}
+                        <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">PENDING</p>
+                        <TodosWrapper
+                            bind:todos={pendingTodos}
+                            bind:selectionMode
+                            on:delete={deleteTodo}
+                            on:toggle={toggleTodo}
+                            on:update={beforeUpdateTodo}
+                        />
+                    {/if}
+                    {#if !_.isEmpty(doneTodos)}
+                        {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
+                            <p class="body-large">Hurray! You're done for now!</p>
+                        {/if}
+                        <section>
+                            <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">DONE</p>
+                            <TodosWrapper
+                                bind:todos={doneTodos}
+                                bind:selectionMode
+                                on:delete={deleteTodo}
+                                on:toggle={toggleTodo}
+                                on:update={beforeUpdateTodo}
+                            />
+                        </section>
+                    {/if}
+                </section>
+            {:else}
+                <section class="text-gray-400">
+                    <div class="i-mdi-format-list-checks mt-4 h-12 w-12" />
+                    <p class="title-large">Notes you add will appear here</p>
+                </section>
+            {/if}
+        </section>
     </section>
 </section>
 

@@ -14,17 +14,15 @@
     import { alerts } from "$lib/stores/AlertStore";
 
     // services
-
     export let refreshing = false;
     export let todoSearchVal = "";
-    export let selectedTodos: TTodoItemViewSchema[] = [];
+    export let selectedTodos: TTodoItemViewSchema[];
     export let allTodos: TTodoItemViewSchema[] = [];
 
     let showDeletePrompt = false;
 
     const dispatchEvent = createEventDispatcher<{
         refresh: null;
-        addTodo: null;
         bulkToggle: { todos: TTodoItemViewSchema[]; action: ETodoToggleType };
         resetSelection: null;
     }>();
@@ -32,10 +30,10 @@
     // bulk delete api
     async function bulkDelete() {
         const toBeDeleted = _.intersection(allTodos, selectedTodos);
-        refreshing = true;
         allTodos = _.difference(allTodos, toBeDeleted);
         let response: TTodoBulkOperationResponseSchema | undefined;
         try {
+            refreshing = true;
             response = await todoService.bulk({
                 requestData: {
                     ids: _.map(selectedTodos, (todo) => todo.id),
@@ -81,7 +79,7 @@
         <span slot="icon" class="title-large i-mdi-menu text-gray-500" />
     </Button>
 
-    <span class="headline-medium i-mdi-document ml-12 text-yellow-400" />
+    <span class="headline-medium i-mdi-format-list-checks ml-12 text-yellow-500" />
     <p class="title-medium text-gray-600">Todos</p>
     <span
         use:tooltip={{

@@ -26,19 +26,30 @@ export const TODO_ITEM_MENU_ITEMS: IDropdownItem<ETodoItemMenuKeys, TTodoItemVie
     },
 ];
 
+export enum ETodoType {
+    PINNED = "pinned",
+    DONE = "done",
+    PENDING = "pending",
+}
+
+export enum ETodoFilter {
+    isDone = "isDone",
+    isPinned = "isPinned",
+}
+
 export const TODO_TYPE_TABS = [
     {
-        href: "#pinned",
+        href: `#${ETodoType.PINNED}`,
         title: "Pinned",
         icon: "i-mdi-pin",
     },
     {
-        href: "#pending",
+        href: `#${ETodoType.PENDING}`,
         title: "Pending",
         icon: "i-mdi-clock-time-six-outline",
     },
     {
-        href: "#done",
+        href: `#${ETodoType.DONE}`,
         title: "Done",
         icon: "i-mdi-checkbox-marked-circle-outline",
     },

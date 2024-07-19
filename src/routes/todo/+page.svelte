@@ -11,7 +11,7 @@
     import { cn, getCurrentTimeStamp } from "$lib/utils";
 
     // schemas and types (in order)
-    import { ETodoToggleType, TODO_TYPE_TABS } from "$constants/todo.consts";
+    import { ETodoToggleType, ETodoType, TODO_TYPE_TABS } from "$constants/todo.consts";
     import type {
         TTodoItemViewSchema,
         TCreateTodoResponseSchema,
@@ -36,6 +36,10 @@
     let allTodos: TTodoItemViewSchema[] = [];
     let selectedTodos: TTodoItemViewSchema[] = [];
 
+    let pinnedTodos: TTodoItemViewSchema[] = [];
+    let pendingTodos: TTodoItemViewSchema[] = [];
+    let doneTodos: TTodoItemViewSchema[] = [];
+
     let selectionMode = false;
 
     let fetchingTodos: boolean;
@@ -50,12 +54,12 @@
         const todoIndex = _.findIndex(allTodos, { id: todoId }); // find the index of the todo before deleting
         try {
             _.remove(allTodos, { id: todoId }); // delete instantly
-            allTodos = allTodos; // update the ui instantly
+            _filterTodos(); // update the ui instantly
             await todoService.remove({ queryParams: { id: todoId }, showAlerts: true });
         } catch (error) {
             // incase of error put the todo back
             allTodos.splice(todoIndex, 0, todo);
-            allTodos = allTodos; // update the ui
+            _filterTodos(); // update the ui
             console.error(error);
         } finally {
             event.detail.afterDeletion?.();
@@ -65,7 +69,7 @@
     function afterCreateTodo(event: CustomEvent<TCreateTodoResponseSchema>) {
         const newTodo = { ...event.detail.todo, isSelected: false };
         allTodos.unshift(newTodo);
-        allTodos = allTodos; //  reassign to update the UI
+        _filterTodos(); //  reassign to update the UI
     }
 
     function beforeUpdateTodo(event: CustomEvent<{ id: string }>) {
@@ -82,7 +86,7 @@
         const todoIdx = _.findIndex(allTodos, { id: updatedTodo.id });
         allTodos.splice(todoIdx, 1);
         allTodos.unshift(updatedTodo);
-        allTodos = allTodos;
+        _filterTodos();
     }
 
     // services
@@ -128,7 +132,7 @@
         allTodos.splice(todoIndex, 1); // removed the old todo from array
         // add the updated todo to the start of the array so that filter works properly - this won't work on reactive statements, as api is called after updating ui
         allTodos.unshift(newTodo);
-        allTodos = allTodos; // update the ui
+        _filterTodos(); // update the ui
 
         try {
             await todoService.edit({
@@ -140,7 +144,7 @@
             // in case some error happens in the backend while updating
             allTodos.splice(0, 1); // remove the updated todo from the first index
             allTodos.splice(todoIndex, 0, oldTodo); // placing back the old todo in case of any error
-            allTodos = allTodos; // updating the ui
+            _filterTodos(); // updating the ui
             alerts.error("Something went wrong! Please try again");
             console.error(error);
         }
@@ -172,7 +176,7 @@
         _.map(allTodos, (todo) => {
             todo.isSelected = false;
         });
-        allTodos = allTodos;
+        _filterTodos();
     }
 
     function addEventListenerToTurnOffSelectionMode() {
@@ -186,18 +190,21 @@
         });
     }
 
-    // reactive statements
-    $: pinnedTodos = _.filter(allTodos, (todo) => !todo.isDone && todo.isPinned);
-    $: pendingTodos = _.filter(allTodos, (todo) => !todo.isDone && !todo.isPinned);
-    $: doneTodos = _.filter(allTodos, (todo) => todo.isDone);
+    function _filterTodos() {
+        allTodos = allTodos;
+        pinnedTodos = _.filter(allTodos, (todo) => !todo.isDone && todo.isPinned);
+        pendingTodos = _.filter(allTodos, (todo) => !todo.isDone && !todo.isPinned);
+        doneTodos = _.filter(allTodos, (todo) => todo.isDone);
+    }
 
     // lifecycle methods
     onMount(async () => {
         await getAllTodos();
         addEventListenerToTurnOffSelectionMode();
+        _filterTodos();
     });
 
-    let currentTab = "#pinned";
+    let currentTab = `#${ETodoType.PINNED}`;
 </script>
 
 <TodoAppHeader
@@ -206,6 +213,7 @@
     refreshing={fetchingTodos}
     on:refresh={getAllTodos}
     on:resetSelection={resetSelectionMode}
+    on:filter={_filterTodos}
 />
 <section id="todos-container">
     {#if !showUpdateTodoForm}
@@ -215,24 +223,27 @@
         />
     {/if}
 
-    <section class="mx-auto mt-32 grid w-[68rem] px-4">
-        <!-- <Divider class="my-0" /> -->
-
-        <Tabs {currentTab} variant="full-width">
-            {#each TODO_TYPE_TABS as tab}
-                <Tabs.Tab key={tab.href} href={tab.href} on:click={() => (currentTab = tab.href)}>
-                    <span slot="icon" class={cn("mt-1 h-6 w-6", tab.icon)} />
-                    <span class="title-small">{tab.title}</span>
-                </Tabs.Tab>
-            {/each}
-        </Tabs>
-
+    <section class="mx-auto mt-32 w-[68rem] px-4">
+        <section class="mx-auto w-full pr-4">
+            <Tabs {currentTab} variant="full-width">
+                {#each TODO_TYPE_TABS as tab}
+                    <Tabs.Tab
+                        key={tab.href}
+                        href={tab.href}
+                        on:click={() => (currentTab = tab.href)}
+                    >
+                        <span slot="icon" class={cn("mt-1 h-6 w-6", tab.icon)} />
+                        <span class="title-small">{tab.title}</span>
+                    </Tabs.Tab>
+                {/each}
+            </Tabs>
+        </section>
         <section class="h-[76vh] w-full overflow-y-scroll overscroll-none p-4">
             {#if fetchingTodos}
                 <TodosWrapperLoader _class="mt-4" />
             {:else if !fetchingTodos && !fetchTodoError}
                 <section>
-                    {#if currentTab === "#pinned"}
+                    {#if currentTab === `#${ETodoType.PINNED}`}
                         {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
                             <p class="body-large text-gray-400">Hurray! You're done for now!</p>
                         {/if}
@@ -251,7 +262,7 @@
                             </section>
                         {/if}
                     {/if}
-                    {#if currentTab === "#pending"}
+                    {#if currentTab === `#${ETodoType.PENDING}`}
                         {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
                             <p class="body-large text-gray-400">Hurray! You're done for now!</p>
                         {/if}
@@ -270,7 +281,7 @@
                             </section>
                         {/if}
                     {/if}
-                    {#if currentTab === "#done"}
+                    {#if currentTab === `#${ETodoType.DONE}`}
                         {#if (!_.isEmpty(pendingTodos) || !_.isEmpty(pinnedTodos)) && _.isEmpty(doneTodos)}
                             <p class="body-large text-gray-400">
                                 Complete your tasks to see them here

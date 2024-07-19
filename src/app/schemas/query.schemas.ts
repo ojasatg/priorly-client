@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-export const AllTodosQuerySchema = z.object({});
+export const AllTodosQuerySchema = z
+    .object({
+        isDone: z.boolean().nullish(),
+        isPinned: z.boolean().nullish(),
+    })
+    .nullish();
 export const EditTodoQuerySchema = z.object({ id: z.string() });
 export const DeleteTodoQuerySchema = EditTodoQuerySchema;
 export const TodoDetailsQuerySchema = EditTodoQuerySchema;

@@ -33,6 +33,7 @@
         refresh: null;
         bulkToggle: { todos: TTodoItemViewSchema[]; action: ETodoToggleType };
         resetSelection: null;
+        filter: null;
     }>();
 
     async function _bulkToggle(operation: ETodoBulkOperation) {
@@ -55,7 +56,7 @@
                 todo[fieldToBeOperated] = valueToBeSet;
             }
         });
-        allTodos = allTodos;
+        dispatchEvent("filter");
         _.remove(toBeOperated, (id) => !id); // removing undefined/null/empty values from to be operated
 
         if (!_.isEmpty(toBeOperated)) {
@@ -76,7 +77,7 @@
                         todo[fieldToBeOperated] = !valueToBeSet;
                     }
                 });
-                allTodos = allTodos;
+                dispatchEvent("filter");
                 console.error(error);
             } finally {
                 refreshing = false;
@@ -105,7 +106,7 @@
         } catch (error) {
             // put back everything when deletion fails
             _.concat(allTodos, toBeDeleted);
-            allTodos = allTodos;
+            dispatchEvent("filter");
             console.error(error);
             alerts.error("Error deleting todos");
         } finally {

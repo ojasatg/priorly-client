@@ -1,5 +1,5 @@
-import { ETodoBulkOperation } from "$constants/todo.consts";
 import z from "zod";
+import { ETodoBulkOperation } from "$constants/todo.consts";
 
 export const CreateTodoRequestSchema = z.object({
     title: z

@@ -70,6 +70,14 @@
 
     $: allSelectedPinned = _.every(selectedTodos, (todo) => todo.isPinned === true);
     $: allSelectedDone = _.every(selectedTodos, (todo) => todo.isDone === true);
+
+    $: pinnedSelected = _.findIndex(selectedTodos, (todo) => todo.isPinned === true) !== -1;
+    $: notPinnedSelected = _.findIndex(selectedTodos, (todo) => todo.isPinned === false) !== -1;
+    $: pendingSelected = _.findIndex(selectedTodos, (todo) => todo.isDone === false) !== -1;
+    $: doneSelected = _.findIndex(selectedTodos, (todo) => todo.isDone === true) !== -1;
+
+    $: showPin = !(pinnedSelected && notPinnedSelected) && !doneSelected; // if not both selected then only show pin
+    $: showDone = !(pendingSelected && doneSelected);
 </script>
 
 <section
@@ -111,57 +119,66 @@
     />
 
     {#if selectedTodos.length}
-        <span
-            use:tooltip={{
-                placement: "top",
-                content: allSelectedPinned ? "Unpin selected" : "Pin selected",
-                arrow: false,
-                animation: "scale",
-            }}
-            class="ml-2 mt-1 w-fit"
-        >
-            <Button
-                size="lg"
-                shape="circle"
-                loading={refreshing}
-                disabled={refreshing}
-                on:click={bulkTogglePin}
+        {#if showPin}
+            <span
+                use:tooltip={{
+                    placement: "top",
+                    content: allSelectedPinned ? "Unpin selected" : "Pin selected",
+                    arrow: false,
+                    animation: "scale",
+                }}
+                class="ml-2 mt-1 w-fit"
             >
-                <span
-                    slot="icon"
-                    class={cn("h-12 w-12", {
-                        "i-mdi-pin-off": allSelectedPinned,
-                        "i-mdi-pin-outline": !allSelectedPinned,
-                    })}
+                <Button
+                    size="lg"
+                    shape="circle"
+                    loading={refreshing}
+                    disabled={refreshing}
+                    on:click={bulkTogglePin}
                 >
-                </span>
-            </Button>
-        </span>
-        <span
-            use:tooltip={{
-                placement: "top",
-                content: allSelectedDone ? "Mark selected as not done" : "Mark selected as done",
-                arrow: false,
-                animation: "scale",
-            }}
-            class="ml-2 mt-1 w-fit"
-        >
-            <Button
-                size="lg"
-                shape="circle"
-                loading={refreshing}
-                disabled={refreshing}
-                on:click={bulkToggleDone}
+                    <span
+                        slot="icon"
+                        class={cn("h-12 w-12", {
+                            "i-mdi-pin-off": allSelectedPinned,
+                            "i-mdi-pin-outline": !allSelectedPinned,
+                        })}
+                    >
+                    </span>
+                </Button>
+            </span>
+        {/if}
+
+        {#if showDone}
+            <span
+                use:tooltip={{
+                    placement: "top",
+                    content: allSelectedDone
+                        ? "Mark selected as not done"
+                        : "Mark selected as done",
+                    arrow: false,
+                    animation: "scale",
+                }}
+                class="ml-2 mt-1 w-fit"
             >
-                <span
-                    slot="icon"
-                    class={cn("h-12 w-12", {
-                        "i-mdi-checkbox-marked-circle-minus-outline text-error": allSelectedDone,
-                        "i-mdi-checkbox-marked-circle-plus-outline text-success": !allSelectedDone,
-                    })}
-                />
-            </Button>
-        </span>
+                <Button
+                    size="lg"
+                    shape="circle"
+                    loading={refreshing}
+                    disabled={refreshing}
+                    on:click={bulkToggleDone}
+                >
+                    <span
+                        slot="icon"
+                        class={cn("h-12 w-12", {
+                            "i-mdi-checkbox-marked-circle-minus-outline text-error":
+                                allSelectedDone,
+                            "i-mdi-checkbox-marked-circle-plus-outline text-success":
+                                !allSelectedDone,
+                        })}
+                    />
+                </Button>
+            </span>
+        {/if}
 
         <span
             use:tooltip={{

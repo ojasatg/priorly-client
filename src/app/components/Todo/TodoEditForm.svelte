@@ -5,7 +5,7 @@
     import { Button, CheckboxGroup, DatePicker, Input, TextArea } from "stwui";
     import tooltip from "stwui/actions/tooltip";
     import { createForm } from "felte";
-    import _ from "lodash";
+    // import _ from "lodash";
 
     // lib imports
     import { getTimestampFromDate } from "$lib/utils";
@@ -65,9 +65,9 @@
                 errors["reminder"] = [reminderFieldErrors];
             }
 
-            if (!_.isEmpty(errors)) {
-                console.error("Form errors: ", errors);
-            }
+            // if (!_.isEmpty(errors)) {
+            //     console.error("Form errors: ", errors);
+            // }
             return errors;
         },
         onSubmit: async () => {

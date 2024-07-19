@@ -1,6 +1,6 @@
 <script lang="ts">
     // svelte imports
-    import { onDestroy, onMount } from "svelte";
+    import { onMount } from "svelte";
     import { Tabs } from "stwui";
     // other modules
     import _ from "lodash";
@@ -206,11 +206,6 @@
         addEventListenerToTurnOffSelectionMode();
         _filterTodos();
     });
-
-    onDestroy(() => {
-        const appBody = document?.getElementById("todos-container");
-        appBody?.removeEventListener("click", _listenClickOutsideTodoItemCard);
-    });
 </script>
 
 <TodoAppHeader
@@ -230,7 +225,7 @@
     {/if}
 
     <section class="mx-auto mt-32 w-[68rem] px-4">
-        <section class="mx-auto w-full pr-4">
+        <section class="mx-auto w-full pr-5">
             <Tabs {currentTab} variant="full-width">
                 {#each TODO_TYPE_TABS as tab}
                     <Tabs.Tab
@@ -244,7 +239,7 @@
                 {/each}
             </Tabs>
         </section>
-        <section class="h-[76vh] w-full overflow-y-scroll overscroll-none p-4">
+        <section class="h-[64vh] w-full overflow-y-scroll overscroll-none p-4 pb-8">
             {#if fetchingTodos}
                 <TodosWrapperLoader _class="mt-4" />
             {:else if !fetchingTodos && !fetchTodoError}

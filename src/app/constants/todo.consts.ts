@@ -73,3 +73,11 @@ export enum ETodoBulkOperation {
     NOT_DONE,
     UNPIN,
 }
+
+export const TODO_OPERATION_MESSAGES = {
+    [ETodoBulkOperation.PIN]: "Todos pinned successfully",
+    [ETodoBulkOperation.UNPIN]: "Todos unpinned successfully",
+    [ETodoBulkOperation.DONE]: "Todos marked as done successfully",
+    [ETodoBulkOperation.NOT_DONE]: "Todos marked as not done successfully",
+    [ETodoBulkOperation.DELETE]: "Todos deleted successfully",
+};

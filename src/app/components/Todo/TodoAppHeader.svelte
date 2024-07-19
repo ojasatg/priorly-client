@@ -4,11 +4,15 @@
     import { tooltip } from "stwui/actions";
     import _ from "lodash";
 
-    import { cn } from "$lib/utils";
+    import { cn, getCurrentTimeStamp } from "$lib/utils";
     import PRPrompt from "$lib/components/PRPrompt.svelte";
 
     // schemas
-    import { ETodoBulkOperation, ETodoToggleType } from "$constants/todo.consts";
+    import {
+        ETodoBulkOperation,
+        ETodoToggleType,
+        TODO_OPERATION_MESSAGES,
+    } from "$constants/todo.consts";
     import type { TTodoItemViewSchema } from "$schemas";
     import todoService from "$services/todo.service";
     import { alerts } from "$lib/stores/AlertStore";
@@ -18,14 +22,6 @@
     export let todoSearchVal = "";
     export let selectedTodos: TTodoItemViewSchema[];
     export let allTodos: TTodoItemViewSchema[] = [];
-
-    const TODO_OPERATION_MESSAGES = {
-        [ETodoBulkOperation.PIN]: "Todos pinned successfully",
-        [ETodoBulkOperation.UNPIN]: "Todos unpinned successfully",
-        [ETodoBulkOperation.DONE]: "Todos marked as done successfully",
-        [ETodoBulkOperation.NOT_DONE]: "Todos marked as not done successfully",
-        [ETodoBulkOperation.DELETE]: "Todos deleted successfully",
-    };
 
     let showDeletePrompt = false;
 
@@ -37,10 +33,13 @@
     }>();
 
     async function _bulkToggle(operation: ETodoBulkOperation) {
+        const _backup = _.cloneDeep(allTodos);
         const fieldToBeOperated =
             operation === ETodoBulkOperation.PIN || operation === ETodoBulkOperation.UNPIN
                 ? "isPinned"
                 : "isDone";
+
+        // true for pin and done
         const valueToBeSet =
             operation === ETodoBulkOperation.PIN || operation === ETodoBulkOperation.DONE;
 
@@ -54,6 +53,15 @@
         _.map(allTodos, (todo) => {
             if (_.includes(toBeOperated, todo.id)) {
                 todo[fieldToBeOperated] = valueToBeSet;
+                if (todo.isDone && operation === ETodoBulkOperation.DONE) {
+                    if (todo.reminder) {
+                        delete todo.reminder;
+                    }
+                    if (todo.deadline) {
+                        delete todo.deadline;
+                    }
+                    todo.completedOn = getCurrentTimeStamp();
+                }
             }
         });
         dispatchEvent("filter");
@@ -72,11 +80,7 @@
                 alerts.success(TODO_OPERATION_MESSAGES[operation]);
             } catch (error) {
                 // rollback the operation
-                _.map(allTodos, (todo) => {
-                    if (_.includes(toBeOperated, todo.id)) {
-                        todo[fieldToBeOperated] = !valueToBeSet;
-                    }
-                });
+                allTodos = _.cloneDeep(_backup);
                 dispatchEvent("filter");
                 console.error(error);
             } finally {

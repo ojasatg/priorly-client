@@ -253,7 +253,11 @@
                     animation: "scale",
                 }}
             >
-                <Button size="sm" shape="circle" on:click={() => (showDeletePrompt = true)}>
+                <Button
+                    size="sm"
+                    shape="circle"
+                    on:click={todo.isDone ? onDelete : () => (showDeletePrompt = true)}
+                >
                     <span slot="icon" class="i-carbon-trash-can h-4 w-4 text-error" />
                 </Button>
             </span>

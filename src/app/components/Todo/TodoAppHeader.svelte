@@ -9,7 +9,7 @@
 
     // schemas
     import { ETodoBulkOperation, ETodoToggleType } from "$constants/todo.consts";
-    import type { TTodoBulkOperationResponseSchema, TTodoItemViewSchema } from "$schemas";
+    import type { TTodoItemViewSchema } from "$schemas";
     import todoService from "$services/todo.service";
     import { alerts } from "$lib/stores/AlertStore";
 
@@ -27,28 +27,35 @@
         resetSelection: null;
     }>();
 
+    async function bulkOperation(ids: string[], operation: ETodoBulkOperation) {
+        if (!_.isEmpty(ids)) {
+            await todoService.bulk({
+                requestData: {
+                    ids: ids,
+                    operation,
+                },
+                showAlerts: false,
+            });
+        } else {
+            throw new Error("No todo item selected for the bulk operation");
+        }
+    }
+
     // bulk delete api
     async function bulkDelete() {
         const toBeDeleted = _.intersection(allTodos, selectedTodos);
         allTodos = _.difference(allTodos, toBeDeleted);
-        let response: TTodoBulkOperationResponseSchema | undefined;
+        const ids = _.map(selectedTodos, (todo) => todo.id);
         try {
             refreshing = true;
-            response = await todoService.bulk({
-                requestData: {
-                    ids: _.map(selectedTodos, (todo) => todo.id),
-                    operation: ETodoBulkOperation.DELETE,
-                },
-                showAlerts: false,
-            });
-            console.info(response);
+            bulkOperation(ids, ETodoBulkOperation.DELETE);
             alerts.success("Todos deleted successfully");
         } catch (error) {
             // put back everything when deletion fails
             _.concat(allTodos, toBeDeleted);
             allTodos = allTodos;
             console.error(error);
-            alerts.error("Cannot delete todos");
+            alerts.error("Error deleting todos");
         } finally {
             refreshing = false;
             dispatchEvent("resetSelection");
@@ -56,16 +63,130 @@
     }
 
     // bulk pin api
-    async function bulkTogglePin() {
-        // done todos cannot be pinned!
-        // do not toggle all of them - toggle only some of them which are not toggled.
-        console.log(selectedTodos);
+    async function bulkPin() {
+        const operation = ETodoBulkOperation.PIN;
+        const toBePinned = _.map(selectedTodos, (todo) => {
+            if (!todo.isPinned) {
+                return todo.id;
+            }
+        });
+        _.map(allTodos, (todo) => {
+            if (_.includes(toBePinned, todo.id)) {
+                todo.isPinned = true;
+            }
+        });
+        allTodos = allTodos;
+
+        try {
+            refreshing = true;
+            await bulkOperation(toBePinned as string[], operation);
+        } catch (error) {
+            _.map(allTodos, (todo) => {
+                if (_.includes(toBePinned, todo.id)) {
+                    todo.isPinned = false;
+                }
+            });
+            console.error(error);
+            alerts.error("Error pinning todos");
+        } finally {
+            refreshing = false;
+            dispatchEvent("resetSelection");
+        }
+    }
+
+    // bulk unpin api
+    async function bulkUnpin() {
+        const operation = ETodoBulkOperation.UNPIN;
+        const toBeUnpinned = _.map(selectedTodos, (todo) => {
+            if (todo.isPinned) {
+                return todo.id;
+            }
+        });
+        _.map(allTodos, (todo) => {
+            if (_.includes(toBeUnpinned, todo.id)) {
+                todo.isPinned = false;
+            }
+        });
+        allTodos = allTodos;
+
+        try {
+            refreshing = true;
+            await bulkOperation(toBeUnpinned as string[], operation);
+        } catch (error) {
+            _.map(allTodos, (todo) => {
+                if (_.includes(toBeUnpinned, todo.id)) {
+                    todo.isPinned = true;
+                }
+            });
+            console.error(error);
+            alerts.error("Error unpinning todos");
+        } finally {
+            refreshing = false;
+            dispatchEvent("resetSelection");
+        }
     }
 
     // bulk done api
-    async function bulkToggleDone() {
-        // do not toggle all of them - toggle only some of them which are not toggled.
-        console.log(selectedTodos);
+    async function bulkMarkDone() {
+        const operation = ETodoBulkOperation.DONE;
+        const toBeDone = _.map(selectedTodos, (todo) => {
+            if (!todo.isDone) {
+                return todo.id;
+            }
+        });
+        _.map(allTodos, (todo) => {
+            if (_.includes(toBeDone, todo.id)) {
+                todo.isDone = true;
+            }
+        });
+        allTodos = allTodos;
+
+        try {
+            refreshing = true;
+            await bulkOperation(toBeDone as string[], operation);
+        } catch (error) {
+            _.map(allTodos, (todo) => {
+                if (_.includes(toBeDone, todo.id)) {
+                    todo.isDone = false;
+                }
+            });
+            console.error(error);
+            alerts.error("Error marking todos as done");
+        } finally {
+            refreshing = false;
+            dispatchEvent("resetSelection");
+        }
+    }
+
+    async function bulkMarkNotdone() {
+        const operation = ETodoBulkOperation.NOT_DONE;
+        const toBeNotDone = _.map(selectedTodos, (todo) => {
+            if (todo.isDone) {
+                return todo.id;
+            }
+        });
+        _.map(allTodos, (todo) => {
+            if (_.includes(toBeNotDone, todo.id)) {
+                todo.isDone = false;
+            }
+        });
+        allTodos = allTodos;
+
+        try {
+            refreshing = true;
+            await bulkOperation(toBeNotDone as string[], operation);
+        } catch (error) {
+            _.map(allTodos, (todo) => {
+                if (_.includes(toBeNotDone, todo.id)) {
+                    todo.isDone = true;
+                }
+            });
+            console.error(error);
+            alerts.error("Error marking todos as not done");
+        } finally {
+            refreshing = false;
+            dispatchEvent("resetSelection");
+        }
     }
 
     $: allSelectedPinned = _.every(selectedTodos, (todo) => todo.isPinned === true);
@@ -134,7 +255,7 @@
                     shape="circle"
                     loading={refreshing}
                     disabled={refreshing}
-                    on:click={bulkTogglePin}
+                    on:click={allSelectedPinned ? bulkUnpin : bulkPin}
                 >
                     <span
                         slot="icon"
@@ -165,7 +286,7 @@
                     shape="circle"
                     loading={refreshing}
                     disabled={refreshing}
-                    on:click={bulkToggleDone}
+                    on:click={allSelectedDone ? bulkMarkNotdone : bulkMarkDone}
                 >
                     <span
                         slot="icon"

@@ -1,17 +1,17 @@
 <script lang="ts">
     // svelte imports
     import { onMount } from "svelte";
-    import { Divider } from "stwui";
+    import { Tabs } from "stwui";
     // other modules
     import _ from "lodash";
 
     // lib imports in order
     import { alerts } from "$lib/stores/AlertStore";
     import PRDialog from "$lib/components/PRDialog.svelte";
-    import { getCurrentTimeStamp } from "$lib/utils";
+    import { cn, getCurrentTimeStamp } from "$lib/utils";
 
     // schemas and types (in order)
-    import { ETodoToggleType } from "$constants/todo.consts";
+    import { ETodoToggleType, TODO_TYPE_TABS } from "$constants/todo.consts";
     import type {
         TTodoItemViewSchema,
         TCreateTodoResponseSchema,
@@ -196,6 +196,8 @@
         await getAllTodos();
         addEventListenerToTurnOffSelectionMode();
     });
+
+    let currentTab = "#pinned";
 </script>
 
 <TodoAppHeader
@@ -207,64 +209,95 @@
 />
 <section id="todos-container">
     {#if !showUpdateTodoForm}
-        <section
-            class="fixed left-[15rem] top-32 z-20 mx-auto -ml-[7.5rem] flex w-[60rem] items-start gap-4"
-        >
-            <TodoAddForm on:create={afterCreateTodo} _class="flex-grow" />
-            <button class="mr-8 mt-7">Filters here</button>
-        </section>
+        <TodoAddForm
+            on:create={afterCreateTodo}
+            _class="fixed left-[48rem] top-32 z-20 mx-auto -ml-[24rem] w-[56rem]"
+        />
     {/if}
 
     <section class="mx-auto mt-32 grid w-[68rem] px-4">
-        <Divider class="my-0" />
+        <!-- <Divider class="my-0" /> -->
+
+        <Tabs {currentTab} variant="full-width">
+            {#each TODO_TYPE_TABS as tab}
+                <Tabs.Tab key={tab.href} href={tab.href} on:click={() => (currentTab = tab.href)}>
+                    <span slot="icon" class={cn("mt-1 h-6 w-6", tab.icon)} />
+                    <span class="title-small">{tab.title}</span>
+                </Tabs.Tab>
+            {/each}
+        </Tabs>
+
         <section class="h-[76vh] w-full overflow-y-scroll overscroll-none p-4">
             {#if fetchingTodos}
                 <TodosWrapperLoader _class="mt-4" />
             {:else if !fetchingTodos && !fetchTodoError}
                 <section>
-                    {#if !_.isEmpty(pinnedTodos)}
-                        <section class="mb-2 ml-2 mt-4 flex items-start gap-1">
-                            <span class="i-mdi-pin h-4 w-4 text-gray-500" />
-                            <p class="label-bold-medium text-gray-500">PINNED</p>
-                        </section>
-                        <TodosWrapper
-                            bind:todos={pinnedTodos}
-                            bind:selectionMode
-                            on:delete={deleteTodo}
-                            on:toggle={toggleTodo}
-                            on:update={beforeUpdateTodo}
-                        />
-                    {/if}
-                    {#if !_.isEmpty(pendingTodos)}
-                        <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">PENDING</p>
-                        <TodosWrapper
-                            bind:todos={pendingTodos}
-                            bind:selectionMode
-                            on:delete={deleteTodo}
-                            on:toggle={toggleTodo}
-                            on:update={beforeUpdateTodo}
-                        />
-                    {/if}
-                    {#if !_.isEmpty(doneTodos)}
+                    {#if currentTab === "#pinned"}
                         {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
-                            <p class="body-large">Hurray! You're done for now!</p>
+                            <p class="body-large text-gray-400">Hurray! You're done for now!</p>
                         {/if}
-                        <section>
-                            <p class="label-bold-medium mb-2 ml-2 mt-4 text-gray-500">DONE</p>
+                        {#if !_.isEmpty(pinnedTodos)}
                             <TodosWrapper
-                                bind:todos={doneTodos}
+                                bind:todos={pinnedTodos}
                                 bind:selectionMode
                                 on:delete={deleteTodo}
                                 on:toggle={toggleTodo}
                                 on:update={beforeUpdateTodo}
                             />
-                        </section>
+                        {:else}
+                            <section class="text-gray-400">
+                                <div class="i-mdi-format-list-checks mt-4 h-12 w-12" />
+                                <p class="title-large">Todos you pin will appear here</p>
+                            </section>
+                        {/if}
+                    {/if}
+                    {#if currentTab === "#pending"}
+                        {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
+                            <p class="body-large text-gray-400">Hurray! You're done for now!</p>
+                        {/if}
+                        {#if !_.isEmpty(pendingTodos)}
+                            <TodosWrapper
+                                bind:todos={pendingTodos}
+                                bind:selectionMode
+                                on:delete={deleteTodo}
+                                on:toggle={toggleTodo}
+                                on:update={beforeUpdateTodo}
+                            />
+                        {:else}
+                            <section class="text-gray-400">
+                                <div class="i-mdi-format-list-checks mt-4 h-12 w-12" />
+                                <p class="title-large">Todos you add will appear here</p>
+                            </section>
+                        {/if}
+                    {/if}
+                    {#if currentTab === "#done"}
+                        {#if (!_.isEmpty(pendingTodos) || !_.isEmpty(pinnedTodos)) && _.isEmpty(doneTodos)}
+                            <p class="body-large text-gray-400">
+                                Complete your tasks to see them here
+                            </p>
+                        {/if}
+                        {#if !_.isEmpty(doneTodos)}
+                            <section>
+                                <TodosWrapper
+                                    bind:todos={doneTodos}
+                                    bind:selectionMode
+                                    on:delete={deleteTodo}
+                                    on:toggle={toggleTodo}
+                                    on:update={beforeUpdateTodo}
+                                />
+                            </section>
+                        {:else}
+                            <section class="text-gray-400">
+                                <div class="i-mdi-format-list-checks mt-4 h-12 w-12" />
+                                <p class="title-large">Todos you mark as done will appear here</p>
+                            </section>
+                        {/if}
                     {/if}
                 </section>
             {:else}
                 <section class="text-gray-400">
                     <div class="i-mdi-format-list-checks mt-4 h-12 w-12" />
-                    <p class="title-large">Notes you add will appear here</p>
+                    <p class="title-large">Todos you add will appear here</p>
                 </section>
             {/if}
         </section>

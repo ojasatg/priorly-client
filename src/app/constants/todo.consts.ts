@@ -24,10 +24,23 @@ export const TODO_ITEM_MENU_ITEMS: IDropdownItem<ETodoItemMenuKeys, TTodoItemVie
         label: "Make a copy",
         icon: "i-mdi-content-copy",
     },
+];
+
+export const TODO_TYPE_TABS = [
     {
-        key: ETodoItemMenuKeys.CONVERT_TO_NOTES,
-        label: "Convert to notes",
-        icon: "i-mdi-note-text-outline",
+        href: "#pinned",
+        title: "Pinned",
+        icon: "i-mdi-pin",
+    },
+    {
+        href: "#pending",
+        title: "Pending",
+        icon: "i-mdi-clock-time-six-outline",
+    },
+    {
+        href: "#done",
+        title: "Done",
+        icon: "i-mdi-checkbox-marked-circle-outline",
     },
 ];
 

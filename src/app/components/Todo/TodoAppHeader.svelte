@@ -19,6 +19,14 @@
     export let selectedTodos: TTodoItemViewSchema[];
     export let allTodos: TTodoItemViewSchema[] = [];
 
+    const TODO_OPERATION_MESSAGES = {
+        [ETodoBulkOperation.PIN]: "Todos pinned successfully",
+        [ETodoBulkOperation.UNPIN]: "Todos unpinned successfully",
+        [ETodoBulkOperation.DONE]: "Todos marked as done successfully",
+        [ETodoBulkOperation.NOT_DONE]: "Todos marked as not done successfully",
+        [ETodoBulkOperation.DELETE]: "Todos deleted successfully",
+    };
+
     let showDeletePrompt = false;
 
     const dispatchEvent = createEventDispatcher<{
@@ -27,15 +35,53 @@
         resetSelection: null;
     }>();
 
-    async function bulkOperation(ids: string[], operation: ETodoBulkOperation) {
-        if (!_.isEmpty(ids)) {
-            await todoService.bulk({
-                requestData: {
-                    ids: ids,
-                    operation,
-                },
-                showAlerts: false,
-            });
+    async function _bulkToggle(operation: ETodoBulkOperation) {
+        const fieldToBeOperated =
+            operation === ETodoBulkOperation.PIN || operation === ETodoBulkOperation.UNPIN
+                ? "isPinned"
+                : "isDone";
+        const valueToBeSet =
+            operation === ETodoBulkOperation.PIN || operation === ETodoBulkOperation.DONE;
+
+        // for pin operation we want the unpinned todos, same for done and vice versa
+        const toBeOperated = _.map(selectedTodos, (todo) => {
+            if (todo[fieldToBeOperated] !== valueToBeSet) {
+                return todo.id;
+            }
+        });
+
+        _.map(allTodos, (todo) => {
+            if (_.includes(toBeOperated, todo.id)) {
+                todo[fieldToBeOperated] = valueToBeSet;
+            }
+        });
+        allTodos = allTodos;
+        _.remove(toBeOperated, (id) => !id); // removing undefined/null/empty values from to be operated
+
+        if (!_.isEmpty(toBeOperated)) {
+            try {
+                refreshing = true;
+                await todoService.bulk({
+                    requestData: {
+                        ids: toBeOperated as string[],
+                        operation,
+                    },
+                    showAlerts: false,
+                });
+                alerts.success(TODO_OPERATION_MESSAGES[operation]);
+            } catch (error) {
+                // rollback the operation
+                _.map(allTodos, (todo) => {
+                    if (_.includes(toBeOperated, todo.id)) {
+                        todo[fieldToBeOperated] = !valueToBeSet;
+                    }
+                });
+                allTodos = allTodos;
+                console.error(error);
+            } finally {
+                refreshing = false;
+                dispatchEvent("resetSelection");
+            }
         } else {
             throw new Error("No todo item selected for the bulk operation");
         }
@@ -48,8 +94,14 @@
         const ids = _.map(selectedTodos, (todo) => todo.id);
         try {
             refreshing = true;
-            bulkOperation(ids, ETodoBulkOperation.DELETE);
-            alerts.success("Todos deleted successfully");
+            await todoService.bulk({
+                requestData: {
+                    ids,
+                    operation: ETodoBulkOperation.DELETE,
+                },
+                showAlerts: false,
+            });
+            alerts.success(TODO_OPERATION_MESSAGES[ETodoBulkOperation.DELETE]);
         } catch (error) {
             // put back everything when deletion fails
             _.concat(allTodos, toBeDeleted);
@@ -64,129 +116,21 @@
 
     // bulk pin api
     async function bulkPin() {
-        const operation = ETodoBulkOperation.PIN;
-        const toBePinned = _.map(selectedTodos, (todo) => {
-            if (!todo.isPinned) {
-                return todo.id;
-            }
-        });
-        _.map(allTodos, (todo) => {
-            if (_.includes(toBePinned, todo.id)) {
-                todo.isPinned = true;
-            }
-        });
-        allTodos = allTodos;
-
-        try {
-            refreshing = true;
-            await bulkOperation(toBePinned as string[], operation);
-        } catch (error) {
-            _.map(allTodos, (todo) => {
-                if (_.includes(toBePinned, todo.id)) {
-                    todo.isPinned = false;
-                }
-            });
-            console.error(error);
-            alerts.error("Error pinning todos");
-        } finally {
-            refreshing = false;
-            dispatchEvent("resetSelection");
-        }
+        await _bulkToggle(ETodoBulkOperation.PIN);
     }
 
     // bulk unpin api
     async function bulkUnpin() {
-        const operation = ETodoBulkOperation.UNPIN;
-        const toBeUnpinned = _.map(selectedTodos, (todo) => {
-            if (todo.isPinned) {
-                return todo.id;
-            }
-        });
-        _.map(allTodos, (todo) => {
-            if (_.includes(toBeUnpinned, todo.id)) {
-                todo.isPinned = false;
-            }
-        });
-        allTodos = allTodos;
-
-        try {
-            refreshing = true;
-            await bulkOperation(toBeUnpinned as string[], operation);
-        } catch (error) {
-            _.map(allTodos, (todo) => {
-                if (_.includes(toBeUnpinned, todo.id)) {
-                    todo.isPinned = true;
-                }
-            });
-            console.error(error);
-            alerts.error("Error unpinning todos");
-        } finally {
-            refreshing = false;
-            dispatchEvent("resetSelection");
-        }
+        await _bulkToggle(ETodoBulkOperation.UNPIN);
     }
 
     // bulk done api
     async function bulkMarkDone() {
-        const operation = ETodoBulkOperation.DONE;
-        const toBeDone = _.map(selectedTodos, (todo) => {
-            if (!todo.isDone) {
-                return todo.id;
-            }
-        });
-        _.map(allTodos, (todo) => {
-            if (_.includes(toBeDone, todo.id)) {
-                todo.isDone = true;
-            }
-        });
-        allTodos = allTodos;
-
-        try {
-            refreshing = true;
-            await bulkOperation(toBeDone as string[], operation);
-        } catch (error) {
-            _.map(allTodos, (todo) => {
-                if (_.includes(toBeDone, todo.id)) {
-                    todo.isDone = false;
-                }
-            });
-            console.error(error);
-            alerts.error("Error marking todos as done");
-        } finally {
-            refreshing = false;
-            dispatchEvent("resetSelection");
-        }
+        await _bulkToggle(ETodoBulkOperation.DONE);
     }
 
     async function bulkMarkNotdone() {
-        const operation = ETodoBulkOperation.NOT_DONE;
-        const toBeNotDone = _.map(selectedTodos, (todo) => {
-            if (todo.isDone) {
-                return todo.id;
-            }
-        });
-        _.map(allTodos, (todo) => {
-            if (_.includes(toBeNotDone, todo.id)) {
-                todo.isDone = false;
-            }
-        });
-        allTodos = allTodos;
-
-        try {
-            refreshing = true;
-            await bulkOperation(toBeNotDone as string[], operation);
-        } catch (error) {
-            _.map(allTodos, (todo) => {
-                if (_.includes(toBeNotDone, todo.id)) {
-                    todo.isDone = true;
-                }
-            });
-            console.error(error);
-            alerts.error("Error marking todos as not done");
-        } finally {
-            refreshing = false;
-            dispatchEvent("resetSelection");
-        }
+        await _bulkToggle(ETodoBulkOperation.NOT_DONE);
     }
 
     $: allSelectedPinned = _.every(selectedTodos, (todo) => todo.isPinned === true);

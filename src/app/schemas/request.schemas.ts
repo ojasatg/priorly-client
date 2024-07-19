@@ -13,7 +13,11 @@ export const CreateTodoRequestSchema = z.object({
         .nullish(),
     deadline: z.number().nullish(),
     reminder: z.number().nullish(),
+    // Have to work on
     color: z.string().nullish(),
+    labels: z.array(z.string()).nullish(),
+    priority: z.string().nullish(),
+    isDeleted: z.boolean().nullish(),
 });
 
 export const EditTodoChangesSchema = CreateTodoRequestSchema.merge(

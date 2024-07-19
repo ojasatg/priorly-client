@@ -1,6 +1,6 @@
 <script lang="ts">
     // svelte imports
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { Tabs } from "stwui";
     // other modules
     import _ from "lodash";
@@ -32,6 +32,7 @@
     // local variables
     let editingTodo: TTodoItemViewSchema;
     let showUpdateTodoForm = false;
+    let currentTab = `#${ETodoType.PINNED}`;
 
     let allTodos: TTodoItemViewSchema[] = [];
     let selectedTodos: TTodoItemViewSchema[] = [];
@@ -179,15 +180,17 @@
         _filterTodos();
     }
 
+    function _listenClickOutsideTodoItemCard(event: MouseEvent) {
+        // Check if the click target is a todo-item-card or inside it
+        if (!(event.target as HTMLElement)?.closest(".todo-item-card") && selectionMode) {
+            // Click was outside any todo-item-card
+            resetSelectionMode();
+        }
+    }
+
     function addEventListenerToTurnOffSelectionMode() {
         const appBody = document?.getElementById("todos-container");
-        appBody?.addEventListener("click", function (event: MouseEvent) {
-            // Check if the click target is a todo-item-card or inside it
-            if (!(event.target as HTMLElement)?.closest(".todo-item-card") && selectionMode) {
-                // Click was outside any todo-item-card
-                resetSelectionMode();
-            }
-        });
+        appBody?.addEventListener("click", _listenClickOutsideTodoItemCard);
     }
 
     function _filterTodos() {
@@ -204,7 +207,10 @@
         _filterTodos();
     });
 
-    let currentTab = `#${ETodoType.PINNED}`;
+    onDestroy(() => {
+        const appBody = document?.getElementById("todos-container");
+        appBody?.removeEventListener("click", _listenClickOutsideTodoItemCard);
+    });
 </script>
 
 <TodoAppHeader

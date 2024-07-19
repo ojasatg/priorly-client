@@ -308,7 +308,7 @@
             <Dropdown.Items slot="items">
                 {#each TODO_ITEM_MENU_ITEMS as menuItem}
                     <!-- hide priortiy option for done items -->
-                    {#if !(todo.isDone && menuItem.key === ETodoItemMenuKeys.ADD_PRIORIY)}
+                    {#if !(todo.isDone && menuItem.key === ETodoItemMenuKeys.EDIT_PRIORIY)}
                         <Dropdown.Items.Item
                             on:click={() => handleMenuItemClick(menuItem.key)}
                             label={menuItem.label}

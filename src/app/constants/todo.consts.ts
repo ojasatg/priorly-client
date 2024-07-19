@@ -3,7 +3,7 @@ import type { TTodoItemViewSchema } from "$schemas";
 
 export enum ETodoItemMenuKeys {
     ADD_LABEL = "add_label",
-    ADD_PRIORIY = "add_priority",
+    EDIT_PRIORIY = "edit_priority",
     MAKE_COPY = "make_copy",
     CONVERT_TO_NOTES = "convert_to_notes",
 }
@@ -15,8 +15,8 @@ export const TODO_ITEM_MENU_ITEMS: IDropdownItem<ETodoItemMenuKeys, TTodoItemVie
         icon: "i-mdi-label",
     },
     {
-        key: ETodoItemMenuKeys.ADD_PRIORIY,
-        label: "Add priority",
+        key: ETodoItemMenuKeys.EDIT_PRIORIY,
+        label: "Edit priority",
         icon: "i-mdi-sort-bool-descending",
     },
     {

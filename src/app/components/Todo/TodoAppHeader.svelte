@@ -13,7 +13,7 @@
         ETodoToggleType,
         TODO_OPERATION_MESSAGES,
     } from "$constants/todo.consts";
-    import type { TTodoItemViewSchema } from "$schemas";
+    import type { TAllTodosQuerySchema, TTodoItemViewSchema } from "$schemas";
     import todoService from "$services/todo.service";
     import { alerts } from "$lib/stores/AlertStore";
 
@@ -26,7 +26,7 @@
     let showDeletePrompt = false;
 
     const dispatchEvent = createEventDispatcher<{
-        refresh: null;
+        refresh: { filters: TAllTodosQuerySchema };
         bulkToggle: { todos: TTodoItemViewSchema[]; action: ETodoToggleType };
         resetSelection: null;
         filter: null;
@@ -171,7 +171,7 @@
         <Button
             shape="circle"
             size="lg"
-            on:click={() => dispatchEvent("refresh")}
+            on:click={() => dispatchEvent("refresh", { filters: null })}
             disabled={refreshing}
             loading={refreshing}
         >

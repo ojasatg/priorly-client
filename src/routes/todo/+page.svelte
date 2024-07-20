@@ -17,6 +17,7 @@
         TCreateTodoResponseSchema,
         TEditTodoResponseSchema,
         TEditTodoChangesSchema,
+        TAllTodosQuerySchema,
     } from "$schemas";
 
     // services
@@ -151,11 +152,12 @@
         }
     }
 
-    async function getAllTodos() {
+    async function getAllTodos(filters?: TAllTodosQuerySchema | null) {
         try {
             fetchingTodos = true;
-            const data = await todoService.all({});
-            allTodos = data?.todos ?? [];
+            const data = await todoService.all({ queryParams: filters });
+            const resTodos = data?.todos ?? [];
+            allTodos = _.concat(allTodos, resTodos);
             allTodos = _.orderBy(allTodos, ["updatedOn"], "desc");
         } catch (error) {
             alerts.error("Failed to fetch todos, please try again");
@@ -164,6 +166,10 @@
         } finally {
             fetchingTodos = false;
         }
+    }
+
+    async function _refresh(event: CustomEvent<{ filters?: TAllTodosQuerySchema | undefined }>) {
+        await getAllTodos(event.detail.filters);
     }
 
     function closeTodoForm() {
@@ -212,7 +218,7 @@
     bind:allTodos
     bind:selectedTodos
     refreshing={fetchingTodos}
-    on:refresh={getAllTodos}
+    on:refresh={_refresh}
     on:resetSelection={resetSelectionMode}
     on:filter={_filterTodos}
 />

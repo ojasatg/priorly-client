@@ -5,6 +5,7 @@ const TODO = {
     DETAILS: "/todo/details",
     EDIT: "/todo/edit",
     BULK: "/todo/bulk",
+    DELETED: "/todo/deleted",
 };
 
 export const APIs = {

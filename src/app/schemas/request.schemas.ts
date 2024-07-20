@@ -17,13 +17,13 @@ export const CreateTodoRequestSchema = z.object({
     color: z.string().nullish(),
     labels: z.array(z.string()).nullish(),
     priority: z.string().nullish(),
-    isDeleted: z.boolean().nullish(),
 });
 
 export const EditTodoChangesSchema = CreateTodoRequestSchema.merge(
     z.object({
         completedOn: z.number().nullish(),
         isDone: z.boolean(),
+        isDeleted: z.boolean(),
     }),
 ).partial();
 

@@ -38,13 +38,26 @@ import { useCreateService } from "$lib/hooks/service.hooks";
 
 const useTodoService = useCreateService();
 
-// Todos
 async function all({ showAlerts, queryParams }: IGetAPIParams<TAllTodosQuerySchema>) {
     return useTodoService<TAllTododsResponseSchema>({
         url: APIs.TODO.ALL,
         options: {
             method: EAPIRequestMethod.GET,
-            query: queryParams,
+            query: queryParams ?? {},
+        },
+        querySchema: AllTodosQuerySchema,
+        requestSchema: AllTodosRequestSchema,
+        responseSchema: AllTodosResponseSchema,
+        showAlerts,
+    });
+}
+
+async function allDeleted({ showAlerts, queryParams }: IGetAPIParams<TAllTodosQuerySchema>) {
+    return useTodoService<TAllTododsResponseSchema>({
+        url: APIs.TODO.DELETED,
+        options: {
+            method: EAPIRequestMethod.GET,
+            query: queryParams ?? {},
         },
         querySchema: AllTodosQuerySchema,
         requestSchema: AllTodosRequestSchema,
@@ -71,7 +84,7 @@ async function details({ showAlerts, queryParams }: IGetAPIParams<TAllTodosQuery
         url: APIs.TODO.DETAILS,
         options: {
             method: EAPIRequestMethod.GET,
-            query: queryParams,
+            query: queryParams ?? {},
         },
         querySchema: TodoDetailsQuerySchema,
         requestSchema: TodoDetailsRequestSchema,
@@ -134,6 +147,7 @@ const todoService = {
     remove,
     edit,
     bulk,
+    allDeleted,
 };
 
 export default todoService;

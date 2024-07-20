@@ -50,21 +50,22 @@
     // event catchers
 
     // functions
-    async function deleteTodo(event: CustomEvent<{ id: string; afterDeletion?: () => void }>) {
+    async function deleteTodo(event: CustomEvent<{ id: string }>) {
         const todoId = event.detail.id;
         const todo = _.find(allTodos, { id: todoId }) as TTodoItemViewSchema; // backup the todo
         const todoIndex = _.findIndex(allTodos, { id: todoId }); // find the index of the todo before deleting
         try {
             _.remove(allTodos, { id: todoId }); // delete instantly
             _filterTodos(); // update the ui instantly
-            await todoService.remove({ queryParams: { id: todoId }, showAlerts: true });
+            await todoService.edit({
+                requestData: { changes: { isDeleted: true } },
+                showAlerts: true,
+            });
         } catch (error) {
             // incase of error put the todo back
             allTodos.splice(todoIndex, 0, todo);
             _filterTodos(); // update the ui
             console.error(error);
-        } finally {
-            event.detail.afterDeletion?.();
         }
     }
 

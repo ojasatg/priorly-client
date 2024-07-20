@@ -10,6 +10,7 @@ export const TodoItemResponseSchema = CreateTodoRequestSchema.merge(
         createdOn: z.number(),
         updatedOn: z.number(),
         completedOn: z.number().nullish(),
+        deletedOn: z.number().nullish(),
     }),
 );
 

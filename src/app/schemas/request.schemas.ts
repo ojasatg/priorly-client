@@ -14,7 +14,10 @@ export const CreateTodoRequestSchema = z.object({
     deadline: z.number().nullish(),
     reminder: z.number().nullish(),
     // Have to work on
-    color: z.string().nullish(),
+    color: z
+        .string()
+        .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Please enter a valid color")
+        .nullish(),
     labels: z.array(z.string()).nullish(),
     priority: z.string().nullish(),
 });

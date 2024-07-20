@@ -51,6 +51,7 @@
 
     // functions
     async function deleteTodo(event: CustomEvent<{ id: string }>) {
+        // Delete just marks the todo as deleted
         const todoId = event.detail.id;
         const todo = _.find(allTodos, { id: todoId }) as TTodoItemViewSchema; // backup the todo
         const todoIndex = _.findIndex(allTodos, { id: todoId }); // find the index of the todo before deleting

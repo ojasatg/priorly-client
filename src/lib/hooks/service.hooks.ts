@@ -1,4 +1,4 @@
-import { PUBLIC_API_URI } from "$env/static/public";
+import { PUBLIC_DEV_API_URI } from "$env/static/public";
 
 import defu from "defu";
 import _ from "lodash";
@@ -40,7 +40,7 @@ async function createService<TData>({
         throw new Error(SERVICE_MESSAGES[EServiceMessageCodes.NO_INTERNET]);
     }
 
-    const baseURL = PUBLIC_API_URI;
+    const baseURL = PUBLIC_DEV_API_URI;
     const defaults: FetchOptions = {
         baseURL,
         timeout: 60000,

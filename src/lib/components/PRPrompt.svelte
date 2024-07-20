@@ -31,10 +31,8 @@
     }
 
     function onCancel() {
-        const shouldContinue = dispatchEvent("cancel", null, { cancelable: true });
-        if (shouldContinue) {
-            model = false;
-        }
+        dispatchEvent("cancel", null, { cancelable: true });
+        model = false;
     }
 </script>
 

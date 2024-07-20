@@ -62,6 +62,11 @@ async function createService<TData>({
                 alerts.error(
                     _response.message ?? SERVICE_MESSAGES[EServiceMessageCodes.ITEM_NOT_EXISTS],
                 );
+            } else if (response.status === EServerResponseCodes.BAD_REQUEST) {
+                const _response = response._data; // get the raw response
+                alerts.error(
+                    _response.message ?? SERVICE_MESSAGES[EServiceMessageCodes.BAD_REQUEST],
+                );
             }
         },
     };

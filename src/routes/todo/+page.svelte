@@ -58,6 +58,7 @@
             _.remove(allTodos, { id: todoId }); // delete instantly
             _filterTodos(); // update the ui instantly
             await todoService.edit({
+                queryParams: { id: todoId },
                 requestData: { changes: { isDeleted: true } },
                 showAlerts: true,
             });

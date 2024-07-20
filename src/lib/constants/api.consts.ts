@@ -9,6 +9,7 @@ export enum EServiceMessageCodes {
     SERVER_NOT_REACHABLE = "SERVER_NOT_REACHABLE",
     NO_INTERNET = "NO_INTERNET",
     ITEM_NOT_EXISTS = "ITEM_NOT_EXISTS",
+    BAD_REQUEST = "BAD_REQUEST",
 }
 
 export const SERVICE_MESSAGES: { [key in EServiceMessageCodes]?: string } = {
@@ -21,6 +22,7 @@ export const SERVICE_MESSAGES: { [key in EServiceMessageCodes]?: string } = {
     NO_INTERNET: "Can't connect to the server right now. Please check your internet connection",
     ITEM_NOT_EXISTS: "Requested item does not exist",
     INTERNAL_SERVER_ERROR: "Some error occured from our end. Please try again after sometime",
+    BAD_REQUEST: "Bad request, please provide relevant details",
 };
 
 export enum EAPIRequestMethod {

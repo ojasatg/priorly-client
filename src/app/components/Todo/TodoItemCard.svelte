@@ -1,6 +1,7 @@
 <script lang="ts">
     // node imports
     import { createEventDispatcher } from "svelte";
+    import { slide } from "svelte/transition";
     import { Button, Dropdown } from "stwui";
     import tooltip from "stwui/actions/tooltip";
 
@@ -82,7 +83,11 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<section class="todo-item-card relative h-fit w-[20rem]" on:mouseleave={resetMenus}>
+<section
+    transition:slide
+    class="todo-item-card relative h-fit w-[20rem]"
+    on:mouseleave={resetMenus}
+>
     <!-- Buttons or features that we don't want to get disturbed by the click on main card - uses relative positioning to place the elements -->
     <span
         use:tooltip={{

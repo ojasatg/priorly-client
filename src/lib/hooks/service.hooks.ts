@@ -48,25 +48,35 @@ async function createService<TData>({
         //     "X-Instance-Id": id,
         // },
         async onResponseError({ response }) {
-            if (response.status === EServerResponseCodes.UNAUTHORIZED) {
-                // handleAuthenticationError(...)
-                // if response has any error, show alert here, dont return anything
-            } else if (response.status === EServerResponseCodes.INTERNAL_SERVER_ERROR) {
-                const _response = response._data; // get the raw response
-                alerts.error(
-                    _response.message ??
-                        SERVICE_MESSAGES[EServiceMessageCodes.INTERNAL_SERVER_ERROR],
-                );
-            } else if (response.status === EServerResponseCodes.NOT_FOUND) {
-                const _response = response._data; // get the raw response
-                alerts.error(
-                    _response.message ?? SERVICE_MESSAGES[EServiceMessageCodes.ITEM_NOT_EXISTS],
-                );
-            } else if (response.status === EServerResponseCodes.BAD_REQUEST) {
-                const _response = response._data; // get the raw response
-                alerts.error(
-                    _response.message ?? SERVICE_MESSAGES[EServiceMessageCodes.BAD_REQUEST],
-                );
+            const status = response.status;
+            const _raw = response._data;
+
+            switch (status) {
+                case EServerResponseCodes.UNAUTHORIZED:
+                    // handleAuthenticationError(...)
+                    // if response has any error, show alert here, dont return anything
+                    break;
+                case EServerResponseCodes.INTERNAL_SERVER_ERROR:
+                    alerts.error(
+                        _raw.message ??
+                            SERVICE_MESSAGES[EServiceMessageCodes.INTERNAL_SERVER_ERROR],
+                    );
+                    break;
+                case EServerResponseCodes.NOT_FOUND:
+                    alerts.error(
+                        _raw.message ?? SERVICE_MESSAGES[EServiceMessageCodes.ITEM_NOT_EXISTS],
+                    );
+                    break;
+                case EServerResponseCodes.BAD_REQUEST:
+                    alerts.error(
+                        _raw.message ?? SERVICE_MESSAGES[EServiceMessageCodes.BAD_REQUEST],
+                    );
+                    break;
+
+                default:
+                    alerts.error(
+                        _raw.message ?? SERVICE_MESSAGES[EServiceMessageCodes.UNKNOWN_ERROR],
+                    );
             }
         },
     };

@@ -20,6 +20,7 @@ export const CreateTodoResponseSchema = z.object({
 
 export const AllTodosResponseSchema = z.object({
     todos: z.array(TodoItemResponseSchema),
+    cursor: z.number(),
 });
 
 export const DeleteTodoResponseSchema = z.object({ id: z.string() });
@@ -31,18 +32,7 @@ export const TodoDetailsResponseSchema = z.object({
 export const EditTodoResponseSchema = TodoDetailsResponseSchema;
 
 export const TodoBulkOperationResponseSchema = z.object({
-    success: z.array(
-        z.object({
-            id: z.string(),
-            message: z.string(),
-        }),
-    ),
-    error: z.array(
-        z.object({
-            id: z.string(),
-            message: z.string(),
-        }),
-    ),
+    ids: z.array(z.string()),
 });
 
 export type TTodoItemResponseSchema = z.infer<typeof TodoItemResponseSchema>;

@@ -122,20 +122,24 @@
     // bulk pin api
     async function bulkPin() {
         await _bulkToggle(ETodoBulkOperation.PIN);
+        dispatchEvent("resetSelection");
     }
 
     // bulk unpin api
     async function bulkUnpin() {
         await _bulkToggle(ETodoBulkOperation.UNPIN);
+        dispatchEvent("resetSelection");
     }
 
     // bulk done api
     async function bulkMarkDone() {
         await _bulkToggle(ETodoBulkOperation.DONE);
+        dispatchEvent("resetSelection");
     }
 
     async function bulkMarkNotdone() {
         await _bulkToggle(ETodoBulkOperation.NOT_DONE);
+        dispatchEvent("resetSelection");
     }
 
     $: allSelectedPinned = _.every(selectedTodos, (todo) => todo.isPinned === true);

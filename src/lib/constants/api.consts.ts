@@ -10,6 +10,7 @@ export enum EServiceMessageCodes {
     NO_INTERNET = "NO_INTERNET",
     ITEM_NOT_EXISTS = "ITEM_NOT_EXISTS",
     BAD_REQUEST = "BAD_REQUEST",
+    UNKNOWN_ERROR = "UNKNOWN_ERROR",
 }
 
 export const SERVICE_MESSAGES: { [key in EServiceMessageCodes]?: string } = {
@@ -23,6 +24,7 @@ export const SERVICE_MESSAGES: { [key in EServiceMessageCodes]?: string } = {
     ITEM_NOT_EXISTS: "Requested item does not exist",
     INTERNAL_SERVER_ERROR: "Some error occured from our end. Please try again after sometime",
     BAD_REQUEST: "Bad request, please provide relevant details",
+    UNKNOWN_ERROR: "Unknown error, cannot complete request",
 };
 
 export enum EAPIRequestMethod {

@@ -61,13 +61,14 @@
             await todoService.edit({
                 queryParams: { id: todoId },
                 requestData: { changes: { isDeleted: true } },
-                showAlerts: true,
+                showAlerts: false,
             });
         } catch (error) {
             // incase of error put the todo back
             allTodos.splice(todoIndex, 0, todo);
             _filterTodos(); // update the ui
             console.error(error);
+            alerts.error(error as string);
         }
     }
 
@@ -292,11 +293,6 @@
                         {/if}
                     {/if}
                     {#if currentTab === `#${ETodoType.DONE}`}
-                        {#if (!_.isEmpty(pendingTodos) || !_.isEmpty(pinnedTodos)) && _.isEmpty(doneTodos)}
-                            <p class="body-large text-gray-400">
-                                Complete your tasks to see them here
-                            </p>
-                        {/if}
                         {#if !_.isEmpty(doneTodos)}
                             <section>
                                 <TodosWrapper

@@ -130,7 +130,7 @@ async function bulk({ requestData, showAlerts }: IPostAPIParams<TTodoBulkOperati
     return useTodoService<TTodoBulkOperationResponseSchema>({
         url: APIs.TODO.BULK,
         options: {
-            method: EAPIRequestMethod.DELETE,
+            method: EAPIRequestMethod.PUT,
             body: requestData,
         },
         querySchema: TodoBulkOperationQuerySchema,

@@ -124,13 +124,6 @@
         }
         if (action === ETodoToggleType.DONE) {
             changes.isDone = !oldTodo.isDone;
-
-            if (changes.isDone) {
-                changes.isPinned = false;
-                changes.completedOn = getCurrentTimeStamp();
-                changes.reminder = undefined;
-                changes.deadline = undefined;
-            }
         }
 
         const newTodo = { ...oldTodo, ...changes, isDone: changes.isDone ?? false };

@@ -8,7 +8,7 @@
     // lib imports in order
     import { alerts } from "$lib/stores/AlertStore";
     import PRDialog from "$lib/components/PRDialog.svelte";
-    import { cn, getCurrentTimeStamp } from "$lib/utils";
+    import { cn } from "$lib/utils";
 
     // schemas and types (in order)
     import { ETodoToggleType, ETodoType, TODO_TYPE_TABS } from "$constants/todo.consts";
@@ -25,10 +25,10 @@
 
     // local components
     import TodosWrapperLoader from "$components/loaders/TodosWrapperLoader.svelte";
-    import TodosWrapper from "$components/Todo/TodosWrapper.svelte";
+    import TodosWrapper from "$components/Todo/TodoWrappers/TodosWrapper.svelte";
     import TodoAppHeader from "$components/Todo/TodoAppHeader.svelte";
-    import TodoAddForm from "$components/Todo/TodoAddForm.svelte";
-    import TodoEditForm from "$components/Todo/TodoEditForm.svelte";
+    import TodoAddForm from "$components/Todo/TodoForms/TodoAddForm.svelte";
+    import TodoEditForm from "$components/Todo/TodoForms/TodoEditForm.svelte";
 
     // local variables
     let editingTodo: TTodoItemViewSchema;

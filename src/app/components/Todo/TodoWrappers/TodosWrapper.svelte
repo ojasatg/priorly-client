@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { TTodoItemViewSchema } from "$schemas";
-    import TodoItemCard from "./TodoItemCard.svelte";
+    import TodoItemCard from "../TodoItemCard.svelte";
 
     export let todos: TTodoItemViewSchema[];
     export let selectionMode: boolean;

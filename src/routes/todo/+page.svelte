@@ -29,6 +29,7 @@
     import TodoAppHeader from "$components/Todo/TodoAppHeader.svelte";
     import TodoAddForm from "$components/Todo/TodoForms/TodoAddForm.svelte";
     import TodoEditForm from "$components/Todo/TodoForms/TodoEditForm.svelte";
+    import PinnedTodos from "$components/Todo/TodoWrappers/PinnedTodos.svelte";
 
     // local variables
     let editingTodo: TTodoItemViewSchema;
@@ -48,6 +49,22 @@
     let fetchTodoError: boolean;
 
     // event catchers
+    async function deleteAPICall(id: string) {
+        try {
+            const todoId = id;
+            await todoService.edit({
+                showAlerts: false,
+                queryParams: { id: todoId },
+                requestData: { changes: { isDeleted: true } },
+            });
+            // not showing alerts on success for seamless ui experience
+            return true;
+        } catch (error) {
+            console.error(error);
+            alerts.error("Failed to delete the todo. Please try again later");
+            return false;
+        }
+    }
 
     // functions
     async function deleteTodo(event: CustomEvent<{ id: string }>) {
@@ -248,23 +265,7 @@
             {:else if !fetchingTodos && !fetchTodoError}
                 <section>
                     {#if currentTab === `#${ETodoType.PINNED}`}
-                        {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
-                            <p class="body-large text-gray-400">Hurray! You're done for now!</p>
-                        {/if}
-                        {#if !_.isEmpty(pinnedTodos)}
-                            <TodosWrapper
-                                bind:todos={pinnedTodos}
-                                bind:selectionMode
-                                on:delete={deleteTodo}
-                                on:toggle={toggleTodo}
-                                on:update={beforeUpdateTodo}
-                            />
-                        {:else}
-                            <section class="text-gray-400">
-                                <div class="i-mdi-format-list-checks mt-4 h-12 w-12" />
-                                <p class="title-large">Todos you pin will appear here</p>
-                            </section>
-                        {/if}
+                        <PinnedTodos {deleteAPICall} />
                     {/if}
                     {#if currentTab === `#${ETodoType.PENDING}`}
                         {#if _.isEmpty(pendingTodos) && _.isEmpty(pinnedTodos)}
@@ -273,7 +274,6 @@
                         {#if !_.isEmpty(pendingTodos)}
                             <TodosWrapper
                                 bind:todos={pendingTodos}
-                                bind:selectionMode
                                 on:delete={deleteTodo}
                                 on:toggle={toggleTodo}
                                 on:update={beforeUpdateTodo}
@@ -290,7 +290,6 @@
                             <section>
                                 <TodosWrapper
                                     bind:todos={doneTodos}
-                                    bind:selectionMode
                                     on:delete={deleteTodo}
                                     on:toggle={toggleTodo}
                                     on:update={beforeUpdateTodo}

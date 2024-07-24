@@ -25,6 +25,7 @@ const config = {
             $types: "./src/app/types",
             $services: "./src/app/services",
             $utils: "./src/app/utils",
+            $stores: "./src/app/stores",
         },
     },
 };

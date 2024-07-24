@@ -4,7 +4,10 @@ export const AllTodosQuerySchema = z
     .object({
         isDone: z.boolean().nullish(),
         isPinned: z.boolean().nullish(),
+        cursor: z.number().nullish(),
+        limit: z.number().nullish(),
     })
+    .partial()
     .nullish();
 export const EditTodoQuerySchema = z.object({ id: z.string() });
 export const DeleteTodoQuerySchema = EditTodoQuerySchema;

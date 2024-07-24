@@ -57,26 +57,34 @@ async function createService<TData>({
                     // if response has any error, show alert here, dont return anything
                     break;
                 case EServerResponseCodes.INTERNAL_SERVER_ERROR:
-                    alerts.error(
-                        _raw.message ??
-                            SERVICE_MESSAGES[EServiceMessageCodes.INTERNAL_SERVER_ERROR],
-                    );
+                    if (showAlerts) {
+                        alerts.error(
+                            _raw.message ??
+                                SERVICE_MESSAGES[EServiceMessageCodes.INTERNAL_SERVER_ERROR],
+                        );
+                    }
                     break;
                 case EServerResponseCodes.NOT_FOUND:
-                    alerts.error(
-                        _raw.message ?? SERVICE_MESSAGES[EServiceMessageCodes.ITEM_NOT_EXISTS],
-                    );
+                    if (showAlerts) {
+                        alerts.error(
+                            _raw.message ?? SERVICE_MESSAGES[EServiceMessageCodes.ITEM_NOT_EXISTS],
+                        );
+                    }
                     break;
                 case EServerResponseCodes.BAD_REQUEST:
-                    alerts.error(
-                        _raw.message ?? SERVICE_MESSAGES[EServiceMessageCodes.BAD_REQUEST],
-                    );
+                    if (showAlerts) {
+                        alerts.error(
+                            _raw.message ?? SERVICE_MESSAGES[EServiceMessageCodes.BAD_REQUEST],
+                        );
+                    }
                     break;
 
                 default:
-                    alerts.error(
-                        _raw.message ?? SERVICE_MESSAGES[EServiceMessageCodes.UNKNOWN_ERROR],
-                    );
+                    if (showAlerts) {
+                        alerts.error(
+                            _raw.message ?? SERVICE_MESSAGES[EServiceMessageCodes.UNKNOWN_ERROR],
+                        );
+                    }
             }
         },
     };
